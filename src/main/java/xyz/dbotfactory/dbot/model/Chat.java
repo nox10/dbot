@@ -8,6 +8,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
+import static javax.persistence.CascadeType.*;
+import static javax.persistence.EnumType.ORDINAL;
+
 @Entity
 @Getter
 @Setter
@@ -17,8 +20,11 @@ public class Chat {
 
     @Id
     @GeneratedValue
-    int id;
+    private int id;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    List<Receipt> receipts;
+    @OneToMany(cascade = ALL)
+    private List<Receipt> receipts;
+
+    @Enumerated(ORDINAL)
+    ChatState chatState;
 }
