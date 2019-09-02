@@ -34,20 +34,33 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler {
                 chat.getChatState() == ChatState.COLLECTING_ITEMS;
     }
 
+    private String[] parseItem(String item) {
+        String[] split = item.split(" ");
+        if (split.length < 3)
+            throw new DBotUserException("incorrect receipt item format");
+        String amount = split[0];
+        String priceForOne = split[1];
+        String name = item.substring(amount.length() + priceForOne.length() + 2);
+
+        return new String[]{amount, priceForOne, name};
+    }
+
     @Override
     public void handle(Update update, Chat chat) {
         String text = update.getMessage().getText();
-        String[] split = text.split("-");
-        if (split.length != 3)
-            throw new DBotUserException("incorrect receipt item format");
+        String[] itemInfo = parseItem(text);
+
+        String amount = itemInfo[0];
+        String priceForOne = itemInfo[1];
+        String name = itemInfo[2];
 
         Receipt receipt = chatService.getActiveReceipt(chat);
 
-        int quantity = Integer.parseInt(split[0].trim());
+        int quantity = Integer.parseInt(amount);
         for (int i = 0; i < quantity; i++) {
             ReceiptItem receiptItem = ReceiptItem.builder()
-                    .price(Double.parseDouble(split[1].trim()))
-                    .name(split[2].trim())
+                    .price(Double.parseDouble(priceForOne))
+                    .name(name)
                     .telegramUsers(new ArrayList<>())
                     .build();
             receipt.getItems().add(receiptItem);
