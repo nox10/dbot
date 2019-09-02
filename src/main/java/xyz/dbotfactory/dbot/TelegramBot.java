@@ -35,9 +35,20 @@ public class TelegramBot extends TelegramLongPollingBot {
     @SneakyThrows
     public void onUpdateReceived(Update update) {
 
-        Chat chat = chatService.findOrCreateChat(update.getMessage().getChatId());
+        long chatId = 0;
+        if (update.hasMessage()) {
+            chatId = update.getMessage().getChatId();
+        } else if (update.hasCallbackQuery()) {
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+        }
 
-        UpdateHandler commandHandler = updateHandlerAggregator.getUpdateHandler(update,chat);
+        if (chatId == 0) {
+            throw new DBotUserException("Unsupported update type, no message and no callbackQuery");
+        }
+
+        Chat chat = chatService.findOrCreateChat(chatId);
+
+        UpdateHandler commandHandler = updateHandlerAggregator.getUpdateHandler(update, chat);
         commandHandler.handle(update, chat);
     }
 

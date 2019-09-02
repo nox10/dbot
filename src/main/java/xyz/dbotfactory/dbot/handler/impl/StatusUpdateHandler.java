@@ -35,7 +35,8 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return update.getMessage().isCommand() &&
+        return update.hasMessage() &&
+                update.getMessage().isCommand() &&
                 update.getMessage().getText().equals(COMMAND_NAME) &&
                 chat.getChatState() == ChatState.COLLECTING_ITEMS;
     }

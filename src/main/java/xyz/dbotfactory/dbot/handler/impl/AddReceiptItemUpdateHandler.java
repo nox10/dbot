@@ -33,7 +33,8 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return !update.getMessage().isCommand() &&
+        return update.hasMessage() &&
+                !update.getMessage().isCommand() &&
                 chat.getChatState() == ChatState.COLLECTING_ITEMS;
     }
 
