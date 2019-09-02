@@ -40,17 +40,6 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
                 chat.getChatState() == ChatState.COLLECTING_ITEMS;
     }
 
-    private String[] parseItem(String item) {
-        String[] split = item.split(" ");
-        if (split.length < 3)
-            throw new DBotUserException("incorrect receipt item format");
-        String amount = split[0];
-        String priceForUnit = split[1];
-        String name = item.substring(amount.length() + priceForUnit.length() + 2);
-
-        return new String[]{amount, priceForUnit, name};
-    }
-
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
@@ -81,5 +70,16 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
         bot.execute(message);
 
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
+    }
+
+    private String[] parseItem(String item) {
+        String[] split = item.split(" ");
+        if (split.length < 3)
+            throw new DBotUserException("incorrect receipt item format");
+        String amount = split[0];
+        String priceForUnit = split[1];
+        String name = item.substring(amount.length() + priceForUnit.length() + 2).toUpperCase();
+
+        return new String[]{amount, priceForUnit, name};
     }
 }

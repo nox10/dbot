@@ -5,5 +5,4 @@
  | |__| || |_) || (_) || |_
  |_____/ |____/  \___/  \__|
 
-  Application : ${info.app.name}
-      Version : ${info.app.version}
+       ${info.app.version}

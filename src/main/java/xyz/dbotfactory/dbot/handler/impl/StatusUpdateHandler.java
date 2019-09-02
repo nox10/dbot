@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -22,7 +23,7 @@ import static java.util.Collections.singletonList;
 public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String COMMAND_NAME = "/status";
-    private static final String SQUARED_DONE_EMOJI = "✅";
+    private static final String SQUARED_DONE_EMOJI = "☑️";
     private static final String COLLECTING_FINISHED_BUTTON_TEXT =
             SQUARED_DONE_EMOJI + " Finish " + SQUARED_DONE_EMOJI;
 
@@ -49,9 +50,11 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
         Receipt activeReceipt = chatService.getActiveReceipt(chat);
         StringBuilder stringBuilder = new StringBuilder();
 
+        stringBuilder.append("<pre>");
         for (ReceiptItem item : activeReceipt.getItems()) {
             stringBuilder.append(item.getName() + " : " + item.getPrice() + "\n");
         }
+        stringBuilder.append("</pre>");
         String result = stringBuilder.toString();
 
         InlineKeyboardButton collectingFinishedButton = new InlineKeyboardButton()
@@ -63,7 +66,8 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
         SendMessage message = new SendMessage()
                 .setChatId(update.getMessage().getChatId())
                 .setText(result)
-                .setReplyMarkup(collectingFinishedMarkup);
+                .setReplyMarkup(collectingFinishedMarkup)
+                .setParseMode(ParseMode.HTML);
 
         bot.execute(message);
     }
