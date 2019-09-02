@@ -43,10 +43,10 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
         if (split.length < 3)
             throw new DBotUserException("incorrect receipt item format");
         String amount = split[0];
-        String priceForOne = split[1];
-        String name = item.substring(amount.length() + priceForOne.length() + 2);
+        String priceForUnit = split[1];
+        String name = item.substring(amount.length() + priceForUnit.length() + 2);
 
-        return new String[]{amount, priceForOne, name};
+        return new String[]{amount, priceForUnit, name};
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
         String[] itemInfo = parseItem(text);
 
         String amount = itemInfo[0];
-        String priceForOne = itemInfo[1];
+        String priceForUnit = itemInfo[1];
         String name = itemInfo[2];
 
         Receipt receipt = chatService.getActiveReceipt(chat);
@@ -64,7 +64,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
         int quantity = Integer.parseInt(amount);
         for (int i = 0; i < quantity; i++) {
             ReceiptItem receiptItem = ReceiptItem.builder()
-                    .price(Double.parseDouble(priceForOne))
+                    .price(Double.parseDouble(priceForUnit))
                     .name(name)
                     .telegramUsers(new ArrayList<>())
                     .build();

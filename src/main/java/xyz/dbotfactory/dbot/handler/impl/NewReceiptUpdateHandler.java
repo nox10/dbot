@@ -24,8 +24,11 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
     private static final String RECEIPT_EMOJI = "🧾";
-    private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <b>Now send receipt information</b> "
-            + RECEIPT_EMOJI + "\n\n<i>(more instructions...)</i>";
+    private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " Now send receipt information.\n\n" +
+            "<i>Receipt info should be in the next format (with spaces):</i>\n\n" +
+            "<code>amount price-for-unit name-for-item</code>\n\n" +
+            "<i>For example:</i>\n\n" +
+            "<code>2 465.5 Almond milk</code>";
 
     private final TelegramLongPollingBot bot;
     private final ChatService chatService;
