@@ -2,13 +2,11 @@ package xyz.dbotfactory.dbot;
 
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.UpdateHandlerAggregator;
@@ -27,7 +25,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final ChatService chatService;
 
     @Autowired
-    public TelegramBot(UpdateHandlerAggregator updateHandlerAggregator, ChatService chatService) {
+    public TelegramBot(UpdateHandlerAggregator updateHandlerAggregator, ChatService chatService, DefaultBotOptions defaultBotOptions) {
+        super(defaultBotOptions);
         this.updateHandlerAggregator = updateHandlerAggregator;
         this.chatService = chatService;
     }

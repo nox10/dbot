@@ -23,30 +23,40 @@ public class Config {
 
     @Bean
     public DefaultBotOptions botOptions(Proxy proxy) {
-        // Set up Http proxy
         DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
 
-        botOptions.setProxyHost(proxy.getHost());
-        botOptions.setProxyPort(proxy.getPort());
-        // Select proxy type: [HTTP|SOCKS4|SOCKS5] (default: NO_PROXY)
-        botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
+        if (proxy.isEnabled()) {
+            botOptions.setProxyHost(proxy.getHost());
+            botOptions.setProxyPort(proxy.getPort());
+            botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
+        }
 
         return botOptions;
     }
 
+
     @Bean
     public PasswordAuthentication passwordAuthentication(Proxy proxy) {
-        return new PasswordAuthentication(proxy.getUser(), proxy.getPass().toCharArray());
+        if (proxy.isEnabled()) {
+            return new PasswordAuthentication(proxy.getUser(), proxy.getPass().toCharArray());
+        } else {
+            return new PasswordAuthentication("no_proxy", "no_proxy".toCharArray());
+        }
     }
 
     @Bean
-    public Authenticator authenticator(PasswordAuthentication passwordAuthentication) {
-        return new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return passwordAuthentication;
-            }
-        };
+    public Authenticator authenticator(PasswordAuthentication passwordAuthentication, Proxy proxy) {
+        if (proxy.isEnabled()) {
+            return new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return passwordAuthentication;
+                }
+            };
+        } else {
+            return new Authenticator() {
+            };
+        }
     }
 
     @PostConstruct

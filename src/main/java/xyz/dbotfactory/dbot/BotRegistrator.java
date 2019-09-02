@@ -20,13 +20,16 @@ public class BotRegistrator {
     @Autowired
     private TelegramBot telegramBot;
 
+    @Autowired
+    private Proxy proxy;
+
     @PostConstruct
     @SneakyThrows
     private void registerBot() {
-        // Create the Authenticator that will return auth's parameters for proxy authentication
-        Authenticator.setDefault(authenticator);
+        if (proxy.isEnabled()) {
+            Authenticator.setDefault(authenticator);
+        }
 
-        // Create the TelegramBotsApi object to register your bots
         telegramBotsApi.registerBot(telegramBot);
     }
 }
