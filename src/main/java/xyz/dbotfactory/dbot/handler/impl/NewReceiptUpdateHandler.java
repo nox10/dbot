@@ -21,13 +21,13 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
 
-    private final TelegramLongPollingBot telegramBot;
+    private final TelegramLongPollingBot bot;
     private final ChatService chatService;
 
     @Autowired
-    public NewReceiptUpdateHandler(ChatService chatService, TelegramLongPollingBot telegramBot) {
+    public NewReceiptUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
-        this.telegramBot = telegramBot;
+        this.bot = bot;
     }
 
     @Override
@@ -47,6 +47,9 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
         chat.getReceipts().add(receipt);
         chat.setChatState(COLLECTING_ITEMS);
         chatService.save(chat);
+
+
+
         log.info("Chat " + chat.getId() + " is now in " + chat.getChatState() + " state");
     }
 }

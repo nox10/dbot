@@ -12,11 +12,11 @@ import xyz.dbotfactory.dbot.model.Chat;
 @Component
 public class TestUpdateHandler implements UpdateHandler {
 
-    private final TelegramLongPollingBot telegramBot;
+    private final TelegramLongPollingBot bot;
 
     @Autowired
-    public TestUpdateHandler(TelegramLongPollingBot telegramBot) {
-        this.telegramBot = telegramBot;
+    public TestUpdateHandler(TelegramLongPollingBot bot) {
+        this.bot = bot;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class TestUpdateHandler implements UpdateHandler {
                     .setChatId(update.getMessage().getChatId())
                     .setText(update.getMessage().getText());
 
-            telegramBot.execute(message);
+            bot.execute(message);
         }
     }
 }

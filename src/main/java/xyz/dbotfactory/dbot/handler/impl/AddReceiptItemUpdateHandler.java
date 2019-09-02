@@ -20,10 +20,12 @@ import java.util.ArrayList;
 public class AddReceiptItemUpdateHandler implements UpdateHandler {
 
     private final ChatService chatService;
+    private final TelegramLongPollingBot bot;
 
     @Autowired
-    public AddReceiptItemUpdateHandler(ChatService chatService, TelegramLongPollingBot telegramBot) {
+    public AddReceiptItemUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
+        this.bot = bot;
     }
 
     @Override

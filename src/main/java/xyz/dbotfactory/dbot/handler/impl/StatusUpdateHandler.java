@@ -19,12 +19,12 @@ public class StatusUpdateHandler implements UpdateHandler {
     private static final String COMMAND_NAME = "/status";
 
     private final ChatService chatService;
-    private final TelegramLongPollingBot telegramBot;
+    private final TelegramLongPollingBot bot;
 
     @Autowired
-    public StatusUpdateHandler(ChatService chatService, TelegramLongPollingBot telegramBot) {
+    public StatusUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
-        this.telegramBot = telegramBot;
+        this.bot = bot;
     }
 
     @Override
@@ -49,6 +49,6 @@ public class StatusUpdateHandler implements UpdateHandler {
                 .setChatId(update.getMessage().getChatId())
                 .setText(result);
 
-        telegramBot.execute(message);
+        bot.execute(message);
     }
 }
