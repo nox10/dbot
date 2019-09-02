@@ -1,11 +1,9 @@
 package xyz.dbotfactory.dbot.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.CascadeType.*;
@@ -15,6 +13,7 @@ import static javax.persistence.EnumType.ORDINAL;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Chat {
 
@@ -22,8 +21,11 @@ public class Chat {
     @GeneratedValue
     private int id;
 
-    @OneToMany(cascade = ALL)
-    private List<Receipt> receipts;
+    @Column(unique = true)
+    private long telegramChatId;
+
+    @OneToMany(cascade = ALL, fetch = FetchType.EAGER)
+    private List<Receipt> receipts = new ArrayList<>();
 
     @Enumerated(ORDINAL)
     ChatState chatState;

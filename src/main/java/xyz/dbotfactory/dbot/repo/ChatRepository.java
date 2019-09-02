@@ -6,4 +6,5 @@ import xyz.dbotfactory.dbot.model.Chat;
 
 @Repository
 public interface ChatRepository extends CrudRepository<Chat, Integer> {
+    Chat findFirstByTelegramChatId(long chatId);
 }

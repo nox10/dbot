@@ -20,7 +20,7 @@ public class TestUpdateHandler implements UpdateHandler {
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return true;
+        return false;
     }
 
     @Override

@@ -1,17 +1,16 @@
 package xyz.dbotfactory.dbot.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Receipt {
 
@@ -19,9 +18,11 @@ public class Receipt {
     @GeneratedValue
     private int id;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<ReceiptItem> items;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ReceiptItem> items = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<UserBalance> userBalances;
+    private List<UserBalance> userBalances = new ArrayList<>();
+
+    boolean isActive;
 }
