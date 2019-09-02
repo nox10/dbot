@@ -43,7 +43,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler {
 
         Receipt receipt = chatService.getActiveReceipt(chat);
 
-        int quantity = Integer.parseInt(split[1].trim());
+        int quantity = Integer.parseInt(split[0].trim());
         for (int i = 0; i < quantity; i++) {
             ReceiptItem receiptItem = ReceiptItem.builder()
                     .price(Double.parseDouble(split[1].trim()))
