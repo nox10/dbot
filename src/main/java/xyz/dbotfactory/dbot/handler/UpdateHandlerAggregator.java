@@ -25,7 +25,7 @@ public class UpdateHandlerAggregator implements BeanPostProcessor {
         return bean;
     }
 
-    public UpdateHandler getCommandHandler(Update update, Chat chat){
+    public UpdateHandler getUpdateHandler(Update update, Chat chat){
         List<UpdateHandler> collect = updateHandlers
                 .stream()
                 .filter(x -> x.canHandle(update, chat))

@@ -1,11 +1,14 @@
 package xyz.dbotfactory.dbot.handler.impl;
 
+import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.DBotUserException;
+import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
@@ -17,7 +20,7 @@ import java.util.ArrayList;
 
 @Component
 @Log
-public class AddReceiptItemUpdateHandler implements UpdateHandler {
+public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts {
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;
@@ -46,6 +49,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler {
     }
 
     @Override
+    @SneakyThrows
     public void handle(Update update, Chat chat) {
         String text = update.getMessage().getText();
         String[] itemInfo = parseItem(text);
@@ -66,6 +70,12 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler {
             receipt.getItems().add(receiptItem);
         }
         chatService.save(chat);
+
+        SendMessage message = new SendMessage()
+                .setChatId(chat.getTelegramChatId())
+                .setText(DONE_EMOJI + "⠀");
+        bot.execute(message);
+
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
     }
 }

@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.handler.MetaConsts;
+import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
@@ -19,10 +19,9 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import static java.util.Collections.singletonList;
 
 @Component
-public class StatusUpdateHandler implements UpdateHandler, MetaConsts {
+public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String COMMAND_NAME = "/status";
-    private static final String DONE_EMOJI = "✅";
     private static final String COLLECTING_FINISHED_BUTTON_TEXT = DONE_EMOJI + " Finish " + DONE_EMOJI;
 
     private final ChatService chatService;

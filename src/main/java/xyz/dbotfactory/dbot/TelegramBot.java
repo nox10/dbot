@@ -37,7 +37,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         Chat chat = chatService.findOrCreateChat(update.getMessage().getChatId());
 
-        UpdateHandler commandHandler = updateHandlerAggregator.getCommandHandler(update,chat);
+        UpdateHandler commandHandler = updateHandlerAggregator.getUpdateHandler(update,chat);
         commandHandler.handle(update, chat);
     }
 
