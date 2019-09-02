@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -22,7 +23,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 public class NewReceiptUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
-    private static final String RECEIPT_EMOJI = "\uD83E\uDDFE";
+    private static final String RECEIPT_EMOJI = "🧾";
     private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <b>Now send receipt information</b> "
             + RECEIPT_EMOJI + "\n\n<i>(more instructions...)</i>";
 
@@ -57,7 +58,7 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
         SendMessage message = new SendMessage()
                 .setChatId(update.getMessage().getChatId())
                 .setText(SPEECH_SEND_RECEIPT)
-                .setParseMode("HTML");
+                .setParseMode(ParseMode.HTML);
         bot.execute(message);
 
         log.info("Chat " + chat.getId() + " is now in " + chat.getChatState() + " state");
