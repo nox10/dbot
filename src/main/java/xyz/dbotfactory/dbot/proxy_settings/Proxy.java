@@ -1,4 +1,4 @@
-package xyz.dbotfactory.dbot;
+package xyz.dbotfactory.dbot.proxy_settings;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

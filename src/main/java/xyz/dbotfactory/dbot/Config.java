@@ -7,6 +7,7 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import xyz.dbotfactory.dbot.proxy_settings.Proxy;
 
 import javax.annotation.PostConstruct;
 import java.net.Authenticator;

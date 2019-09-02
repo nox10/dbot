@@ -1,9 +1,10 @@
-package xyz.dbotfactory.dbot.handler;
+package xyz.dbotfactory.dbot.handler.impl;
 
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;

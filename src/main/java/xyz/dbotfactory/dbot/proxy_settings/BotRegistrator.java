@@ -1,9 +1,10 @@
-package xyz.dbotfactory.dbot;
+package xyz.dbotfactory.dbot.proxy_settings;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import xyz.dbotfactory.dbot.TelegramBot;
 
 import javax.annotation.PostConstruct;
 import java.net.Authenticator;
