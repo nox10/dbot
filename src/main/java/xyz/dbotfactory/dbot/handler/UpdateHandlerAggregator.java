@@ -5,6 +5,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.DBotUserException;
+import xyz.dbotfactory.dbot.model.Chat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +25,10 @@ public class UpdateHandlerAggregator implements BeanPostProcessor {
         return bean;
     }
 
-    public UpdateHandler getCommandHandler(Update update){
+    public UpdateHandler getCommandHandler(Update update, Chat chat){
         List<UpdateHandler> collect = updateHandlers
                 .stream()
-                .filter(x -> x.canHandle(update))
+                .filter(x -> x.canHandle(update, chat))
                 .collect(toList());
 
         if(collect.size() == 0)

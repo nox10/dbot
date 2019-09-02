@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.UpdateHandlerAggregator;
+import xyz.dbotfactory.dbot.model.Chat;
 
 @Component
 @ConfigurationProperties("bot")
@@ -25,8 +26,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     @SneakyThrows
     public void onUpdateReceived(Update update) {
-        UpdateHandler commandHandler = updateHandlerAggregator.getCommandHandler(update);
-        commandHandler.handle(update);
+        Chat chat = new Chat();
+        UpdateHandler commandHandler = updateHandlerAggregator.getCommandHandler(update,chat);
+        commandHandler.handle(update, chat);
     }
 
     @Override

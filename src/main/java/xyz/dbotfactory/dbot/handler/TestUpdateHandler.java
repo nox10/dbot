@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.TelegramBot;
+import xyz.dbotfactory.dbot.model.Chat;
 
 @Component
 public class TestUpdateHandler implements UpdateHandler {
@@ -18,13 +19,13 @@ public class TestUpdateHandler implements UpdateHandler {
     }
 
     @Override
-    public boolean canHandle(Update update) {
+    public boolean canHandle(Update update, Chat chat) {
         return true;
     }
 
     @Override
     @SneakyThrows
-    public void handle(Update update) {
+    public void handle(Update update, Chat chat) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             SendMessage message = new SendMessage()
                     .setChatId(update.getMessage().getChatId())
