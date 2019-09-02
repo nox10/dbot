@@ -1,9 +1,11 @@
 package xyz.dbotfactory.dbot.handler.impl;
 
+import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -20,6 +22,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 public class NewReceiptUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
+    private static final String SPEECH_SEND_RECEIPT = "<i>Now send receipt information</i>\n\n(more instructions...)";
 
     private final TelegramLongPollingBot bot;
     private final ChatService chatService;
@@ -38,6 +41,7 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
     }
 
     @Override
+    @SneakyThrows
     public void handle(Update update, Chat chat) {
         Receipt receipt = Receipt.builder()
                 .items(new ArrayList<>())
@@ -48,7 +52,11 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
         chat.setChatState(COLLECTING_ITEMS);
         chatService.save(chat);
 
-
+        SendMessage message = new SendMessage()
+                .setChatId(update.getMessage().getChatId())
+                .setText(SPEECH_SEND_RECEIPT)
+                .setParseMode("HTML");
+        bot.execute(message);
 
         log.info("Chat " + chat.getId() + " is now in " + chat.getChatState() + " state");
     }
