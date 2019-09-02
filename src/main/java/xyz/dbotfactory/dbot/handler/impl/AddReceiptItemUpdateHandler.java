@@ -22,6 +22,8 @@ import java.util.ArrayList;
 @Log
 public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts {
 
+    private static final String DONE_EMOJI = "✔️";
+
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;
 
@@ -74,7 +76,8 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
 
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
-                .setText(DONE_EMOJI + "⠀");
+                .setText(DONE_EMOJI + "⠀")
+                .setReplyToMessageId(update.getMessage().getMessageId());
         bot.execute(message);
 
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());

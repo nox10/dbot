@@ -22,7 +22,9 @@ import static java.util.Collections.singletonList;
 public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String COMMAND_NAME = "/status";
-    private static final String COLLECTING_FINISHED_BUTTON_TEXT = DONE_EMOJI + " Finish " + DONE_EMOJI;
+    private static final String SQUARED_DONE_EMOJI = "✅";
+    private static final String COLLECTING_FINISHED_BUTTON_TEXT =
+            SQUARED_DONE_EMOJI + " Finish " + SQUARED_DONE_EMOJI;
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;

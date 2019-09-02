@@ -16,8 +16,8 @@ import xyz.dbotfactory.dbot.service.ChatService;
 @Log
 public class CollectingFinishedUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private ChatService chatService;
-    private TelegramLongPollingBot bot;
+    private final ChatService chatService;
+    private final TelegramLongPollingBot bot;
 
     public CollectingFinishedUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
