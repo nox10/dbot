@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.handler.impl;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -20,11 +21,13 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
 
+    private final TelegramLongPollingBot telegramBot;
     private final ChatService chatService;
 
     @Autowired
-    public NewReceiptUpdateHandler(ChatService chatService) {
+    public NewReceiptUpdateHandler(ChatService chatService, TelegramLongPollingBot telegramBot) {
         this.chatService = chatService;
+        this.telegramBot = telegramBot;
     }
 
     @Override

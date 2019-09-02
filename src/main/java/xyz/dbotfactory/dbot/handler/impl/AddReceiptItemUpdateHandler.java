@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.handler.impl;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -10,7 +11,6 @@ import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.model.ReceiptItem;
-import xyz.dbotfactory.dbot.repo.ChatRepository;
 import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler {
     private final ChatService chatService;
 
     @Autowired
-    public AddReceiptItemUpdateHandler(ChatService chatService) {
+    public AddReceiptItemUpdateHandler(ChatService chatService, TelegramLongPollingBot telegramBot) {
         this.chatService = chatService;
     }
 
@@ -36,7 +36,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler {
     public void handle(Update update, Chat chat) {
         String text = update.getMessage().getText();
         String[] split = text.split("-");
-        if(split.length != 3)
+        if (split.length != 3)
             throw new DBotUserException("incorrect receipt item format");
 
         Receipt receipt = chatService.getActiveReceipt(chat);
@@ -51,6 +51,6 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler {
             receipt.getItems().add(receiptItem);
         }
         chatService.save(chat);
-        log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  "  + receipt.getItems());
+        log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
     }
 }

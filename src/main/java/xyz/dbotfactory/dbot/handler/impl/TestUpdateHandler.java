@@ -3,19 +3,19 @@ package xyz.dbotfactory.dbot.handler.impl;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import xyz.dbotfactory.dbot.TelegramBot;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
 
 @Component
 public class TestUpdateHandler implements UpdateHandler {
 
-    private final TelegramBot telegramBot;
+    private final TelegramLongPollingBot telegramBot;
 
     @Autowired
-    public TestUpdateHandler(TelegramBot telegramBot) {
+    public TestUpdateHandler(TelegramLongPollingBot telegramBot) {
         this.telegramBot = telegramBot;
     }
 
