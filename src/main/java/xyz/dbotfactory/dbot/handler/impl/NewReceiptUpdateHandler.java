@@ -22,7 +22,9 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 public class NewReceiptUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
-    private static final String SPEECH_SEND_RECEIPT = "<i>Now send receipt information</i>\n\n(more instructions...)";
+    private static final String RECEIPT_EMOJI = "\uD83E\uDDFE";
+    private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <b>Now send receipt information</b> "
+            + RECEIPT_EMOJI + "\n\n<i>(more instructions...)</i>";
 
     private final TelegramLongPollingBot bot;
     private final ChatService chatService;
