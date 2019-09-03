@@ -1,21 +1,28 @@
 package xyz.dbotfactory.dbot;
 
+import lombok.SneakyThrows;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
-import org.telegram.telegrambots.meta.ApiContext;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import xyz.dbotfactory.dbot.proxy_settings.Proxy;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.handler.UpdateHandlerAggregator;
+import xyz.dbotfactory.dbot.model.Chat;
+import xyz.dbotfactory.dbot.service.ChatService;
 
 import javax.annotation.PostConstruct;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 
 @Configuration
 @EnableConfigurationProperties
 public class Config {
+
+    @PostConstruct
+    public void init() {
+        ApiContextInitializer.init();
+    }
 
     @Bean
     public TelegramBotsApi telegramBotsApi() {
@@ -23,45 +30,44 @@ public class Config {
     }
 
     @Bean
-    public DefaultBotOptions botOptions(Proxy proxy) {
-        DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
+    @SneakyThrows
+    public TelegramLongPollingBot telegramLongPollingBot(ChatService chatService,
+                                                         UpdateHandlerAggregator updateHandlerAggregator,
+                                                         TelegramBotsApi telegramBotsApi,
+                                                         BotProperties botProperties) {
+        TelegramLongPollingBot bot = new TelegramLongPollingBot() {
+            @Override
+            public String getBotToken() {
+                return botProperties.getToken();
+            }
 
-        if (proxy.isEnabled()) {
-            botOptions.setProxyHost(proxy.getHost());
-            botOptions.setProxyPort(proxy.getPort());
-            botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
-        }
+            @Override
+            public String getBotUsername() {
+                return botProperties.getUsername();
+            }
 
-        return botOptions;
-    }
-
-
-    @Bean
-    public PasswordAuthentication passwordAuthentication(Proxy proxy) {
-        if (proxy.isEnabled()) {
-            return new PasswordAuthentication(proxy.getUser(), proxy.getPass().toCharArray());
-        } else {
-            return new PasswordAuthentication("no_proxy", "no_proxy".toCharArray());
-        }
-    }
-
-    @Bean
-    public Authenticator authenticator(PasswordAuthentication passwordAuthentication, Proxy proxy) {
-        if (proxy.isEnabled()) {
-            return new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return passwordAuthentication;
+            @Override
+            public void onUpdateReceived(Update update) {
+                long chatId = 0;
+                if (update.hasMessage()) {
+                    chatId = update.getMessage().getChatId();
+                } else if (update.hasCallbackQuery()) {
+                    chatId = update.getCallbackQuery().getMessage().getChatId();
                 }
-            };
-        } else {
-            return new Authenticator() {
-            };
-        }
-    }
 
-    @PostConstruct
-    public void init() {
-        ApiContextInitializer.init();
+                if (chatId == 0) {
+                    throw new DBotUserException("Unsupported update type, no message and no callbackQuery");
+                }
+
+                Chat chat = chatService.findOrCreateChat(chatId);
+
+                UpdateHandler commandHandler = updateHandlerAggregator.getUpdateHandler(update, chat);
+                commandHandler.handle(update, chat);
+            }
+        };
+
+        telegramBotsApi.registerBot(bot);
+
+        return bot;
     }
 }
