@@ -19,22 +19,22 @@ public class UpdateHandlerAggregator implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        if(bean instanceof UpdateHandler){
+        if (bean instanceof UpdateHandler) {
             updateHandlers.add((UpdateHandler) bean);
         }
         return bean;
     }
 
-    public UpdateHandler getUpdateHandler(Update update, Chat chat){
+    public UpdateHandler getUpdateHandler(Update update, Chat chat) {
         List<UpdateHandler> collect = updateHandlers
                 .stream()
                 .filter(x -> x.canHandle(update, chat))
                 .collect(toList());
 
-        if(collect.size() == 0)
+        if (collect.size() == 0)
             throw new DBotUserException("No handler for update found");
 
-        if(collect.size() > 1 )
+        if (collect.size() > 1)
             throw new DBotUserException("More than 1 handler for update found");
 
         return collect.get(0);
