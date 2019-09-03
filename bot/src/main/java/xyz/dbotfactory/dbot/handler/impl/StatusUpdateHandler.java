@@ -11,11 +11,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.helper.PrettyPrintHelper;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.service.ChatService;
+
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 
@@ -49,10 +52,17 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("<pre>");
-        for (ReceiptItem item : activeReceipt.getItems()) {
+
+        List<ReceiptItem> items = activeReceipt.getItems();
+        int maxNameLength = items.stream().mapToInt(x -> x.getName().length()).max().orElse(0);
+        int maxPriceLength = items.stream().mapToInt(x -> String.valueOf(x.getPrice()).length()).max().orElse(0);
+        for (ReceiptItem item : items) {
+
+            String name = PrettyPrintHelper.padRight(item.getName(), maxNameLength);
+            String price = PrettyPrintHelper.padRight(String.valueOf(item.getPrice()), maxPriceLength);
             stringBuilder
-                    .append(item.getName()).append(" : ")
-                    .append(item.getPrice()).append(" x ")
+                    .append(name).append(" : ")
+                    .append(price).append(" x ")
                     .append(item.getAmount()).append("\n");
         }
         stringBuilder.append("</pre>");
