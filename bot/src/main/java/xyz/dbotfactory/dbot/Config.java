@@ -1,6 +1,7 @@
 package xyz.dbotfactory.dbot;
 
 import lombok.SneakyThrows;
+import lombok.extern.java.Log;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 
 @Configuration
 @EnableConfigurationProperties
+@Log
 public class Config {
 
     @PostConstruct
@@ -50,7 +52,7 @@ public class Config {
             @Override
             @SneakyThrows
             public void onUpdateReceived(Update update) {
-                try{
+                try {
                     long chatId = 0;
                     if (update.hasMessage()) {
                         chatId = update.getMessage().getChatId();
@@ -66,10 +68,8 @@ public class Config {
 
                     UpdateHandler commandHandler = updateHandlerAggregator.getUpdateHandler(update, chat);
                     commandHandler.handle(update, chat);
-                }catch (DBotUserException userEx){
-                    SendMessage message = new SendMessage().setChatId(update.getMessage().getChatId())
-                            .setText("Error: " + userEx.getMessage());
-                    execute(message);
+                } catch (DBotUserException userEx) {
+                    log.warning("Error: " + userEx.getMessage());
                 }
             }
         };

@@ -43,7 +43,7 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
     public boolean canHandle(Update update, Chat chat) {
         return update.hasMessage() &&
                 update.getMessage().isCommand() &&
-                update.getMessage().getText().equals(COMMAND_NAME) &&
+                update.getMessage().getText().equals(COMMAND_NAME + "@" + bot.getBotUsername()) &&
                 chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT;
     }
 

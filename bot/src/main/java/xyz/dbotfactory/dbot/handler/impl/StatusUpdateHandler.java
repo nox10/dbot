@@ -22,7 +22,6 @@ import static java.util.Collections.singletonList;
 @Component
 public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private static final String COMMAND_NAME = "/status";
     private static final String SQUARED_DONE_EMOJI = "☑️";
     private static final String COLLECTING_FINISHED_BUTTON_TEXT =
             SQUARED_DONE_EMOJI + " Finish " + SQUARED_DONE_EMOJI;
@@ -38,10 +37,9 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return update.hasMessage() &&
-                update.getMessage().isCommand() &&
-                update.getMessage().getText().equals(COMMAND_NAME) &&
-                chat.getChatState() == ChatState.COLLECTING_ITEMS;
+        return chat.getChatState() == ChatState.COLLECTING_ITEMS &&
+                update.hasCallbackQuery() &&
+                update.getCallbackQuery().getData().equals(COLLECTING_STATUS_CALLBACK_DATA);
     }
 
     @Override
@@ -65,7 +63,7 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
                 .setKeyboard(singletonList(singletonList(collectingFinishedButton)));
 
         SendMessage message = new SendMessage()
-                .setChatId(update.getMessage().getChatId())
+                .setChatId(update.getCallbackQuery().getMessage().getChatId())
                 .setText(result)
                 .setReplyMarkup(collectingFinishedMarkup)
                 .setParseMode(ParseMode.HTML);

@@ -18,7 +18,7 @@ public class TelegramUser {
     @GeneratedValue
     private int id;
 
-    private int telegramId;
+    private long telegramId;
 
     private String firstName;
 
