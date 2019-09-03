@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -18,11 +20,16 @@ import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.ArrayList;
 
+import static java.util.Collections.singletonList;
+
 @Component
 @Log
 public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String DONE_EMOJI = "✔️";
+    private static final String DONE_TEXT = DONE_EMOJI + " Done, feel free to send more...";
+    private static final String STATUS_EMOJI = "ℹ️";
+    private static final String COLLECTING_STATUS_BUTTON_TEXT = STATUS_EMOJI + " Status " + STATUS_EMOJI;
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;
@@ -63,10 +70,18 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
         }
         chatService.save(chat);
 
+
+        InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
+                .setText(COLLECTING_STATUS_BUTTON_TEXT)
+                .setCallbackData(COLLECTING_STATUS_CALLBACK_DATA);
+        InlineKeyboardMarkup collectingStatusMarkup = new InlineKeyboardMarkup()
+                .setKeyboard(singletonList(singletonList(collectingStatusButton)));
+
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
-                .setText(DONE_EMOJI + "⠀")
-                .setReplyToMessageId(update.getMessage().getMessageId());
+                .setText(DONE_TEXT)
+                .setReplyToMessageId(update.getMessage().getMessageId())
+                .setReplyMarkup(collectingStatusMarkup);
         bot.execute(message);
 
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
