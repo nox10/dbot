@@ -7,6 +7,5 @@ public interface CommonConsts {
     String CONTINUE_DELIMITER = "_";
     String COLLECTING_STATUS_CALLBACK_DATA = "collecting_status";
     String CONTINUE_COMMAND_METADATA_PREFIX = "continue";
-    String FINISHED_SETTING_SHARES_BUTTON_TEXT = "Finished";
     String FINISHED_SETTING_SHARES_CALLBACK_DATA = "shares_done";
 }

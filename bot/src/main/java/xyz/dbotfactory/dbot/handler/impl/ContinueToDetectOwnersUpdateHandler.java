@@ -11,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -29,6 +28,7 @@ import static java.util.Collections.singletonList;
 public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, CommonConsts {
 
     private final static String MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
+    private final static String FINISHED_SETTING_SHARES_BUTTON_TEXT = "Finished";
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;
