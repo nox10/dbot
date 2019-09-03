@@ -49,9 +49,11 @@ public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, Commo
                     String[] metadata = text.substring(1 + 5 + 1 + CONTINUE_COMMAND_METADATA_PREFIX.length())
                             .split(CONTINUE_DELIMITER);
                     long telegramGroupChatId = Long.parseLong(metadata[0]);
+                    int receiptId = Integer.parseInt(metadata[1]);
                     Chat publicGroup = chatService.findOrCreateChatByTelegramId(telegramGroupChatId);
 
-                    return publicGroup.getChatState() == ChatState.DETECTING_OWNERS;
+                    return chatService.getActiveReceipt(publicGroup).getId() == receiptId &&
+                            publicGroup.getChatState() == ChatState.DETECTING_OWNERS;
                 }
             }
         }
@@ -72,15 +74,12 @@ public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, Commo
         Chat groupChat = chatService.findOrCreateChatByTelegramId(telegramGroupChatId);
         Receipt receipt = chatService.getActiveReceipt(groupChat);
 
-        if (receipt.getId() != receiptId) {
-            throw new DBotUserException("Session expired: receipt is no longer active");
-        }
-
-        List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream().map(item -> singletonList(new InlineKeyboardButton()
-                .setText(item.getName())
-                .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + item.getId() + DELIMITER +
-                        receiptId + DELIMITER + telegramGroupChatId)
-        )).collect(Collectors.toList());
+        List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
+                .map(item -> singletonList(new InlineKeyboardButton()
+                        .setText(item.getName())
+                        .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + item.getId() + DELIMITER +
+                                receiptId + DELIMITER + telegramGroupChatId)
+                )).collect(Collectors.toList());
 
         InlineKeyboardButton finishedButton = new InlineKeyboardButton()
                 .setText(FINISHED_SETTING_SHARES_BUTTON_TEXT)
