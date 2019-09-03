@@ -22,5 +22,5 @@ public class UserBalance {
     @OneToOne
     private TelegramUser user;
 
-    private int balance;
+    private double balance;
 }
