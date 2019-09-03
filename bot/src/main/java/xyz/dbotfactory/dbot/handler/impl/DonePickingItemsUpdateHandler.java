@@ -6,15 +6,12 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.generics.LongPollingBot;
-import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.text.DecimalFormat;
 
-import static java.lang.StrictMath.round;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.FINISHED_SETTING_SHARES_CALLBACK_DATA;
 
@@ -71,8 +68,7 @@ public class DonePickingItemsUpdateHandler implements UpdateHandler {
                 }
             }
             response = sb.toString();
-        }
-        else
+        } else
             response = "All items are picked!";
 
         SendMessage message = new SendMessage()
