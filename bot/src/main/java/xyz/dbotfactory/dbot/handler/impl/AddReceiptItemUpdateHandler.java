@@ -19,6 +19,7 @@ import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 
@@ -53,23 +54,31 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
         String text = update.getMessage().getText();
         String[] itemInfo = parseItem(text);
 
-        String amount = itemInfo[0];
+        String amountStr = itemInfo[0];
         String priceForUnit = itemInfo[1];
         String name = itemInfo[2];
 
         Receipt receipt = chatService.getActiveReceipt(chat);
 
-        int quantity = Integer.parseInt(amount);
-        for (int i = 0; i < quantity; i++) {
-            ReceiptItem receiptItem = ReceiptItem.builder()
-                    .price(Double.parseDouble(priceForUnit))
-                    .name(name)
-                    .telegramUsers(new ArrayList<>())
-                    .build();
-            receipt.getItems().add(receiptItem);
-        }
-        chatService.save(chat);
+        int amount = Integer.parseInt(amountStr);
+        ReceiptItem receiptItem = ReceiptItem.builder()
+                .price(Double.parseDouble(priceForUnit))
+                .name(name)
+                .shares(new ArrayList<>())
+                .amount(amount)
+                .build();
 
+        List<ReceiptItem> items = receipt.getItems();
+
+        int index = items.indexOf(receiptItem);
+        if (index == -1) {
+            items.add(receiptItem);
+        } else {
+            ReceiptItem existingItem = items.get(index);
+            existingItem.setAmount(existingItem.getAmount() + receiptItem.getAmount());
+        }
+
+        chatService.save(chat);
 
         InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
                 .setText(COLLECTING_STATUS_BUTTON_TEXT)

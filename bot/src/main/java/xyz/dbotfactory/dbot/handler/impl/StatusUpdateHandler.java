@@ -50,8 +50,10 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
         stringBuilder.append("<pre>");
         for (ReceiptItem item : activeReceipt.getItems()) {
-            stringBuilder.append(
-                    item.getName()).append(" : ").append(item.getPrice()).append("\n");
+            stringBuilder
+                    .append(item.getName()).append(" : ")
+                    .append(item.getPrice()).append(" x ")
+                    .append(item.getAmount()).append("\n");
         }
         stringBuilder.append("</pre>");
         String result = stringBuilder.toString();

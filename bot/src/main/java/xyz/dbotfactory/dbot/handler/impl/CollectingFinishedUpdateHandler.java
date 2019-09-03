@@ -2,6 +2,7 @@ package xyz.dbotfactory.dbot.handler.impl;
 
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -17,9 +18,6 @@ import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.service.ChatService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static java.util.Collections.singletonList;
 import static org.telegram.telegrambots.meta.api.methods.ParseMode.HTML;
 import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
@@ -28,15 +26,13 @@ import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
 @Log
 public class CollectingFinishedUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private static final String FINISH_EMOJI = "🏁";
-    private static final String FINISH_BUTTON_TEXT = FINISH_EMOJI + " Finish " + FINISH_EMOJI;
-    private static final String MESSAGE_TEXT = "Press to items which are yours, " +
-            "wait for others to do the same and then press " +
-            "[" + FINISH_BUTTON_TEXT + "] button below at the end of items list.";
+    private static final String MESSAGE_TEXT = "<i>Press button below to continue</i>";
+    private static final String CONTINUE_BUTTON_TEXT = "Continue";
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;
 
+    @Autowired
     public CollectingFinishedUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.bot = bot;
@@ -59,17 +55,15 @@ public class CollectingFinishedUpdateHandler implements UpdateHandler, CommonCon
         chat.setChatState(DETECTING_OWNERS);
 
         Receipt receipt = chatService.getActiveReceipt(chat);
-        List<List<InlineKeyboardButton>> itemButtons = receipt.getItems()
-                .stream()
-                .map(receiptItem -> singletonList(new InlineKeyboardButton()
-                        .setText(receiptItem.getName())
-                        .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + DELIMITER + receiptItem.getId())))
-                .collect(Collectors.toList());
-        itemButtons.add(singletonList(new InlineKeyboardButton()
-                .setCallbackData(ITEMS_ARE_CHOSEN_CALLBACK_DATA)
-                .setText(FINISH_BUTTON_TEXT)));
+
+        InlineKeyboardButton continueButton =
+                new InlineKeyboardButton().setUrl(
+                        "https://telegram.me/" + bot.getBotUsername() + "?start=" + CONTINUE_COMMAND_METADATA_PREFIX +
+                                chat.getTelegramChatId() + CONTINUE_DELIMITER + receipt.getId())
+                        .setText(CONTINUE_BUTTON_TEXT);
+
         InlineKeyboardMarkup itemButtonsMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(itemButtons);
+                .setKeyboard(singletonList(singletonList(continueButton)));
 
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())

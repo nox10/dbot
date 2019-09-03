@@ -12,7 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"id", "telegramUsers"})
+@ToString(exclude = {"id", "shares"})
+@EqualsAndHashCode(exclude = {"id", "amount", "shares"})
 public class ReceiptItem {
 
     @Id
@@ -23,6 +24,8 @@ public class ReceiptItem {
 
     private String name;
 
+    private int amount;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<TelegramUser> telegramUsers = new ArrayList<>();
+    private List<Share> shares = new ArrayList<>();
 }

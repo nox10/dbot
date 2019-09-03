@@ -22,7 +22,7 @@ public class ChatService {
         this.chatRepository = chatRepository;
     }
 
-    public Chat findOrCreateChat(long chatId) {
+    public Chat findOrCreateChatByTelegramId(long chatId) {
         Chat chat = chatRepository.findFirstByTelegramChatId(chatId);
         if (chat == null) {
             Chat newChat = Chat.builder()
