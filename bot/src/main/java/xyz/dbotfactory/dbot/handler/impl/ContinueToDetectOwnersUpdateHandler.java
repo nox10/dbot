@@ -83,7 +83,7 @@ public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, Commo
 
         InlineKeyboardButton finishedButton = new InlineKeyboardButton()
                 .setText(FINISHED_SETTING_SHARES_BUTTON_TEXT)
-                .setCallbackData(FINISHED_SETTING_SHARES_CALLBACK_DATA);
+                .setCallbackData(FINISHED_SETTING_SHARES_CALLBACK_DATA + telegramGroupChatId + DELIMITER + receiptId);
 
         itemButtons.add(singletonList(finishedButton));
 
