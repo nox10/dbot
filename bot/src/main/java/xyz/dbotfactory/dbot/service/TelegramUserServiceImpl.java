@@ -6,7 +6,10 @@ import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.model.TelegramUser;
 import xyz.dbotfactory.dbot.repo.TelegramUserRepository;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
 public class TelegramUserServiceImpl implements TelegramUserService {
     private final TelegramUserRepository repository;
 
