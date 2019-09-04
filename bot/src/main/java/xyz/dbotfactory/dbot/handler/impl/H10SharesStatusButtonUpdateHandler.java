@@ -15,12 +15,12 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.FINISHED_SETTING_SHARES_CALLBACK_DATA;
-import static xyz.dbotfactory.dbot.model.BigDecimalHelper.*;
 
 @Component
-public class H8SharesStatusButtonUpdateHandler implements UpdateHandler {
+public class H10SharesStatusButtonUpdateHandler implements UpdateHandler {
 
     private static DecimalFormat df2 = new DecimalFormat("#.##");
 
@@ -29,7 +29,7 @@ public class H8SharesStatusButtonUpdateHandler implements UpdateHandler {
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public H8SharesStatusButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H10SharesStatusButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.bot = bot;
     }
@@ -76,7 +76,7 @@ public class H8SharesStatusButtonUpdateHandler implements UpdateHandler {
                         .map(Share::getShare)
                         .reduce(BigDecimal::add)
                         .orElse(create(0));
-                if (!item.getAmount().equals(pickedShare) ) {
+                if (!item.getAmount().equals(pickedShare)) {
 
                     BigDecimal unpickedShare = item.getAmount().subtract(pickedShare);
                     sb.append("<pre>").append(item.getName()).append(" x ").append(df2.format(unpickedShare))

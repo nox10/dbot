@@ -14,4 +14,8 @@ public interface CommonConsts {
     String CUSTOM_SHARE_CALLBACK_DATA = "customshare";
     String FINISHED_SETTING_SHARES_BUTTON_TEXT = "Finished";
     String SUGGEST_DEBT_RETURN_STATEGY_MESSAGE = "How to pay off?";
+    String SETING_CUSTOM_SHARE_METADATA = "settingcustshr";
+    String DONE_MESSAGE_TEXT = "<i>Now each of you can send me how much you have already paid, right in this chat</i>";
+    String GO_TO_GROUP_TEXT = "<i>Go back to group chat</i>";
+    String ITEMS_MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
 }

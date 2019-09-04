@@ -11,9 +11,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
-import xyz.dbotfactory.dbot.model.*;
+import xyz.dbotfactory.dbot.model.BalanceStatus;
+import xyz.dbotfactory.dbot.model.Chat;
+import xyz.dbotfactory.dbot.model.Receipt;
+import xyz.dbotfactory.dbot.model.UserBalance;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
@@ -22,15 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.BigDecimalHelper.isSmaller;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.*;
-import static xyz.dbotfactory.dbot.model.BigDecimalHelper.create;
-import static xyz.dbotfactory.dbot.model.BigDecimalHelper.isSmaller;
 import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 
 @Component
 @Log
-public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
+public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
 
     private final ChatService chatService;
 
@@ -40,7 +42,7 @@ public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public H9CollectingPaymentsMessageUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot) {
+    public H11CollectingPaymentsMessageUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
@@ -89,7 +91,7 @@ public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
             howToPayOffMarkup = new InlineKeyboardMarkup()
                     .setKeyboard(singletonList(singletonList(collectingStatusButton)));
 
-        } else if (isSmaller(totalBalance,totalReceiptPrice)) {
+        } else if (isSmaller(totalBalance, totalReceiptPrice)) {
             response = "<i>Ok. Anyone else?\n" +
                     "Need " + totalReceiptPrice.subtract(totalBalance) + " more</i>";
         } else { // totalBalance > totalReceiptPrice

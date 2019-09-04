@@ -28,8 +28,6 @@ import static java.util.Collections.singletonList;
 @Log
 public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private final static String MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
-
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
@@ -95,14 +93,16 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
 
         SendMessage message = new SendMessage()
                 .setReplyMarkup(markup)
-                .setText(MESSAGE_TEXT)
+                .setText(ITEMS_MESSAGE_TEXT)
                 .setChatId(telegramUserId)
                 .setParseMode(ParseMode.HTML);
 
-        String pmUserIds = receipt.getReceiptMetaInfo().getPmUserIds();
-        receipt.getReceiptMetaInfo().setPmUserIds(pmUserIds + telegramUserId + DELIMITER);
+        String pmUserIds = groupChat.getChatMetaInfo().getPmUserIds();
+        if (!pmUserIds.contains(Long.toString(telegramUserId))) {
+            groupChat.getChatMetaInfo().setPmUserIds(pmUserIds + telegramUserId + DELIMITER);
+        }
 
-        receiptService.save(receipt);
+        chatService.save(groupChat);
 
         bot.execute(message);
     }

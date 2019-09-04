@@ -2,13 +2,14 @@ package xyz.dbotfactory.dbot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xyz.dbotfactory.dbot.BigDecimalHelper;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.repo.ReceiptRepository;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
-import static xyz.dbotfactory.dbot.model.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
 
 @Service
 @Transactional

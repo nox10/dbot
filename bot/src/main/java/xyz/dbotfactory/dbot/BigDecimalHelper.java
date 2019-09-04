@@ -1,4 +1,4 @@
-package xyz.dbotfactory.dbot.model;
+package xyz.dbotfactory.dbot;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,7 +24,6 @@ public class BigDecimalHelper {
     public static boolean isGreaterOrEqual(BigDecimal a, BigDecimal b){
         return a.compareTo(b) >= 0;
     }
-
 
     public static boolean isSmallerOrEqual(BigDecimal a, BigDecimal b){
         return a.compareTo(b) <= 0;

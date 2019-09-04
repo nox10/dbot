@@ -13,14 +13,17 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
-import xyz.dbotfactory.dbot.model.*;
+import xyz.dbotfactory.dbot.model.Chat;
+import xyz.dbotfactory.dbot.model.ChatState;
+import xyz.dbotfactory.dbot.model.Receipt;
+import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static xyz.dbotfactory.dbot.model.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
 
 @Component
 @Log

@@ -32,7 +32,4 @@ public class Receipt {
     private List<UserBalance> userBalances = new ArrayList<>();
 
     boolean isActive;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private ReceiptMetaInfo receiptMetaInfo;
 }

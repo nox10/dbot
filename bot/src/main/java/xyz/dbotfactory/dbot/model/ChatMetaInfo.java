@@ -12,10 +12,11 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReceiptMetaInfo {
+public class ChatMetaInfo {
     @Id
     @GeneratedValue
     private int id;
 
     private String pmUserIds;
+    private String metaData;
 }

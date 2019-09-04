@@ -29,4 +29,7 @@ public class Chat {
 
     @Enumerated(ORDINAL)
     ChatState chatState;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private ChatMetaInfo chatMetaInfo;
 }

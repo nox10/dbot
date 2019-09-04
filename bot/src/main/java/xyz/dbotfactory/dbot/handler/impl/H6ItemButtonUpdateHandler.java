@@ -5,14 +5,18 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
-import xyz.dbotfactory.dbot.model.*;
+import xyz.dbotfactory.dbot.model.Chat;
+import xyz.dbotfactory.dbot.model.ChatState;
+import xyz.dbotfactory.dbot.model.Receipt;
+import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
@@ -21,12 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static xyz.dbotfactory.dbot.model.BigDecimalHelper.isGreater;
-import static xyz.dbotfactory.dbot.model.BigDecimalHelper.isGreaterOrEqual;
+import static xyz.dbotfactory.dbot.BigDecimalHelper.isGreater;
+import static xyz.dbotfactory.dbot.BigDecimalHelper.isGreaterOrEqual;
 
 @Component
 @Log
 public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
+
+    private static final String CUSTOM_SHARE_BUTTON_TEXT = "Custom";
+    private static final String SHARES_MESSAGE_TEXT = "<i>Set your share</i>";
+
 
     private final ChatService chatService;
     private final ReceiptService receiptService;
@@ -78,7 +86,7 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
         List<List<InlineKeyboardButton>> shareButtons = new ArrayList<>();
 
         BigDecimal shareLeft = receiptService.shareLeft(item, userId);
-        if (isGreater(shareLeft,0)) {
+        if (isGreater(shareLeft, 0)) {
             InlineKeyboardButton shareLeftButton = new InlineKeyboardButton()
                     .setText(numberToProperString(shareLeft))
                     .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + SHARE_LEFT_BUTTON_CALLBACK_DATA +
@@ -100,21 +108,28 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
             shareButtons.add(singletonList(shareLeftButton));
         }
 
-        InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText("Not supported yet")
+        InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText(CUSTOM_SHARE_BUTTON_TEXT)
                 .setCallbackData(CUSTOM_SHARE_CALLBACK_DATA + itemId + DELIMITER +
                         receiptId + DELIMITER + tgGroupChatId);
         shareButtons.add(singletonList(shareLeftButton));
 
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup()
+        InlineKeyboardMarkup shareButtonsKeyboardMarkup = new InlineKeyboardMarkup()
                 .setKeyboard(shareButtons);
 
         Message message = update.getCallbackQuery().getMessage();
-        EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup()
+        EditMessageText editMessageText = new EditMessageText()
                 .setMessageId(message.getMessageId())
                 .setChatId(userId)
-                .setReplyMarkup(inlineKeyboardMarkup);
+                .setReplyMarkup(shareButtonsKeyboardMarkup)
+                .setText(SHARES_MESSAGE_TEXT)
+                .setParseMode(ParseMode.HTML);
 
-        bot.execute(editMessageReplyMarkup);
+        bot.execute(editMessageText);
+
+        if (chat.getChatState() == ChatState.SETTING_CUSTOM_SHARE) {
+            chat.setChatState(ChatState.NO_ACTIVE_RECEIPT);
+            chatService.save(chat);
+        }
     }
 
     private String numberToProperString(BigDecimal number) {

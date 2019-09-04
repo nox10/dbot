@@ -10,9 +10,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
+import xyz.dbotfactory.dbot.model.ChatMetaInfo;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
-import xyz.dbotfactory.dbot.model.ReceiptMetaInfo;
 import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.ArrayList;
@@ -56,10 +56,12 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
                 .items(new ArrayList<>())
                 .userBalances(new ArrayList<>())
                 .isActive(true)
-                .receiptMetaInfo(ReceiptMetaInfo.builder().pmUserIds("").build())
                 .build();
         chat.getReceipts().add(receipt);
         chat.setChatState(COLLECTING_ITEMS);
+        if (chat.getChatMetaInfo() == null) {
+            chat.setChatMetaInfo(ChatMetaInfo.builder().pmUserIds("").build());
+        }
         chatService.save(chat);
 
         SendMessage message = new SendMessage()
