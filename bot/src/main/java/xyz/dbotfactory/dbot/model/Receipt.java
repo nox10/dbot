@@ -33,21 +33,6 @@ public class Receipt {
 
     boolean isActive;
 
-    private String receiptMetaInfoJson;
-
-    @SneakyThrows
-    public String getReceiptMetaInfoJson(){
-        return objectMapper.writeValueAsString(getReceiptMetaInfo());
-    }
-
-    @Transient
-    @Setter(AccessLevel.NONE)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private ReceiptMetaInfo receiptMetaInfo;
-
-    @SneakyThrows
-    public ReceiptMetaInfo getReceiptMetaInfo(){
-        if (receiptMetaInfo == null)
-            receiptMetaInfo = objectMapper.readValue(receiptMetaInfoJson, ReceiptMetaInfo.class);
-        return receiptMetaInfo;
-    }
 }
