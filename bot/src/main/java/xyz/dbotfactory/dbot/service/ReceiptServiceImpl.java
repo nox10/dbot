@@ -1,14 +1,21 @@
 package xyz.dbotfactory.dbot.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.model.Share;
 import xyz.dbotfactory.dbot.model.UserBalance;
+import xyz.dbotfactory.dbot.repo.ReceiptRepository;
+
+import javax.transaction.Transactional;
 
 @Service
+@Transactional
 public class ReceiptServiceImpl implements ReceiptService {
 
+    @Autowired
+    ReceiptRepository receiptRepository;
 
     @Override
     public double getTotalReceiptPrice(Receipt receipt) {
@@ -45,5 +52,20 @@ public class ReceiptServiceImpl implements ReceiptService {
         } else {
             return " — " + shareAmount;
         }
+    }
+
+    @Override
+    public void save(Receipt receipt) {
+        receiptRepository.save(receipt);
+    }
+
+    @Override
+    public boolean allSharesDone(Receipt receipt) {
+        return receipt.getItems().stream()
+                .map(item -> item.getShares().stream()
+                        .map(Share::getShare)
+                        .reduce(Double::sum).get() == item.getAmount())
+                .reduce((expr1, expr2) -> expr1 & expr2).get();
+
     }
 }

@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
+import xyz.dbotfactory.dbot.handler.ShareButtonCallbackInfo;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
@@ -54,16 +55,12 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         if (update.hasCallbackQuery()) {
             String data = update.getCallbackQuery().getData();
             if (data.startsWith(SHARE_BUTTON_CALLBACK_DATA)) {
-                String[] dataArray = data.substring(SHARE_BUTTON_CALLBACK_DATA.length()).split(DELIMITER);
-                String shareAmount = dataArray[0];
-                int itemId = Integer.parseInt(dataArray[1]);
-                int receiptId = Integer.parseInt(dataArray[2]);
-                long tgGroupChatId = Integer.parseInt(dataArray[3]);
+                ShareButtonCallbackInfo callbackInfo = ShareButtonCallbackInfo.parseCallbackString(data);
 
-                Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
+                Chat groupChat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTgGroupChatId());
 
                 return groupChat.getChatState() == ChatState.DETECTING_OWNERS &&
-                        chatService.getActiveReceipt(groupChat).getId() == receiptId;
+                        chatService.getActiveReceipt(groupChat).getId() == callbackInfo.getReceiptId();
             }
         }
 
@@ -75,25 +72,22 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
     public void handle(Update update, Chat chat) {
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
                 .setCallbackQueryId(update.getCallbackQuery().getId());
-        String[] dataArray = update.getCallbackQuery()
-                .getData().substring(SHARE_BUTTON_CALLBACK_DATA.length()).split(DELIMITER);
-        String shareAmount = dataArray[0];
-        int itemId = Integer.parseInt(dataArray[1]);
-        int receiptId = Integer.parseInt(dataArray[2]);
-        long tgGroupChatId = Integer.parseInt(dataArray[3]);
+        String data = update.getCallbackQuery().getData();
+        ShareButtonCallbackInfo callbackInfo = ShareButtonCallbackInfo.parseCallbackString(data);
+
         long userId = update.getCallbackQuery().getMessage().getChatId();
 
-        Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
+        Chat groupChat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTgGroupChatId());
         Receipt receipt = chatService.getActiveReceipt(groupChat);
         List<ReceiptItem> items = receipt.getItems();
 
-        ReceiptItem item = items.stream().filter(anItem -> anItem.getId() == itemId).findFirst().get();
+        ReceiptItem item = items.stream().filter(anItem -> anItem.getId() == callbackInfo.getItemId()).findFirst().get();
 
         double shareAmountDouble;
-        if (shareAmount.equals(SHARE_LEFT_BUTTON_CALLBACK_DATA)) {
+        if (callbackInfo.getShareAmount().equals(SHARE_LEFT_BUTTON_CALLBACK_DATA)) {
             shareAmountDouble = receiptService.shareLeft(item, userId);
         } else {
-            shareAmountDouble = Double.parseDouble(shareAmount);
+            shareAmountDouble = Double.parseDouble(callbackInfo.getShareAmount());
         }
 
         Share share;
@@ -112,12 +106,13 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
                 .map(anItem -> singletonList(new InlineKeyboardButton()
                         .setText(anItem.getName() + receiptService.getShareStringForButton(anItem, userId))
                         .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + anItem.getId() + DELIMITER +
-                                receiptId + DELIMITER + tgGroupChatId)
+                                callbackInfo.getReceiptId() + DELIMITER + callbackInfo.getTgGroupChatId())
                 )).collect(Collectors.toList());
 
         InlineKeyboardButton finishedButton = new InlineKeyboardButton()
                 .setText(FINISHED_SETTING_SHARES_BUTTON_TEXT)
-                .setCallbackData(FINISHED_SETTING_SHARES_CALLBACK_DATA + tgGroupChatId + DELIMITER + receiptId);
+                .setCallbackData(FINISHED_SETTING_SHARES_CALLBACK_DATA + callbackInfo.getTgGroupChatId()
+                        + DELIMITER + callbackInfo.getReceiptId());
 
         itemButtons.add(singletonList(finishedButton));
 
@@ -133,11 +128,11 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         bot.execute(editMessageReplyMarkup);
         bot.execute(answerCallbackQuery);
 
-        if (allSharesDone(receipt)) {
+        if (receiptService.allSharesDone(receipt)) {
             groupChat.setChatState(ChatState.COLLECTING_PAYMENTS_INFO);
             log.info("Chat " + groupChat.getId() + " is now in " + groupChat.getChatState() + " state");
             SendMessage sendMessage = new SendMessage()
-                    .setChatId(tgGroupChatId)
+                    .setChatId(callbackInfo.getTgGroupChatId())
                     .setParseMode(ParseMode.HTML)
                     .setText(DONE_MESSAGE_TEXT);
             SendMessage sendMessage2 = new SendMessage()
@@ -148,14 +143,8 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
             bot.execute(sendMessage2);
         }
 
+        receiptService.save(receipt);
         chatService.save(groupChat);
     }
 
-    private boolean allSharesDone(Receipt receipt) {
-        return receipt.getItems().stream()
-                .map(item -> item.getShares().stream()
-                        .map(Share::getShare)
-                        .reduce(Double::sum).get() == item.getAmount())
-                .reduce((expr1, expr2) -> expr1 & expr2).get();
-    }
 }
