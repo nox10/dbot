@@ -19,7 +19,7 @@ import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
-import xyz.dbotfactory.dbot.service.TelegramUserService;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,15 +38,12 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
-    private final TelegramUserService telegramUserService;
 
     @Autowired
     public ShareButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                    TelegramUserService telegramUserService,
                                     TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.receiptService = receiptService;
-        this.telegramUserService = telegramUserService;
         this.bot = bot;
     }
 
@@ -91,14 +88,14 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         }
 
         Share share;
-        if (item.getShares().stream().anyMatch(aShare -> aShare.getTelegramUser().getTelegramId() == userId)) {
+        if (item.getShares().stream().anyMatch(aShare -> aShare.getTelegramUserId() == userId)) {
             share = item.getShares().stream()
-                    .filter(aShare -> aShare.getTelegramUser().getTelegramId() == userId)
+                    .filter(aShare -> aShare.getTelegramUserId() == userId)
                     .findFirst().get();
             share.setShare(shareAmountDouble);
         } else {
             share = Share.builder().share(shareAmountDouble)
-                    .telegramUser(telegramUserService.getTelegramUserByTgId(userId)).build();
+                    .telegramUserId(userId).build();
             item.getShares().add(share);
         }
 

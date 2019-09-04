@@ -16,9 +16,7 @@ public class UserBalance {
     @GeneratedValue
     private int id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @Transient
-    private TelegramUser user;
+    private long telegramUserId;
 
     private double balance;
 }

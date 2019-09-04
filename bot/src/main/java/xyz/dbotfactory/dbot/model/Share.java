@@ -15,8 +15,7 @@ public class Share {
     @GeneratedValue
     private int id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private TelegramUser telegramUser;
+    private long telegramUserId;
 
     private Double share;
 }

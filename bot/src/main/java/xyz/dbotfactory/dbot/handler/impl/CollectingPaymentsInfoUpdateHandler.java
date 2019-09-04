@@ -11,11 +11,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.Receipt;
-import xyz.dbotfactory.dbot.model.TelegramUser;
 import xyz.dbotfactory.dbot.model.UserBalance;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
-import xyz.dbotfactory.dbot.service.TelegramUserService;
 
 import java.util.ArrayList;
 
@@ -28,16 +26,14 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
 
     private final ChatService chatService;
 
-    private final TelegramUserService telegramUserService;
 
     private final ReceiptService receiptService;
 
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public CollectingPaymentsInfoUpdateHandler(ChatService chatService, TelegramUserService telegramUserService, ReceiptService receiptService, TelegramLongPollingBot bot) {
+    public CollectingPaymentsInfoUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
-        this.telegramUserService = telegramUserService;
         this.receiptService = receiptService;
         this.bot = bot;
     }
@@ -58,11 +54,11 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
             return;
         }
         Receipt receipt = chatService.getActiveReceipt(chat);
-        TelegramUser user = telegramUserService.getTelegramUserByTgId(update.getMessage().getFrom().getId());
+        long telegramUserId = update.getMessage().getFrom().getId();
 
         UserBalance userBalance = UserBalance
                 .builder()
-                .user(user)
+                .telegramUserId(telegramUserId)
                 .balance(payment)
                 .build();
         receipt.getUserBalances().add(userBalance);

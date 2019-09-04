@@ -32,11 +32,11 @@ public class ReceiptServiceImpl implements ReceiptService {
         if (item.getShares().isEmpty() ||
                 item.getShares().size() == 1 &&
                         item.getShares().stream()
-                                .anyMatch(share -> share.getTelegramUser().getTelegramId() == userId)) {
+                                .anyMatch(share -> share.getTelegramUserId() == userId)) {
             return item.getAmount();
         } else {
             double otherSharesSum = item.getShares().stream()
-                    .filter(share -> share.getTelegramUser().getTelegramId() != userId)
+                    .filter(share -> share.getTelegramUserId() != userId)
                     .map(Share::getShare).reduce(Double::sum).get();
             return item.getAmount() - otherSharesSum;
         }
@@ -45,7 +45,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     @Override
     public String getShareStringForButton(ReceiptItem item, long telegramUserId) {
         double shareAmount = item.getShares().stream()
-                .filter(share -> share.getTelegramUser().getTelegramId() == telegramUserId)
+                .filter(share -> share.getTelegramUserId() == telegramUserId)
                 .findFirst().orElse(Share.builder().share(0.0).build()).getShare();
         if (shareAmount == 0.0) {
             return "";
