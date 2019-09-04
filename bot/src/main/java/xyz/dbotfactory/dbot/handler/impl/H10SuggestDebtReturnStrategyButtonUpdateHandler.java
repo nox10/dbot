@@ -21,7 +21,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.SUGGEST_DEBT_RETURN_STATEGY;
 
 @Component
-public class SuggestDebtReturnStrategyUpdateHandler implements UpdateHandler {
+public class H10SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHandler {
     @Autowired
     ChatService chatService;
 

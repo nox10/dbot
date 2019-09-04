@@ -20,7 +20,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 
 @Component
 @Log
-public class NewReceiptUpdateHandler implements UpdateHandler {
+public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
     private static final String RECEIPT_EMOJI = "🧾";
@@ -34,7 +34,7 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
     private final ChatService chatService;
 
     @Autowired
-    public NewReceiptUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H1NewReceiptCommandUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.bot = bot;
     }

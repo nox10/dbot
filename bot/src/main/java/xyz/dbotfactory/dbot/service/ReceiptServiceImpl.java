@@ -34,9 +34,8 @@ public class ReceiptServiceImpl implements ReceiptService {
     @Override
     public double shareLeft(ReceiptItem item, long userId) {
         if (item.getShares().isEmpty() ||
-                item.getShares().size() == 1 &&
-                        item.getShares().stream()
-                                .anyMatch(share -> share.getTelegramUserId() == userId)) {
+                (item.getShares().size() == 1 &&
+                        item.getShares().get(0).getTelegramUserId() == userId)) {
             return item.getAmount();
         } else {
             double otherSharesSum = item.getShares().stream()

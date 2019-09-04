@@ -26,7 +26,7 @@ import static java.util.Collections.singletonList;
 
 @Service
 @Log
-public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, CommonConsts {
+public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
     private final static String MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
 
@@ -35,8 +35,8 @@ public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, Commo
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public ContinueToDetectOwnersUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                               TelegramLongPollingBot bot) {
+    public H5RedirectToPmButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
+                                             TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;

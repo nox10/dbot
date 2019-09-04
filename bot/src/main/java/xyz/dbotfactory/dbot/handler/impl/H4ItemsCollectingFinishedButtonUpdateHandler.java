@@ -24,7 +24,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
 
 @Component
 @Log
-public class CollectingFinishedUpdateHandler implements UpdateHandler, CommonConsts {
+public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String MESSAGE_TEXT = "<i>Press button below to continue</i>";
     private static final String CONTINUE_BUTTON_TEXT = "Continue";
@@ -33,7 +33,7 @@ public class CollectingFinishedUpdateHandler implements UpdateHandler, CommonCon
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public CollectingFinishedUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H4ItemsCollectingFinishedButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.bot = bot;
     }

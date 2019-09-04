@@ -28,7 +28,7 @@ import static java.util.Collections.singletonList;
 
 @Component
 @Log
-public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
+public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String DONE_MESSAGE_TEXT =
             "<i>Now each of you can send me how much you have already paid, right in this chat</i>";
@@ -40,8 +40,8 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public ShareButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                    TelegramLongPollingBot bot) {
+    public H7ShareButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
+                                      TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;

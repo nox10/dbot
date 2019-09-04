@@ -26,7 +26,7 @@ import static java.util.Collections.singletonList;
 
 @Component
 @Log
-public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts {
+public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String DONE_EMOJI = "✔️";
     private static final String DONE_TEXT = DONE_EMOJI + " <i>Done, feel free to send more...</i>";
@@ -37,7 +37,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public AddReceiptItemUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H2AddReceiptItemMessageUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.bot = bot;
     }

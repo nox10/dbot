@@ -23,7 +23,7 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 
 @Component
-public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
+public class H3StatusButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String SQUARED_DONE_EMOJI = "☑️";
     private static final String COLLECTING_FINISHED_BUTTON_TEXT =
@@ -33,7 +33,7 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public StatusUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H3StatusButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.bot = bot;
     }

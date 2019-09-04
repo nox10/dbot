@@ -30,7 +30,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 
 @Component
 @Log
-public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
+public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
 
     private final ChatService chatService;
 
@@ -40,7 +40,7 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public CollectingPaymentsInfoUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot) {
+    public H9CollectingPaymentsMessageUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;

@@ -26,15 +26,15 @@ import static java.util.Collections.singletonList;
 
 @Component
 @Log
-public class ItemButtonIsClickedUpdateHandler implements UpdateHandler, CommonConsts {
+public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public ItemButtonIsClickedUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                            TelegramLongPollingBot bot) {
+    public H6ItemButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
+                                     TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;

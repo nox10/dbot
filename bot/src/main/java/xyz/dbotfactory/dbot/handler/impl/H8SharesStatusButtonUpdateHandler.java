@@ -18,7 +18,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.FINISHED_SETTING_SHARES_CALLBACK_DATA;
 
 @Component
-public class DonePickingItemsUpdateHandler implements UpdateHandler {
+public class H8SharesStatusButtonUpdateHandler implements UpdateHandler {
 
     private static DecimalFormat df2 = new DecimalFormat("#.##");
 
@@ -27,7 +27,7 @@ public class DonePickingItemsUpdateHandler implements UpdateHandler {
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public DonePickingItemsUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H8SharesStatusButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
         this.chatService = chatService;
         this.bot = bot;
     }
