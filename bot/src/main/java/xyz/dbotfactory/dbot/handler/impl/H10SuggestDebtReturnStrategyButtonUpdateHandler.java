@@ -57,9 +57,10 @@ public class H10SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
         List<DebtReturnTransaction> returnStrategy = chatService.getReturnStrategy(chat);
 
         String response = prettyPrintReturnStrategy(returnStrategy);
-        SendMessage sendMessage = new SendMessage(chatId, response);
-
-        bot.execute(sendMessage);
+        if(!response.equals("")){
+            SendMessage sendMessage = new SendMessage(chatId, response);
+            bot.execute(sendMessage);
+        }
     }
 
     @SneakyThrows
@@ -67,7 +68,7 @@ public class H10SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
         StringBuilder sb = new StringBuilder();
         for (DebtReturnTransaction debtReturnTransaction : returnStrategy) {
             GetChat getFromChat = new GetChat(debtReturnTransaction.getFromId());
-            GetChat getToChat = new GetChat(debtReturnTransaction.getFromId());
+            GetChat getToChat = new GetChat(debtReturnTransaction.getToId());
             String fromUsername = bot.execute(getFromChat).getUserName();
             String toUsername = bot.execute(getToChat).getUserName();
 

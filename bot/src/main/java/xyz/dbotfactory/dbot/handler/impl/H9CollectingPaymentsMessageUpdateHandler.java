@@ -85,7 +85,7 @@ public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
             receipt.setActive(false);
             InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
                     .setText(SUGGEST_DEBT_RETURN_STATEGY_MESSAGE)
-                    .setCallbackData(SUGGEST_DEBT_RETURN_STATEGY + DELIMITER + chat.getId());
+                    .setCallbackData(SUGGEST_DEBT_RETURN_STATEGY + DELIMITER + chat.getTelegramChatId());
             howToPayOffMarkup = new InlineKeyboardMarkup()
                     .setKeyboard(singletonList(singletonList(collectingStatusButton)));
 
@@ -105,6 +105,7 @@ public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
                 .setParseMode(ParseMode.HTML);
 
         bot.execute(message);
+
     }
 
     @SneakyThrows
@@ -114,7 +115,7 @@ public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
         for (BalanceStatus balanceStatus : totalBalanceStatuses) {
             GetChat getChat = new GetChat(balanceStatus.getId());
             String userName = bot.execute(getChat).getUserName();
-            sb.append(userName).append(" : ").append(balanceStatus.getAmount()).append("\n");
+            sb.append("@").append(userName).append(" : ").append(balanceStatus.getAmount()).append("\n");
         }
         return sb.toString();
     }
