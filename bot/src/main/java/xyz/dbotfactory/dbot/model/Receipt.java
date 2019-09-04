@@ -1,5 +1,6 @@
 package xyz.dbotfactory.dbot.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -16,6 +17,8 @@ import java.util.List;
 @Builder
 public class Receipt {
 
+    private static ObjectMapper objectMapper = new ObjectMapper();
+
     @Id
     @GeneratedValue
     private int id;
@@ -30,6 +33,20 @@ public class Receipt {
 
     boolean isActive;
 
-    @Embedded
-    ReceiptMetaInfo metaInfo;
+    private String receiptMetaInfoJson;
+
+    @SneakyThrows
+    public String getReceiptMetaInfoJson(){
+        return objectMapper.writeValueAsString(getReceiptMetaInfo());
+    }
+
+    @Transient
+    private ReceiptMetaInfo receiptMetaInfo;
+
+    @SneakyThrows
+    public ReceiptMetaInfo getReceiptMetaInfo(){
+        if (receiptMetaInfo == null)
+            receiptMetaInfo = objectMapper.readValue(receiptMetaInfoJson, ReceiptMetaInfo.class);
+        return receiptMetaInfo;
+    }
 }
