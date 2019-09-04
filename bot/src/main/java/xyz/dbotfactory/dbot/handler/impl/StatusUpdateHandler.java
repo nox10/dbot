@@ -27,7 +27,7 @@ public class StatusUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String SQUARED_DONE_EMOJI = "☑️";
     private static final String COLLECTING_FINISHED_BUTTON_TEXT =
-            SQUARED_DONE_EMOJI + " Finish " + SQUARED_DONE_EMOJI;
+            SQUARED_DONE_EMOJI + " That's it, done " + SQUARED_DONE_EMOJI;
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;

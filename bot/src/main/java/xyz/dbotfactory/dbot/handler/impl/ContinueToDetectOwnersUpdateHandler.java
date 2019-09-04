@@ -17,6 +17,7 @@ import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.service.ChatService;
+import xyz.dbotfactory.dbot.service.ReceiptService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,14 +29,16 @@ import static java.util.Collections.singletonList;
 public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, CommonConsts {
 
     private final static String MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
-    private final static String FINISHED_SETTING_SHARES_BUTTON_TEXT = "Finished";
 
     private final ChatService chatService;
+    private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public ContinueToDetectOwnersUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public ContinueToDetectOwnersUpdateHandler(ChatService chatService, ReceiptService receiptService,
+                                               TelegramLongPollingBot bot) {
         this.chatService = chatService;
+        this.receiptService = receiptService;
         this.bot = bot;
     }
 
@@ -76,7 +79,7 @@ public class ContinueToDetectOwnersUpdateHandler implements UpdateHandler, Commo
 
         List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
                 .map(item -> singletonList(new InlineKeyboardButton()
-                        .setText(item.getName())
+                        .setText(item.getName() + receiptService.getShareStringForButton(item, telegramUserId))
                         .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + item.getId() + DELIMITER +
                                 receiptId + DELIMITER + telegramGroupChatId)
                 )).collect(Collectors.toList());

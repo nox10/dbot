@@ -24,7 +24,7 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
 
     private static final String COMMAND_NAME = "/new_receipt";
     private static final String RECEIPT_EMOJI = "🧾";
-    private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " Now send receipt information.\n\n" +
+    private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <i>Now send receipt information.</i>\n\n" +
             "<i>Receipt info should be in the next format (with spaces):</i>\n\n" +
             "<code>amount price-for-unit name-for-item</code>\n\n" +
             "<i>For example:</i>\n\n" +

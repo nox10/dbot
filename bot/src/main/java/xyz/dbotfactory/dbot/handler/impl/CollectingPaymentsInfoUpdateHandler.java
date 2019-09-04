@@ -1,9 +1,11 @@
 package xyz.dbotfactory.dbot.handler.impl;
 
 import lombok.SneakyThrows;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -21,6 +23,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 
 @Component
+@Log
 public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
 
     private final ChatService chatService;
@@ -51,6 +54,7 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
         try {
             payment = Double.parseDouble(update.getMessage().getText());
         } catch (Throwable throwable) {
+            // TODO: logging etc
             return;
         }
         Receipt receipt = chatService.getActiveReceipt(chat);
@@ -76,14 +80,15 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
             response = "";
             //TODO: ask nikita
         } else {// totalBalance > totalReceiptPrice
-            response = "Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
-                    + "). Can you pls check and type again?";
+            response = "<i>Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
+                    + "). Can you pls check and type again?</i>";
             receipt.setUserBalances(new ArrayList<>());
         }
         chatService.save(chat);
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
-                .setText(response);
+                .setText(response)
+                .setParseMode(ParseMode.HTML);
 
         bot.execute(message);
     }

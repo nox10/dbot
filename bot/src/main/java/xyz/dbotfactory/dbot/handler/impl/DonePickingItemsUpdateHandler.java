@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -37,8 +38,8 @@ public class DonePickingItemsUpdateHandler implements UpdateHandler {
             String data = update.getCallbackQuery().getData();
             if (data.startsWith(FINISHED_SETTING_SHARES_CALLBACK_DATA)) {
                 String[] ids = data.substring(FINISHED_SETTING_SHARES_CALLBACK_DATA.length()).split(DELIMITER);
-                int receiptId = Integer.parseInt(ids[0]);
-                long tgGroupChatId = Integer.parseInt(ids[1]);
+                int receiptId = Integer.parseInt(ids[1]);
+                long tgGroupChatId = Integer.parseInt(ids[0]);
 
                 Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
@@ -52,28 +53,35 @@ public class DonePickingItemsUpdateHandler implements UpdateHandler {
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
+        String[] ids = update.getCallbackQuery()
+                .getData().substring(FINISHED_SETTING_SHARES_CALLBACK_DATA.length()).split(DELIMITER);
+        int receiptId = Integer.parseInt(ids[1]);
+        long tgGroupChatId = Integer.parseInt(ids[0]);
+        Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
-        Receipt receipt = chatService.getActiveReceipt(chat);
+        Receipt receipt = chatService.getActiveReceipt(groupChat);
         String response;
         if (receipt.getItems().size() != 0) {
             StringBuilder sb = new StringBuilder();
-            sb.append("This items are still not picked: \n");
+            sb.append("<b>These items are still not picked:</b> \n");
             for (ReceiptItem item : receipt.getItems()) {
 
                 double pickedShare = item.getShares().stream().mapToDouble(Share::getShare).sum();
-                if (item.getAmount() != pickedShare) {
+                if (item.getAmount() - pickedShare != 0) {
 
                     double unpickedShare = item.getAmount() - pickedShare;
-                    sb.append(item.getName()).append(" x ").append(df2.format(unpickedShare));
+                    sb.append("<pre>").append(item.getName()).append(" x ").append(df2.format(unpickedShare))
+                            .append("</pre>");
                 }
             }
             response = sb.toString();
         } else
-            response = "All items are picked!";
+            response = "<i>All items are picked!</i>";
 
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
-                .setText(response);
+                .setText(response)
+                .setParseMode(ParseMode.HTML);
         bot.execute(message);
     }
 }

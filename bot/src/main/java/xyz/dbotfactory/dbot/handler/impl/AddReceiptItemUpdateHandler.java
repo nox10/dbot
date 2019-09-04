@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -28,7 +29,7 @@ import static java.util.Collections.singletonList;
 public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String DONE_EMOJI = "✔️";
-    private static final String DONE_TEXT = DONE_EMOJI + " Done, feel free to send more...";
+    private static final String DONE_TEXT = DONE_EMOJI + " <i>Done, feel free to send more...</i>";
     private static final String STATUS_EMOJI = "ℹ️";
     private static final String COLLECTING_STATUS_BUTTON_TEXT = STATUS_EMOJI + " Status " + STATUS_EMOJI;
 
@@ -90,6 +91,7 @@ public class AddReceiptItemUpdateHandler implements UpdateHandler, CommonConsts 
                 .setChatId(chat.getTelegramChatId())
                 .setText(DONE_TEXT)
                 .setReplyToMessageId(update.getMessage().getMessageId())
+                .setParseMode(ParseMode.HTML)
                 .setReplyMarkup(collectingStatusMarkup);
         bot.execute(message);
 

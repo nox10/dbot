@@ -2,10 +2,7 @@ package xyz.dbotfactory.dbot.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 @Setter
@@ -19,7 +16,7 @@ public class UserBalance {
     @GeneratedValue
     private int id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private TelegramUser user;
 
     private double balance;

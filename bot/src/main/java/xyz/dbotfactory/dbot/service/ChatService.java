@@ -30,7 +30,7 @@ public class ChatService {
                     .chatState(ChatState.NO_ACTIVE_RECEIPT)
                     .receipts(new ArrayList<>())
                     .build();
-            chatRepository.save(newChat);
+            newChat = chatRepository.save(newChat);
             return newChat;
         } else {
             return chat;

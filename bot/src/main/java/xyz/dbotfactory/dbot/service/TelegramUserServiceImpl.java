@@ -2,7 +2,6 @@ package xyz.dbotfactory.dbot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.model.TelegramUser;
 import xyz.dbotfactory.dbot.repo.TelegramUserRepository;
 
@@ -21,8 +20,11 @@ public class TelegramUserServiceImpl implements TelegramUserService {
     @Override
     public TelegramUser getTelegramUserByTgId(long telegramId) {
         TelegramUser telegramUser = repository.findTelegramUserByTelegramId(telegramId);
-        if(telegramUser == null)
-            throw new DBotUserException("No user with id " + telegramId + " found");
-        return  telegramUser;
+        if (telegramUser == null) {
+            telegramUser = TelegramUser.builder()
+                    .telegramId(telegramId).build();
+            telegramUser = repository.save(telegramUser);
+        }
+        return telegramUser;
     }
 }
