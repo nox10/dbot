@@ -40,7 +40,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         } else {
             double otherSharesSum = item.getShares().stream()
                     .filter(share -> share.getTelegramUserId() != userId)
-                    .map(Share::getShare).reduce(Double::sum).get();
+                    .map(Share::getShare).reduce(Double::sum).orElse(0.0);
             return item.getAmount() - otherSharesSum;
         }
     }
@@ -67,8 +67,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         return receipt.getItems().stream()
                 .map(item -> item.getShares().stream()
                         .map(Share::getShare)
-                        .reduce(Double::sum).get() == item.getAmount())
-                .reduce((expr1, expr2) -> expr1 & expr2).get();
-
+                        .reduce(Double::sum).orElse(0.0) == item.getAmount())
+                .reduce(Boolean::logicalAnd).orElseThrow(() -> new IllegalStateException("Empty receipt"));
     }
 }
