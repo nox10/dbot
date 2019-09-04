@@ -72,13 +72,14 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
         String response;
 
         if (totalBalance == totalReceiptPrice) {
-            response = "All good, receipt input completed.Current status: \n" + getPrettyChatBalanceStatuses(chat);
+            response = "<i>All good, receipt input completed.Current status: \n" +
+                    getPrettyChatBalanceStatuses(chat) + "</i>";
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
         } else if (totalBalance < totalReceiptPrice) {
-            response = "";
-            //TODO: ask nikita
-        } else {// totalBalance > totalReceiptPrice
+            response = "<i>Ok. Anyone else?\n" +
+                    "Need " + (totalReceiptPrice - totalBalance) + " more</i>";
+        } else { // totalBalance > totalReceiptPrice
             response = "<i>Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
                     + "). Can you pls check and type again?</i>";
             receipt.setUserBalances(new ArrayList<>());

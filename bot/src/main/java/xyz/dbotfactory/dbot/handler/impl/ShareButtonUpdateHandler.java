@@ -113,8 +113,7 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
         itemButtons.add(singletonList(finishedButton));
 
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup()
-                .setKeyboard(itemButtons);
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup().setKeyboard(itemButtons);
 
         Message message = update.getCallbackQuery().getMessage();
         EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup()

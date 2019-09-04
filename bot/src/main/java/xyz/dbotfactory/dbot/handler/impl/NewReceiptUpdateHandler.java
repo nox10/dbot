@@ -44,7 +44,8 @@ public class NewReceiptUpdateHandler implements UpdateHandler {
         return update.hasMessage() &&
                 update.getMessage().isCommand() &&
                 update.getMessage().getText().equals(COMMAND_NAME + "@" + bot.getBotUsername()) &&
-                chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT;
+                chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT &&
+                !update.getMessage().getChat().isUserChat();
     }
 
     @Override
