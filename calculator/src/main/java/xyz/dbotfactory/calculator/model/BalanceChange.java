@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BalanceChange {
-    int id;
+    long id;
     double amount;
 
     public void addToAmount(double amount) {

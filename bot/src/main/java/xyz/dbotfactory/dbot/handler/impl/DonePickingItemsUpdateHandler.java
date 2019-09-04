@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -55,6 +56,8 @@ public class DonePickingItemsUpdateHandler implements UpdateHandler {
     public void handle(Update update, Chat chat) {
         String[] ids = update.getCallbackQuery()
                 .getData().substring(FINISHED_SETTING_SHARES_CALLBACK_DATA.length()).split(DELIMITER);
+
+
         int receiptId = Integer.parseInt(ids[1]);
         long tgGroupChatId = Integer.parseInt(ids[0]);
         Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
@@ -83,5 +86,9 @@ public class DonePickingItemsUpdateHandler implements UpdateHandler {
                 .setText(response)
                 .setParseMode(ParseMode.HTML);
         bot.execute(message);
+
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
+                .setCallbackQueryId(update.getCallbackQuery().getId());
+        bot.execute(answerCallbackQuery);
     }
 }

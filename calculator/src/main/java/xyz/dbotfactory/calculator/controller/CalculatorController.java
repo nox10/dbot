@@ -28,6 +28,7 @@ public class CalculatorController {
 
     @PostMapping("/return_strategy")
     public List<DebtReturnTransaction> getDebtReturnStrategy(@RequestBody List<BalanceChange> request){
+        log.info("new return_strategy request:" + request);
         return calculatorService.getDebtReturnStrategy(request);
     }
 }

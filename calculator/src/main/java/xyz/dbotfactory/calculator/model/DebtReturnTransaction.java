@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DebtReturnTransaction {
-    int fromId;
-    int toId;
+    long fromId;
+    long toId;
     double amount;
 }

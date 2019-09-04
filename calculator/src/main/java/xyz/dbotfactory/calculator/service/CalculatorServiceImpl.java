@@ -21,7 +21,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     }
 
     private List<BalanceChange> aggregateBalanceChanges(List<BalanceChange> balanceChanges) {
-        Map<Integer, Double> totalBalances = balanceChanges
+        Map<Long, Double> totalBalances = balanceChanges
                 .stream()
                 .collect(
                         toMap(
@@ -57,8 +57,7 @@ public class CalculatorServiceImpl implements CalculatorService {
         sortPositive(positiveBalances);
         sortNegative(negativeBalances);
 
-        List<DebtReturnTransaction> resultList = getDebtReturnTransactions(positiveBalances, negativeBalances);
-        return resultList;
+        return getDebtReturnTransactions(positiveBalances, negativeBalances);
     }
 
     private List<DebtReturnTransaction> getDebtReturnTransactions(List<BalanceChange> positiveBalances, List<BalanceChange> negativeBalances) {
@@ -68,7 +67,7 @@ public class CalculatorServiceImpl implements CalculatorService {
             sortNegative(negativeBalances);
             for (BalanceChange negB : negativeBalances) {
 
-                if(negB.getAmount() == 0)
+                if (negB.getAmount() == 0)
                     continue;
                 if (abs(negB.getAmount()) >= posB.getAmount()) {
                     DebtReturnTransaction transaction = DebtReturnTransaction
@@ -83,7 +82,7 @@ public class CalculatorServiceImpl implements CalculatorService {
                     negB.addToAmount(posB.getAmount());
                     posB.setAmount(0);
                     break;
-                }else {
+                } else {
 
                     DebtReturnTransaction transaction = DebtReturnTransaction
                             .builder()

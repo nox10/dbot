@@ -9,6 +9,9 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -20,6 +23,8 @@ import xyz.dbotfactory.dbot.service.ReceiptService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
+import static xyz.dbotfactory.dbot.handler.CommonConsts.*;
 import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 
@@ -71,11 +76,19 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
 
         String response;
 
+        InlineKeyboardMarkup howToPayOffMarkup = null;
+
         if (totalBalance == totalReceiptPrice) {
             response = "<i>All good, receipt input completed.Current status: \n" +
                     getPrettyChatBalanceStatuses(chat) + "</i>";
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
+            InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
+                    .setText(SUGGEST_DEBT_RETURN_STATEGY_MESSAGE)
+                    .setCallbackData(SUGGEST_DEBT_RETURN_STATEGY + DELIMITER + chat.getId());
+            howToPayOffMarkup = new InlineKeyboardMarkup()
+                    .setKeyboard(singletonList(singletonList(collectingStatusButton)));
+
         } else if (totalBalance < totalReceiptPrice) {
             response = "<i>Ok. Anyone else?\n" +
                     "Need " + (totalReceiptPrice - totalBalance) + " more</i>";
@@ -88,6 +101,7 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
                 .setText(response)
+                .setReplyMarkup(howToPayOffMarkup)
                 .setParseMode(ParseMode.HTML);
 
         bot.execute(message);
