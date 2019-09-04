@@ -29,4 +29,7 @@ public class Receipt {
     private List<UserBalance> userBalances = new ArrayList<>();
 
     boolean isActive;
+
+    @Embedded
+    ReceiptMetaInfo metaInfo;
 }
