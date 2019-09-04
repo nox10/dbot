@@ -1,6 +1,5 @@
 package xyz.dbotfactory.dbot.handler.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +56,7 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
                 .items(new ArrayList<>())
                 .userBalances(new ArrayList<>())
                 .isActive(true)
-                .receiptMetaInfo(new ReceiptMetaInfo())
+                .receiptMetaInfo(ReceiptMetaInfo.builder().pmUserIds("").build())
                 .build();
         chat.getReceipts().add(receipt);
         chat.setChatState(COLLECTING_ITEMS);

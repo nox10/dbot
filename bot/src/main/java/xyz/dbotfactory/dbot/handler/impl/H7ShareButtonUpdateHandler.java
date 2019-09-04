@@ -20,7 +20,6 @@ import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -133,12 +132,16 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
                     .setChatId(callbackInfo.getTgGroupChatId())
                     .setParseMode(ParseMode.HTML)
                     .setText(DONE_MESSAGE_TEXT);
-            SendMessage sendMessage2 = new SendMessage()
-                    .setChatId(userId)
-                    .setParseMode(ParseMode.HTML)
-                    .setText(GO_TO_GROUP_TEXT);
             bot.execute(sendMessage);
-            bot.execute(sendMessage2);
+
+            String[] pmUserIds = receipt.getReceiptMetaInfo().getPmUserIds().split(DELIMITER);
+            for (String pmUserId : pmUserIds) {
+                SendMessage sendMessage2 = new SendMessage()
+                        .setChatId(pmUserId)
+                        .setParseMode(ParseMode.HTML)
+                        .setText(GO_TO_GROUP_TEXT);
+                bot.execute(sendMessage2);
+            }
         }
 
         chatService.save(groupChat);

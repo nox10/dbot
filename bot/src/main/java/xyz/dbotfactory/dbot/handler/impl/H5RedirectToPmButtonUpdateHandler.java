@@ -99,6 +99,11 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
                 .setChatId(telegramUserId)
                 .setParseMode(ParseMode.HTML);
 
+        String pmUserIds = receipt.getReceiptMetaInfo().getPmUserIds();
+        receipt.getReceiptMetaInfo().setPmUserIds(pmUserIds + telegramUserId + DELIMITER);
+
+        receiptService.save(receipt);
+
         bot.execute(message);
     }
 }

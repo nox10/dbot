@@ -17,5 +17,5 @@ public class ReceiptMetaInfo {
     @GeneratedValue
     private int id;
 
-    private String testMetaData;
+    private String pmUserIds;
 }
