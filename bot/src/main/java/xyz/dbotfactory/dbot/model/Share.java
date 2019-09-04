@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Setter
@@ -17,5 +18,5 @@ public class Share {
 
     private long telegramUserId;
 
-    private Double share;
+    private BigDecimal share;
 }

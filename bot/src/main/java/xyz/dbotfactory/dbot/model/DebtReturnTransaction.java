@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -12,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class DebtReturnTransaction {
     long fromId;
     long toId;
-    double amount;
+    BigDecimal amount;
 }

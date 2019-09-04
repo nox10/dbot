@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,11 +21,11 @@ public class ReceiptItem {
     @GeneratedValue
     private int id;
 
-    private double price;
+    private BigDecimal price;
 
     private String name;
 
-    private int amount;
+    private BigDecimal amount;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Share> shares = new ArrayList<>();

@@ -21,10 +21,12 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
+import static xyz.dbotfactory.dbot.model.BigDecimalHelper.create;
 
 @Component
 @Log
@@ -80,11 +82,11 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
         ReceiptItem item = items.stream().filter(anItem -> anItem.getId() == callbackInfo.getItemId()).findFirst().get();
 
-        double shareAmountDouble;
+        BigDecimal shareAmount;
         if (callbackInfo.getShareAmount().equals(SHARE_LEFT_BUTTON_CALLBACK_DATA)) {
-            shareAmountDouble = receiptService.shareLeft(item, userId);
+            shareAmount = receiptService.shareLeft(item, userId);
         } else {
-            shareAmountDouble = Double.parseDouble(callbackInfo.getShareAmount());
+            shareAmount = create(Double.parseDouble(callbackInfo.getShareAmount()));
         }
 
         Share share;
@@ -92,9 +94,9 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
             share = item.getShares().stream()
                     .filter(aShare -> aShare.getTelegramUserId() == userId)
                     .findFirst().get();
-            share.setShare(shareAmountDouble);
+            share.setShare(shareAmount);
         } else {
-            share = Share.builder().share(shareAmountDouble)
+            share = Share.builder().share(shareAmount)
                     .telegramUserId(userId).build();
             item.getShares().add(share);
         }

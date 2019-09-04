@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Setter
@@ -18,5 +19,5 @@ public class UserBalance {
 
     private long telegramUserId;
 
-    private double balance;
+    private BigDecimal balance;
 }

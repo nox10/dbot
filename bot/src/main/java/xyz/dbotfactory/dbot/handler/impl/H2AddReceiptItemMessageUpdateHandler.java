@@ -13,16 +13,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
-import xyz.dbotfactory.dbot.model.Chat;
-import xyz.dbotfactory.dbot.model.ChatState;
-import xyz.dbotfactory.dbot.model.Receipt;
-import xyz.dbotfactory.dbot.model.ReceiptItem;
+import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static xyz.dbotfactory.dbot.model.BigDecimalHelper.create;
 
 @Component
 @Log
@@ -63,10 +61,10 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
 
         int amount = Integer.parseInt(amountStr);
         ReceiptItem receiptItem = ReceiptItem.builder()
-                .price(Double.parseDouble(priceForUnit))
+                .price(create(Double.parseDouble(priceForUnit)))
                 .name(name)
                 .shares(new ArrayList<>())
-                .amount(amount)
+                .amount(create(amount))
                 .build();
 
         List<ReceiptItem> items = receipt.getItems();
@@ -76,7 +74,7 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
             items.add(receiptItem);
         } else {
             ReceiptItem existingItem = items.get(index);
-            existingItem.setAmount(existingItem.getAmount() + receiptItem.getAmount());
+            existingItem.setAmount(existingItem.getAmount().add(receiptItem.getAmount()));
         }
 
         chatService.save(chat);

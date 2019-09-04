@@ -13,18 +13,18 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
-import xyz.dbotfactory.dbot.model.BalanceStatus;
-import xyz.dbotfactory.dbot.model.Chat;
-import xyz.dbotfactory.dbot.model.Receipt;
-import xyz.dbotfactory.dbot.model.UserBalance;
+import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.*;
+import static xyz.dbotfactory.dbot.model.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.model.BigDecimalHelper.isSmaller;
 import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 
@@ -67,18 +67,18 @@ public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
         UserBalance userBalance = UserBalance
                 .builder()
                 .telegramUserId(telegramUserId)
-                .balance(payment)
+                .balance(create(payment))
                 .build();
         receipt.getUserBalances().add(userBalance);
 
-        double totalReceiptPrice = receiptService.getTotalReceiptPrice(receipt);
-        double totalBalance = receiptService.getTotalBalance(receipt);
+        BigDecimal totalReceiptPrice = receiptService.getTotalReceiptPrice(receipt);
+        BigDecimal totalBalance = receiptService.getTotalBalance(receipt);
 
         String response;
 
         InlineKeyboardMarkup howToPayOffMarkup = null;
 
-        if (totalBalance == totalReceiptPrice) {
+        if (totalBalance.equals(totalReceiptPrice)) {
             response = "<i>All good, receipt input completed.Current status: \n" +
                     getPrettyChatBalanceStatuses(chat) + "</i>";
             chat.setChatState(NO_ACTIVE_RECEIPT);
@@ -89,9 +89,9 @@ public class H9CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
             howToPayOffMarkup = new InlineKeyboardMarkup()
                     .setKeyboard(singletonList(singletonList(collectingStatusButton)));
 
-        } else if (totalBalance < totalReceiptPrice) {
+        } else if (isSmaller(totalBalance,totalReceiptPrice)) {
             response = "<i>Ok. Anyone else?\n" +
-                    "Need " + (totalReceiptPrice - totalBalance) + " more</i>";
+                    "Need " + totalReceiptPrice.subtract(totalBalance) + " more</i>";
         } else { // totalBalance > totalReceiptPrice
             response = "<i>Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
                     + "). Can you pls check and type again?</i>";

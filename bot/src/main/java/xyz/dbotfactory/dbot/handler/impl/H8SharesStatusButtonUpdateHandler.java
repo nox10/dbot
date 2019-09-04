@@ -12,10 +12,12 @@ import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.FINISHED_SETTING_SHARES_CALLBACK_DATA;
+import static xyz.dbotfactory.dbot.model.BigDecimalHelper.*;
 
 @Component
 public class H8SharesStatusButtonUpdateHandler implements UpdateHandler {
@@ -69,10 +71,14 @@ public class H8SharesStatusButtonUpdateHandler implements UpdateHandler {
             sb.append("<b>These items are still not picked:</b> \n");
             for (ReceiptItem item : receipt.getItems()) {
 
-                double pickedShare = item.getShares().stream().mapToDouble(Share::getShare).sum();
-                if (item.getAmount() - pickedShare != 0) {
+                BigDecimal pickedShare = item.getShares()
+                        .stream()
+                        .map(Share::getShare)
+                        .reduce(BigDecimal::add)
+                        .orElse(create(0));
+                if (!item.getAmount().equals(pickedShare) ) {
 
-                    double unpickedShare = item.getAmount() - pickedShare;
+                    BigDecimal unpickedShare = item.getAmount().subtract(pickedShare);
                     sb.append("<pre>").append(item.getName()).append(" x ").append(df2.format(unpickedShare))
                             .append("</pre>");
                 }

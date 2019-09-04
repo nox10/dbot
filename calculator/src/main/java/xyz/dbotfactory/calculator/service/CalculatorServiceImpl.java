@@ -1,13 +1,15 @@
 package xyz.dbotfactory.calculator.service;
 
 import org.springframework.stereotype.Service;
-import xyz.dbotfactory.calculator.model.*;
+import xyz.dbotfactory.calculator.model.BalanceChange;
+import xyz.dbotfactory.calculator.model.DebtReturnTransaction;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.StrictMath.abs;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -21,13 +23,13 @@ public class CalculatorServiceImpl implements CalculatorService {
     }
 
     private List<BalanceChange> aggregateBalanceChanges(List<BalanceChange> balanceChanges) {
-        Map<Long, Double> totalBalances = balanceChanges
+        Map<Long, BigDecimal> totalBalances = balanceChanges
                 .stream()
                 .collect(
                         toMap(
                                 BalanceChange::getId,
                                 BalanceChange::getAmount,
-                                (a, b) -> a + b
+                                BigDecimal::add
                         )
                 );
 
@@ -47,11 +49,11 @@ public class CalculatorServiceImpl implements CalculatorService {
 
         List<BalanceChange> positiveBalances = aggregatedBalanceChanges
                 .stream()
-                .filter(x -> x.getAmount() > 0)
+                .filter(x -> x.getAmount().compareTo(BigDecimal.ZERO) > 0)
                 .collect(toList());
         List<BalanceChange> negativeBalances = aggregatedBalanceChanges
                 .stream()
-                .filter(x -> x.getAmount() < 0)
+                .filter(x -> x.getAmount().compareTo(BigDecimal.ZERO) < 0)
                 .collect(toList());
 
         sortPositive(positiveBalances);
@@ -67,9 +69,9 @@ public class CalculatorServiceImpl implements CalculatorService {
             sortNegative(negativeBalances);
             for (BalanceChange negB : negativeBalances) {
 
-                if (negB.getAmount() == 0)
+                if (negB.getAmount().equals(BigDecimal.ZERO) )
                     continue;
-                if (abs(negB.getAmount()) >= posB.getAmount()) {
+                if (negB.getAmount().abs().compareTo(posB.getAmount()) > 0) {
                     DebtReturnTransaction transaction = DebtReturnTransaction
                             .builder()
                             .fromId(negB.getId())
@@ -80,7 +82,7 @@ public class CalculatorServiceImpl implements CalculatorService {
                     resultList.add(transaction);
 
                     negB.addToAmount(posB.getAmount());
-                    posB.setAmount(0);
+                    posB.setAmount(BigDecimal.ZERO);
                     break;
                 } else {
 
@@ -88,13 +90,13 @@ public class CalculatorServiceImpl implements CalculatorService {
                             .builder()
                             .fromId(negB.getId())
                             .toId(posB.getId())
-                            .amount(abs(negB.getAmount()))
+                            .amount(negB.getAmount().abs())
                             .build();
 
                     resultList.add(transaction);
 
                     posB.addToAmount(negB.getAmount());
-                    negB.setAmount(0);
+                    negB.setAmount(BigDecimal.ZERO);
                 }
             }
         }
@@ -102,10 +104,10 @@ public class CalculatorServiceImpl implements CalculatorService {
     }
 
     private void sortPositive(List<BalanceChange> positiveBalances) {
-        positiveBalances.sort((a, b) -> (int) (a.getAmount() - b.getAmount()));
+        positiveBalances.sort(Comparator.comparing(BalanceChange::getAmount));
     }
 
     private void sortNegative(List<BalanceChange> negativeBalances) {
-        negativeBalances.sort((a, b) -> (int) (b.getAmount() - a.getAmount()));
+        negativeBalances.sort((a, b) -> b.getAmount().compareTo(a.getAmount()));
     }
 }

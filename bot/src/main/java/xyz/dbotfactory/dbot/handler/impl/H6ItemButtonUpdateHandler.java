@@ -12,17 +12,17 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
-import xyz.dbotfactory.dbot.model.Chat;
-import xyz.dbotfactory.dbot.model.ChatState;
-import xyz.dbotfactory.dbot.model.Receipt;
-import xyz.dbotfactory.dbot.model.ReceiptItem;
+import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static xyz.dbotfactory.dbot.model.BigDecimalHelper.isGreater;
+import static xyz.dbotfactory.dbot.model.BigDecimalHelper.isGreaterOrEqual;
 
 @Component
 @Log
@@ -77,8 +77,8 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
         List<List<InlineKeyboardButton>> shareButtons = new ArrayList<>();
 
-        double shareLeft = receiptService.shareLeft(item, userId);
-        if (shareLeft > 0) {
+        BigDecimal shareLeft = receiptService.shareLeft(item, userId);
+        if (isGreater(shareLeft,0)) {
             InlineKeyboardButton shareLeftButton = new InlineKeyboardButton()
                     .setText(numberToProperString(shareLeft))
                     .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + SHARE_LEFT_BUTTON_CALLBACK_DATA +
@@ -86,14 +86,14 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
             shareButtons.add(singletonList(shareLeftButton));
         }
 
-        if (shareLeft >= 1) {
+        if (isGreaterOrEqual(shareLeft, 1)) {
             InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText("1")
                     .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + "1" + DELIMITER +
                             itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
             shareButtons.add(singletonList(shareLeftButton));
         }
 
-        if (shareLeft >= 0.5) {
+        if (isGreaterOrEqual(shareLeft, 0.5)) {
             InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText("0.5")
                     .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + "0.5" + DELIMITER +
                             itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
@@ -117,11 +117,12 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
         bot.execute(editMessageReplyMarkup);
     }
 
-    private String numberToProperString(double number) {
-        if (number - (int) number == 0) {
-            return Integer.toString((int) number);
-        } else {
-            return Double.toString(number);
-        }
+    private String numberToProperString(BigDecimal number) {
+//        if (number - (int) number == 0) {
+//            return Integer.toString((int) number);
+//        } else {
+//            return Double.toString(number);
+//        }
+        return number.toString();
     }
 }

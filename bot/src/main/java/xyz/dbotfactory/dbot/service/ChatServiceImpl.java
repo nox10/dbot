@@ -89,7 +89,7 @@ public class ChatServiceImpl implements ChatService {
                 .map(share -> BalanceStatus
                         .builder()
                         .id(share.getTelegramUserId())
-                        .amount(-(share.getShare() * item.getPrice()))
+                        .amount(share.getShare().multiply(item.getPrice()).negate())
                         .build())
                 .collect(toList());
     }

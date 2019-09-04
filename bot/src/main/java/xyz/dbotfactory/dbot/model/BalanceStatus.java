@@ -6,11 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class BalanceStatus {
     private long id;
-    private double amount;
+    private BigDecimal amount;
 }

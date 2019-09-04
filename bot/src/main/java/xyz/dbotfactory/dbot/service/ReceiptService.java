@@ -5,14 +5,16 @@ import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.model.Share;
 
+import java.math.BigDecimal;
+
 @Service
 public interface ReceiptService {
 
-    double getTotalReceiptPrice(Receipt receipt);
+    BigDecimal getTotalReceiptPrice(Receipt receipt);
 
-    double getTotalBalance(Receipt receipt);
+    BigDecimal getTotalBalance(Receipt receipt);
 
-    double shareLeft(ReceiptItem item, long userId);
+    BigDecimal shareLeft(ReceiptItem item, long userId);
 
     String getShareStringForButton(ReceiptItem item, long telegramUserId);
 
