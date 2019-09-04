@@ -41,6 +41,7 @@ public class Receipt {
     }
 
     @Transient
+    @Setter(AccessLevel.NONE)
     private ReceiptMetaInfo receiptMetaInfo;
 
     @SneakyThrows

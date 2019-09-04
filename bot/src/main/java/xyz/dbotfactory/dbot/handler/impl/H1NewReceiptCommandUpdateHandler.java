@@ -1,5 +1,6 @@
 package xyz.dbotfactory.dbot.handler.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +53,12 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
+        String receiptMetaInfoJson = new ObjectMapper().writeValueAsString(new ReceiptMetaInfo());
         Receipt receipt = Receipt.builder()
                 .items(new ArrayList<>())
                 .userBalances(new ArrayList<>())
                 .isActive(true)
-                .metaInfo(new ReceiptMetaInfo())
+                .receiptMetaInfoJson(receiptMetaInfoJson)
                 .build();
         chat.getReceipts().add(receipt);
         chat.setChatState(COLLECTING_ITEMS);
