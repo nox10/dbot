@@ -14,8 +14,12 @@ import javax.transaction.Transactional;
 @Transactional
 public class ReceiptServiceImpl implements ReceiptService {
 
+    private final ReceiptRepository receiptRepository;
+
     @Autowired
-    ReceiptRepository receiptRepository;
+    public ReceiptServiceImpl(ReceiptRepository receiptRepository) {
+        this.receiptRepository = receiptRepository;
+    }
 
     @Override
     public double getTotalReceiptPrice(Receipt receipt) {

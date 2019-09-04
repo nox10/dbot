@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.model.UserBalance;
@@ -16,6 +18,7 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
@@ -69,7 +72,7 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
         String response;
 
         if (totalBalance == totalReceiptPrice) {
-            response = "All good, receipt input completed";
+            response = "All good, receipt input completed.Current status: \n" + getPrettyChatBalanceStatuses(chat);
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
         } else if (totalBalance < totalReceiptPrice) {
@@ -87,5 +90,17 @@ public class CollectingPaymentsInfoUpdateHandler implements UpdateHandler {
                 .setParseMode(ParseMode.HTML);
 
         bot.execute(message);
+    }
+
+    @SneakyThrows
+    private String getPrettyChatBalanceStatuses(Chat chat) {
+        List<BalanceStatus> totalBalanceStatuses = chatService.getTotalBalanceStatuses(chat);
+        StringBuilder sb = new StringBuilder();
+        for (BalanceStatus balanceStatus : totalBalanceStatuses) {
+            GetChat getChat = new GetChat(balanceStatus.getId());
+            String userName = bot.execute(getChat).getUserName();
+            sb.append(userName).append(" : ").append(balanceStatus.getAmount()).append("\n");
+        }
+        return sb.toString();
     }
 }

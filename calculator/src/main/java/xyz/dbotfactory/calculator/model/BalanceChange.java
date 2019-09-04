@@ -2,8 +2,7 @@ package xyz.dbotfactory.calculator.model;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

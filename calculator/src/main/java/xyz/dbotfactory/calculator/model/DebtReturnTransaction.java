@@ -3,8 +3,7 @@ package xyz.dbotfactory.calculator.model;
 import lombok.*;
 
 @Builder
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DebtReturnTransaction {

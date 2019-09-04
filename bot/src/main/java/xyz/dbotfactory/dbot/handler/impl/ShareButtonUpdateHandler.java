@@ -140,7 +140,6 @@ public class ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
             bot.execute(sendMessage2);
         }
 
-        receiptService.save(receipt);
         chatService.save(groupChat);
     }
 
