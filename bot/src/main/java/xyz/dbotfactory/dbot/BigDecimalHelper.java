@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 
 public class BigDecimalHelper {
 
-    private static final int SCALE = 2;
+    private static final int SCALE = 4;
 
     public static BigDecimal create(double number) {
         return new BigDecimal(number).setScale(SCALE, RoundingMode.HALF_UP);

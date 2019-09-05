@@ -20,6 +20,7 @@ import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,13 +67,18 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
         String name = itemInfo[2];
 
         Receipt receipt = chatService.getActiveReceipt(chat);
+        BigDecimal price = create(Double.parseDouble(priceForUnit));
 
-        int amount = Integer.parseInt(amountStr);
+        BigDecimal amount = create(amountStr);
+
+        if(amount.signum() <= 0 || price.signum() < 0)
+            return;
+
         ReceiptItem receiptItem = ReceiptItem.builder()
-                .price(create(Double.parseDouble(priceForUnit)))
+                .price(price)
                 .name(name)
                 .shares(new ArrayList<>())
-                .amount(create(amount))
+                .amount(amount)
                 .build();
 
         List<ReceiptItem> items = receipt.getItems();
