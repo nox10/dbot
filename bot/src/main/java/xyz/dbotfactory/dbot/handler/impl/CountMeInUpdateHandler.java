@@ -61,7 +61,7 @@ public class CountMeInUpdateHandler implements UpdateHandler {
 
         Receipt activeReceipt = chatService.getActiveReceipt(chat);
 
-        BigDecimal totalBalance = receiptService.getTotalBalance(activeReceipt);
+        BigDecimal totalBalance = receiptService.getTotalReceiptPrice(activeReceipt);
         int id = update.getCallbackQuery().getFrom().getId();
 
         if(countInNewUser(activeReceipt, id)){
