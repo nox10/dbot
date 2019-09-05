@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Double.parseDouble;
 import static java.util.Collections.singletonList;
 
 @Component
@@ -135,7 +136,7 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
             SendMessage sendMessage = new SendMessage()
                     .setChatId(tgGroupChatId)
                     .setParseMode(ParseMode.HTML)
-                    .setText(DONE_MESSAGE_TEXT);
+                    .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
             bot.execute(sendMessage);
 
             String[] pmUserIds = groupChat.getChatMetaInfo().getPmUserIds().split(DELIMITER);
@@ -154,7 +155,29 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
     }
 
     private BigDecimal getCustomShareFromString(String text) {
-        // TODO: "1/3" etc
-        return new BigDecimal(text);
+        if (text.contains("/")) {
+            String[] fraction = text.split("/");
+            if (isNotProperDecimal(fraction[0]) || isNotProperDecimal(fraction[1])) {
+                return BigDecimalHelper.create(-1);
+            } else {
+                return BigDecimalHelper.create(parseDouble(fraction[0]) / parseDouble(fraction[1]));
+            }
+        } else {
+            if (isNotProperDecimal(text)) {
+                return BigDecimalHelper.create(-1);
+            } else {
+                return new BigDecimal(text);
+            }
+        }
+    }
+
+    private boolean isNotProperDecimal(String decimal) {
+        try {
+            Double.parseDouble(decimal);
+        } catch (Throwable e) {
+            return true;
+        }
+
+        return false;
     }
 }

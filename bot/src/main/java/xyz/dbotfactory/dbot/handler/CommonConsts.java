@@ -15,7 +15,8 @@ public interface CommonConsts {
     String FINISHED_SETTING_SHARES_BUTTON_TEXT = "Finished";
     String SUGGEST_DEBT_RETURN_STATEGY_MESSAGE = "How to pay off?";
     String SETING_CUSTOM_SHARE_METADATA = "settingcustshr";
-    String DONE_MESSAGE_TEXT = "<i>Now each of you can send me how much you have already paid, right in this chat</i>";
+    String DONE_MESSAGE_TEXT = "<i>Now each of you can send me how much you have already paid, right in this chat.\n\n" +
+            "Total sum is: </i>";
     String GO_TO_GROUP_TEXT = "<i>Go back to group chat</i>";
     String ITEMS_MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
 }

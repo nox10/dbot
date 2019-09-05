@@ -80,7 +80,8 @@ public class H8CustomShareButtonUpdateHandler implements UpdateHandler, CommonCo
         Message message = update.getCallbackQuery().getMessage();
         EditMessageText editMessageText = new EditMessageText()
                 .setText("<i>Enter share amount between 0 and " +
-                        receiptService.shareLeft(item, userId) + " or press cancel</i>")
+                        receiptService.shareLeft(item, userId) + " or press cancel.\n\n" +
+                        "You can also use fractions like </i><code>1/3</code>")
                 .setReplyMarkup(cancelKeyboardMarkup)
                 .setChatId(userId)
                 .setMessageId(message.getMessageId())

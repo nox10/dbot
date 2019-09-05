@@ -34,7 +34,6 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler {
         this.bot = bot;
     }
 
-
     @Override
     public boolean canHandle(Update update, Chat chat) {
         if (update.hasCallbackQuery()) {

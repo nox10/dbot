@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import xyz.dbotfactory.dbot.BigDecimalHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -66,12 +67,15 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
         Receipt receipt = chatService.getActiveReceipt(chat);
         long telegramUserId = update.getMessage().getFrom().getId();
 
-        UserBalance userBalance = UserBalance
-                .builder()
-                .telegramUserId(telegramUserId)
-                .balance(create(payment))
-                .build();
-        receipt.getUserBalances().add(userBalance);
+        UserBalance userBalance = receipt.getUserBalances().stream()
+                .filter(userBalance1 -> userBalance1.getTelegramUserId() == telegramUserId)
+                .findAny()
+                .orElse(UserBalance.builder().telegramUserId(telegramUserId).build());
+        userBalance.setBalance(create(payment));
+        if (!receipt.getUserBalances().contains(userBalance)) {
+            receipt.getUserBalances().add(userBalance);
+        }
+
 
         BigDecimal totalReceiptPrice = receiptService.getTotalReceiptPrice(receipt);
         BigDecimal totalBalance = receiptService.getTotalBalance(receipt);
@@ -81,19 +85,21 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
         InlineKeyboardMarkup howToPayOffMarkup = null;
 
         if (totalBalance.equals(totalReceiptPrice)) {
-            response = "<i>All good, receipt input completed.Current status: \n" +
+            response = "<i>All good, receipt input completed.\n\nCurrent balances: \n" +
                     getPrettyChatBalanceStatuses(chat) + "</i>";
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
-            InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
-                    .setText(SUGGEST_DEBT_RETURN_STATEGY_MESSAGE)
-                    .setCallbackData(SUGGEST_DEBT_RETURN_STATEGY + DELIMITER + chat.getTelegramChatId());
-            howToPayOffMarkup = new InlineKeyboardMarkup()
-                    .setKeyboard(singletonList(singletonList(collectingStatusButton)));
 
+            if (needPayoffButton(chat)) {
+                InlineKeyboardButton howToPayOffButton = new InlineKeyboardButton()
+                        .setText(SUGGEST_DEBT_RETURN_STATEGY_MESSAGE)
+                        .setCallbackData(SUGGEST_DEBT_RETURN_STATEGY + DELIMITER + chat.getTelegramChatId());
+                howToPayOffMarkup = new InlineKeyboardMarkup()
+                        .setKeyboard(singletonList(singletonList(howToPayOffButton)));
+            }
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
-            response = "<i>Ok. Anyone else?\n" +
-                    "Need " + totalReceiptPrice.subtract(totalBalance) + " more</i>";
+            response = "<i>Ok. Anyone else?\n\n" +
+                    "Need " + totalReceiptPrice.subtract(totalBalance) + " more.</i>";
         } else { // totalBalance > totalReceiptPrice
             response = "<i>Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
                     + "). Can you pls check and type again?</i>";
@@ -107,7 +113,6 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
                 .setParseMode(ParseMode.HTML);
 
         bot.execute(message);
-
     }
 
     @SneakyThrows
@@ -120,5 +125,11 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
             sb.append("@").append(userName).append(" : ").append(balanceStatus.getAmount()).append("\n");
         }
         return sb.toString();
+    }
+
+    private boolean needPayoffButton(Chat chat) {
+        List<BalanceStatus> totalBalanceStatuses = chatService.getTotalBalanceStatuses(chat);
+        return totalBalanceStatuses.stream()
+                .anyMatch(balance -> !balance.getAmount().equals(BigDecimalHelper.create(0)));
     }
 }

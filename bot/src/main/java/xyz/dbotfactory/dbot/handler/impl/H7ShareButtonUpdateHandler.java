@@ -128,7 +128,7 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
             SendMessage sendMessage = new SendMessage()
                     .setChatId(callbackInfo.getTgGroupChatId())
                     .setParseMode(ParseMode.HTML)
-                    .setText(DONE_MESSAGE_TEXT);
+                    .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
             bot.execute(sendMessage);
 
             String[] pmUserIds = groupChat.getChatMetaInfo().getPmUserIds().split(DELIMITER);
