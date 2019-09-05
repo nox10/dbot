@@ -1,9 +1,12 @@
 package xyz.dbotfactory.dbot.handler;
 
 import lombok.SneakyThrows;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 @Component
 public class BotMessageHelper {
@@ -12,5 +15,26 @@ public class BotMessageHelper {
     public void sendSimpleMessageToChat(String message, Long chatId, TelegramLongPollingBot bot){
         SendMessage sendMessage = new SendMessage(chatId, message);
         bot.execute(sendMessage);
+    }
+
+    @SneakyThrows
+    public void sendMessageWithSingleInlineMarkup(Long chatId,
+                                                  InlineKeyboardMarkup markup,
+                                                  TelegramLongPollingBot bot,
+                                                  @Nullable String message){
+
+        SendMessage sendMessage = new SendMessage()
+                .setChatId(chatId)
+                .setText(message)
+                .setReplyMarkup(markup);
+
+        bot.execute(sendMessage);
+    }
+
+    @SneakyThrows
+    public void notifyCallbackProcessed(String callbackId, TelegramLongPollingBot bot){
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
+                .setCallbackQueryId(callbackId);
+        bot.execute(answerCallbackQuery);
     }
 }

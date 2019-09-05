@@ -52,6 +52,11 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
+        handle(chat);
+    }
+
+    @SneakyThrows
+    public void handle(Chat chat){
         Receipt receipt = Receipt.builder()
                 .items(new ArrayList<>())
                 .userBalances(new ArrayList<>())
@@ -65,7 +70,7 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
         chatService.save(chat);
 
         SendMessage message = new SendMessage()
-                .setChatId(update.getMessage().getChatId())
+                .setChatId(chat.getTelegramChatId())
                 .setText(SPEECH_SEND_RECEIPT)
                 .setParseMode(ParseMode.HTML);
         bot.execute(message);

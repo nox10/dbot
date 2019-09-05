@@ -37,7 +37,8 @@ public class DiscardReceiptUpdateHandler implements UpdateHandler {
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return update.getMessage().isCommand() &&
+        return  update.hasMessage() &&
+                update.getMessage().isCommand() &&
                 update.getMessage().getText().contains(COMMAND_NAME)
                 && chat.getChatState() != NO_ACTIVE_RECEIPT
                 && !update.getMessage().getChat().isUserChat();
