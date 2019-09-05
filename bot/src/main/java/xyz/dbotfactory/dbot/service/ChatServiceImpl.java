@@ -127,4 +127,9 @@ public class ChatServiceImpl implements ChatService {
         Receipt activeReceipt = getActiveReceipt(chat);
         chat.getReceipts().remove(activeReceipt);
     }
+
+    @Override
+    public void removeReceipt(Chat chat, int receiptId) {
+        chat.getReceipts().removeIf(receipt -> receipt.getId() == receiptId);
+    }
 }

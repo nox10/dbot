@@ -19,4 +19,6 @@ public interface ChatService {
     void save(Chat chat);
 
     void removeActiveReceipt(Chat chat);
+
+    void removeReceipt(Chat chat, int receiptId);
 }

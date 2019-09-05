@@ -50,7 +50,7 @@ public class DiscardReceiptBalanceButton implements UpdateHandler {
         chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
 
         messageHelper.sendSimpleMessage("Current receipt was PERERASCHETED", chat.getTelegramChatId(), bot);
-        chatService.removeActiveReceipt(chat);
+        chatService.removeReceipt(chat, callbackInfo.getReceiptId());
         chatService.save(chat);
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
     }

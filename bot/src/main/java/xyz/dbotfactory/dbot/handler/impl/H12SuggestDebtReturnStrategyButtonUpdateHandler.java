@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import xyz.dbotfactory.dbot.handler.CommonConsts;
-import xyz.dbotfactory.dbot.handler.ShareButtonCallbackInfo;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.handler.impl.callback.PayOffCallbackInfo;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.DebtReturnTransaction;
@@ -17,50 +16,52 @@ import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.List;
 
-import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
-import static xyz.dbotfactory.dbot.handler.CommonConsts.SUGGEST_DEBT_RETURN_STATEGY;
 
 @Component
 public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHandler {
-    @Autowired
-    ChatService chatService;
+    private final ChatService chatService;
+
+    private final TelegramLongPollingBot bot;
+
+    private final BotMessageHelper messageHelper;
 
     @Autowired
-    TelegramLongPollingBot bot;
+    public H12SuggestDebtReturnStrategyButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot, BotMessageHelper messageHelper) {
+        this.chatService = chatService;
+        this.bot = bot;
+        this.messageHelper = messageHelper;
+    }
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
         if (update.hasCallbackQuery()) {
             String data = update.getCallbackQuery().getData();
-            if (data.startsWith(SUGGEST_DEBT_RETURN_STATEGY)) {
+            if (PayOffCallbackInfo.canHandle(data)) {
+                PayOffCallbackInfo callbackInfo = PayOffCallbackInfo.fromCallbackData(data);
+                Chat groupChat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
 
-                Chat groupChat = chatService.findOrCreateChatByTelegramId(getChatIdFromCallbackData(data));
-
-                return groupChat.getChatState() == ChatState.NO_ACTIVE_RECEIPT ;
-
+                return groupChat.getChatState() == ChatState.NO_ACTIVE_RECEIPT;
             }
         }
 
         return false;
     }
 
-    private long getChatIdFromCallbackData(String data) {
-        return Long.parseLong(data.split(DELIMITER)[1]);
-    }
-
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
-        long chatId = getChatIdFromCallbackData(update.getCallbackQuery().getData());
-        chat = chatService.findOrCreateChatByTelegramId(chatId);
+        String data = update.getCallbackQuery().getData();
+        PayOffCallbackInfo callbackInfo = PayOffCallbackInfo.fromCallbackData(data);
+
+        chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
 
         List<DebtReturnTransaction> returnStrategy = chatService.getReturnStrategy(chat);
 
         String response = prettyPrintReturnStrategy(returnStrategy);
-        if(!response.equals("")){
-            SendMessage sendMessage = new SendMessage(chatId, response);
-            bot.execute(sendMessage);
-        }
+        if (!response.equals(""))
+            messageHelper.sendSimpleMessage(response, callbackInfo.getTelegramChatId(), bot);
+
+        messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
     }
 
     @SneakyThrows
@@ -74,7 +75,7 @@ public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
 
             String string = "@" + fromUsername + " -> " + "@" + toUsername + " : " + debtReturnTransaction.getAmount() + "\n";
             sb.append(string);
-         }
+        }
         return sb.toString();
     }
 }
