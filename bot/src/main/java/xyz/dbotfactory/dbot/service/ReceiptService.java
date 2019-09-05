@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import xyz.dbotfactory.dbot.model.OCRResult;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.model.ReceiptItem;
-import xyz.dbotfactory.dbot.model.Share;
 
 import java.math.BigDecimal;
 
@@ -22,6 +21,8 @@ public interface ReceiptService {
     void save(Receipt receipt);
 
     boolean allSharesDone(Receipt receipt);
+
+    String buildBeautifulReceiptString(Receipt receipt);
 
     OCRResult parseReceipt(String imageUrl);
 }

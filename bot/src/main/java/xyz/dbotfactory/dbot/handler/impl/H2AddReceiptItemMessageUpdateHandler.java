@@ -18,6 +18,7 @@ import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.model.ReceiptItem;
 import xyz.dbotfactory.dbot.service.ChatService;
+import xyz.dbotfactory.dbot.service.ReceiptService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,17 +30,21 @@ import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
 @Log
 public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private static final String DONE_EMOJI = "✔️";
-    private static final String DONE_TEXT = DONE_EMOJI + " <i>Done, feel free to send more...</i>";
-    private static final String STATUS_EMOJI = "ℹ️";
-    private static final String COLLECTING_STATUS_BUTTON_TEXT = STATUS_EMOJI + " Status " + STATUS_EMOJI;
+    private static final String YOUR_RECEIPT_TEXT = "<b>Your receipt:\n\n</b>";
+    private static final String DONE_TEXT = "<i>Feel free to add more items now</i>";
+    private static final String SQUARED_DONE_EMOJI = "☑️";
+    private static final String COLLECTING_FINISHED_BUTTON_TEXT =
+            SQUARED_DONE_EMOJI + " No more items " + SQUARED_DONE_EMOJI;
 
     private final ChatService chatService;
+    private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public H2AddReceiptItemMessageUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H2AddReceiptItemMessageUpdateHandler(ChatService chatService, ReceiptService receiptService,
+                                                TelegramLongPollingBot bot) {
         this.chatService = chatService;
+        this.receiptService = receiptService;
         this.bot = bot;
     }
 
@@ -80,23 +85,22 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
             existingItem.setAmount(existingItem.getAmount().add(receiptItem.getAmount()));
         }
 
-        chatService.save(chat);
+        String formattedReceipt = receiptService.buildBeautifulReceiptString(receipt);
 
-        InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
-                .setText(COLLECTING_STATUS_BUTTON_TEXT)
-                .setCallbackData(COLLECTING_STATUS_CALLBACK_DATA);
-        InlineKeyboardMarkup collectingStatusMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(singletonList(singletonList(collectingStatusButton)));
-
+        InlineKeyboardButton collectingFinishedButton = new InlineKeyboardButton()
+                .setText(COLLECTING_FINISHED_BUTTON_TEXT)
+                .setCallbackData(COLLECTING_FINISHED_CALLBACK_DATA);
+        InlineKeyboardMarkup collectingFinishedMarkup = new InlineKeyboardMarkup()
+                .setKeyboard(singletonList(singletonList(collectingFinishedButton)));
         SendMessage message = new SendMessage()
-                .setChatId(chat.getTelegramChatId())
-                .setText(DONE_TEXT)
-                .setReplyToMessageId(update.getMessage().getMessageId())
-                .setParseMode(ParseMode.HTML)
-                .setReplyMarkup(collectingStatusMarkup);
-        bot.execute(message);
+                .setChatId(update.getMessage().getChatId())
+                .setText(YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT)
+                .setReplyMarkup(collectingFinishedMarkup)
+                .setParseMode(ParseMode.HTML);
 
+        bot.execute(message);
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
+        chatService.save(chat);
     }
 
     private String[] parseItem(String item) {

@@ -7,7 +7,6 @@ public interface CommonConsts {
     String ITEM_BUTTON_CALLBACK_DATA_PREFIX = "item";
     String DELIMITER = "/";
     String CONTINUE_DELIMITER = "_";
-    String COLLECTING_STATUS_CALLBACK_DATA = "collecting_status";
     String CONTINUE_COMMAND_METADATA_PREFIX = "continue";
     String FINISHED_SETTING_SHARES_CALLBACK_DATA = "shares_done";
     String SHARE_LEFT_BUTTON_CALLBACK_DATA = "left";
