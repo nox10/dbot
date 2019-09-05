@@ -5,6 +5,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
@@ -13,7 +14,7 @@ public class BotMessageHelper {
 
     @SneakyThrows
     public void sendSimpleMessageToChat(String message, Long chatId, TelegramLongPollingBot bot){
-        SendMessage sendMessage = new SendMessage(chatId, message);
+        SendMessage sendMessage = new SendMessage(chatId, message).setParseMode(ParseMode.HTML);
         bot.execute(sendMessage);
     }
 

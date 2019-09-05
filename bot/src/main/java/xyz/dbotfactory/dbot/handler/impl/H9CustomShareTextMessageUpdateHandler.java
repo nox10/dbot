@@ -12,7 +12,8 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.BigDecimalHelper;
+import xyz.dbotfactory.dbot.BigDecimalUtils;
+import xyz.dbotfactory.dbot.handler.SharePickerHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.*;
@@ -34,12 +35,15 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
 
+    private final SharePickerHelper sharePickerHelper;
+
     @Autowired
     public H9CustomShareTextMessageUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                                 TelegramLongPollingBot bot) {
+                                                 TelegramLongPollingBot bot, SharePickerHelper sharePickerHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
+        this.sharePickerHelper = sharePickerHelper;
     }
 
     @Override
@@ -83,8 +87,8 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                 receipt.getItems().stream().filter(anItem -> anItem.getId() == itemId).findFirst().get();
 
         boolean shareIsValid =
-                BigDecimalHelper.isSmallerOrEqual(customShareAmount, receiptService.shareLeft(item, userId))
-                        && BigDecimalHelper.isGreaterOrEqual(customShareAmount, BigDecimal.ZERO);
+                BigDecimalUtils.isSmallerOrEqual(customShareAmount, receiptService.shareLeft(item, userId))
+                        && BigDecimalUtils.isGreaterOrEqual(customShareAmount, BigDecimal.ZERO);
 
         if (shareIsValid) {
             Share share;
@@ -139,15 +143,7 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                     .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
             bot.execute(sendMessage);
 
-            String[] pmUserIds = groupChat.getChatMetaInfo().getPmUserIds().split(DELIMITER);
-            for (String pmUserId : pmUserIds) {
-                SendMessage sendMessage2 = new SendMessage()
-                        .setChatId(pmUserId)
-                        .setParseMode(ParseMode.HTML)
-                        .setText(GO_TO_GROUP_TEXT);
-                bot.execute(sendMessage2);
-                groupChat.getChatMetaInfo().setPmUserIds("");
-            }
+            sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
         }
 
         chatService.save(groupChat);
@@ -158,15 +154,15 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
         if (text.contains("/")) {
             String[] fraction = text.split("/");
             if (isNotProperDecimal(fraction[0]) || isNotProperDecimal(fraction[1])) {
-                return BigDecimalHelper.create(-1);
+                return BigDecimalUtils.create(-1);
             } else {
-                return BigDecimalHelper.create(parseDouble(fraction[0]) / parseDouble(fraction[1]));
+                return BigDecimalUtils.create(parseDouble(fraction[0]) / parseDouble(fraction[1]));
             }
         } else {
             if (isNotProperDecimal(text)) {
-                return BigDecimalHelper.create(-1);
+                return BigDecimalUtils.create(-1);
             } else {
-                return new BigDecimal(text);
+                return BigDecimalUtils.create(text);
             }
         }
     }

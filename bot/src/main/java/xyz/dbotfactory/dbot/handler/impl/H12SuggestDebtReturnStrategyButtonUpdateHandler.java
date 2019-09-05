@@ -72,7 +72,7 @@ public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
             String fromUsername = bot.execute(getFromChat).getUserName();
             String toUsername = bot.execute(getToChat).getUserName();
 
-            String string = "@" + fromUsername + " -> " + "@" + toUsername + " : " + debtReturnTransaction.getAmount();
+            String string = "@" + fromUsername + " -> " + "@" + toUsername + " : " + debtReturnTransaction.getAmount() + "\n";
             sb.append(string);
          }
         return sb.toString();
