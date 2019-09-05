@@ -23,7 +23,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 @Log
 public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
 
-    private static final String COMMAND_NAME = "/new_receipt";
+    public static final String COMMAND_NAME = "/new_receipt";
     private static final String RECEIPT_EMOJI = "🧾";
     private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <i>Now send receipt information.</i>\n\n" +
             "<i>Receipt info should be in the next format (with spaces):</i>\n\n" +
@@ -52,6 +52,11 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
+        handle(chat);
+    }
+
+    @SneakyThrows
+    public void handle(Chat chat){
         Receipt receipt = Receipt.builder()
                 .items(new ArrayList<>())
                 .userBalances(new ArrayList<>())
@@ -65,7 +70,7 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
         chatService.save(chat);
 
         SendMessage message = new SendMessage()
-                .setChatId(update.getMessage().getChatId())
+                .setChatId(chat.getTelegramChatId())
                 .setText(SPEECH_SEND_RECEIPT)
                 .setParseMode(ParseMode.HTML);
         bot.execute(message);

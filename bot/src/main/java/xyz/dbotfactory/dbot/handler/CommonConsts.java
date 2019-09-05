@@ -1,6 +1,7 @@
 package xyz.dbotfactory.dbot.handler;
 
 public interface CommonConsts {
+    String DISCARD_ACTIVE_RECEIPT_CALLBACK_DATA = "discard_active_receipt";
     String COLLECTING_FINISHED_CALLBACK_DATA = "collecting_is_finished";
     String SUGGEST_DEBT_RETURN_STATEGY = "suggest_debt_return_strategy";
     String ITEM_BUTTON_CALLBACK_DATA_PREFIX = "item";

@@ -110,4 +110,10 @@ public class ChatServiceImpl implements ChatService {
     public void save(Chat chat) {
         chatRepository.save(chat);
     }
+
+    @Override
+    public void removeActiveReceipt(Chat chat) {
+        Receipt activeReceipt = getActiveReceipt(chat);
+        chat.getReceipts().remove(activeReceipt);
+    }
 }

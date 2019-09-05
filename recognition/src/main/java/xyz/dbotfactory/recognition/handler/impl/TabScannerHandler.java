@@ -40,13 +40,17 @@ public class TabScannerHandler implements OCRHandler {
     private String apiKey = "MsfV5SbXY44ZUIt29Z6kN7w2hjwtT5I9LNfKBsqjs92B7NlGsoXG6t7BWEEQC7zB";
 
     @Override
+    @SneakyThrows
     public OCRHandleInfo parseImage(String imageUrl) {
         JSONObject jsonObject = sendPost(imageUrl);
 
         if ((Long) jsonObject.get("status_code")== 4)
             return OCRHandleInfo.builder().handled(false).build();
+        Thread.sleep(5000);
         JSONObject jsonReceipt = sendGet((String) jsonObject.get("token"));
-        System.out.println(jsonReceipt);
+        if ((Long) jsonReceipt.get("status_code")==1){
+            return OCRHandleInfo.builder().handled(false).build();
+        }
         Receipt receipt = convert(jsonReceipt);
         return OCRHandleInfo.builder().handled(true).handleInfo(receipt).build();
     }
@@ -81,7 +85,7 @@ public class TabScannerHandler implements OCRHandler {
             return o;
         }
         JSONObject jsonObject = (JSONObject) j.parse("{\"status_code\":4");
-        file.delete();
+        Files.deleteIfExists(Paths.get(pathToImage));
         return jsonObject;
     }
 
@@ -121,7 +125,6 @@ public class TabScannerHandler implements OCRHandler {
     private Receipt convert(JSONObject object){
         JSONObject result = (JSONObject)object.get("result");
         JSONArray lineItems = (JSONArray)result.get("lineItems");
-        System.out.println(lineItems.get(0));
         List<ReceiptItem> receiptItems = IntStream.range(0, lineItems.size())
                 .mapToObj(i -> (JSONObject) lineItems.get(i))
                 .map(x -> ReceiptItem.builder()
