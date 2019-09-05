@@ -13,7 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 public class BotMessageHelper {
 
     @SneakyThrows
-    public void sendSimpleMessageToChat(String message, Long chatId, TelegramLongPollingBot bot){
+    public void sendSimpleMessage(String message, Long chatId, TelegramLongPollingBot bot){
         SendMessage sendMessage = new SendMessage(chatId, message).setParseMode(ParseMode.HTML);
         bot.execute(sendMessage);
     }
@@ -27,7 +27,8 @@ public class BotMessageHelper {
         SendMessage sendMessage = new SendMessage()
                 .setChatId(chatId)
                 .setText(message)
-                .setReplyMarkup(markup);
+                .setReplyMarkup(markup)
+                .setParseMode(ParseMode.HTML);
 
         bot.execute(sendMessage);
     }

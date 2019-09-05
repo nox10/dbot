@@ -92,7 +92,7 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
         InlineKeyboardMarkup howToPayOffMarkup = null;
 
         if (totalBalance.compareTo(totalReceiptPrice) == 0) {
-            response = "<i>All good, receipt input completed.\n\nCurrent balances: \n" +
+            response = "<i>All good, receipt input completed.\n" +
                     getPrettyChatBalanceStatuses(chat) + "</i>";
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
@@ -123,7 +123,17 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
 
     @SneakyThrows
     private String getPrettyChatBalanceStatuses(Chat chat) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("RECEIPT BALANCES: \n\n");
+        List<BalanceStatus> receiptBalanceStatuses = chatService.getCurrentReceiptBalanceStatuses(chatService.getActiveReceipt(chat));
+        sb.append(getPrettyBalanceStatuses(receiptBalanceStatuses));
+        sb.append("\n\n TOTAL BALANCES: \n\n");
         List<BalanceStatus> totalBalanceStatuses = chatService.getTotalBalanceStatuses(chat);
+        sb.append(getPrettyBalanceStatuses(totalBalanceStatuses));
+        return sb.toString();
+    }
+
+    private String getPrettyBalanceStatuses(List<BalanceStatus> totalBalanceStatuses) throws org.telegram.telegrambots.meta.exceptions.TelegramApiException {
         StringBuilder sb = new StringBuilder();
         for (BalanceStatus balanceStatus : totalBalanceStatuses) {
             GetChat getChat = new GetChat(balanceStatus.getId());

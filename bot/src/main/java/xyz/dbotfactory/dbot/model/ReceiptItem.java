@@ -29,4 +29,8 @@ public class ReceiptItem {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Share> shares = new ArrayList<>();
+
+    public void addAmount(BigDecimal amount) {
+        setAmount(getAmount().add(amount));
+    }
 }

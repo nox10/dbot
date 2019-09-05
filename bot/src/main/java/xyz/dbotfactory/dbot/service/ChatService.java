@@ -13,6 +13,7 @@ public interface ChatService {
     Receipt getActiveReceipt(Chat chat);
 
     List<BalanceStatus> getTotalBalanceStatuses(Chat chat);
+    List<BalanceStatus> getCurrentReceiptBalanceStatuses(Receipt receipt);
     List<DebtReturnTransaction> getReturnStrategy(Chat chat);
 
     void save(Chat chat);

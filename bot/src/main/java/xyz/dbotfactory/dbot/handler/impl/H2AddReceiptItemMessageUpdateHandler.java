@@ -11,6 +11,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.DBotUserException;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
+import xyz.dbotfactory.dbot.handler.ButtonFactory;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -23,6 +25,7 @@ import xyz.dbotfactory.dbot.service.ReceiptService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
@@ -36,12 +39,18 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
 
+    private final BotMessageHelper messageHelper;
+
+    private final ButtonFactory buttonFactory;
+
     @Autowired
     public H2AddReceiptItemMessageUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                                TelegramLongPollingBot bot) {
+                                                TelegramLongPollingBot bot, BotMessageHelper messageHelper, ButtonFactory buttonFactory) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
+        this.messageHelper = messageHelper;
+        this.buttonFactory = buttonFactory;
     }
 
     @Override
@@ -78,30 +87,30 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
 
         List<ReceiptItem> items = receipt.getItems();
 
-        int index = items.indexOf(receiptItem);
-        if (index == -1) {
-            items.add(receiptItem);
-        } else {
-            ReceiptItem existingItem = items.get(index);
-            existingItem.setAmount(existingItem.getAmount().add(receiptItem.getAmount()));
-        }
+        addOrUpdateExistingItem(items, receiptItem);
 
         String formattedReceipt = receiptService.buildBeautifulReceiptString(receipt);
 
-        InlineKeyboardButton collectingFinishedButton = new InlineKeyboardButton()
-                .setText(COLLECTING_FINISHED_BUTTON_TEXT)
-                .setCallbackData(COLLECTING_FINISHED_CALLBACK_DATA);
-        InlineKeyboardMarkup collectingFinishedMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(singletonList(singletonList(collectingFinishedButton)));
-        SendMessage message = new SendMessage()
-                .setChatId(update.getMessage().getChatId())
-                .setText(YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT)
-                .setReplyMarkup(collectingFinishedMarkup)
-                .setParseMode(ParseMode.HTML);
+        InlineKeyboardMarkup collectingFinishedButton =
+                buttonFactory.getSingleButton(COLLECTING_FINISHED_BUTTON_TEXT, COLLECTING_FINISHED_CALLBACK_DATA);
 
-        bot.execute(message);
+        messageHelper.sendMessageWithSingleInlineMarkup(
+                chat.getTelegramChatId(),
+                collectingFinishedButton,
+                bot,
+                YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT);
+
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
         chatService.save(chat);
+    }
+
+    private void addOrUpdateExistingItem(List<ReceiptItem> items, ReceiptItem newItem) {
+
+        Optional<ReceiptItem> existingItem = items
+                .stream()
+                .filter(item -> item.getName().equals(newItem.getName()) && item.getPrice().compareTo(newItem.getPrice()) == 0)
+                .findFirst();
+        existingItem.ifPresentOrElse(item -> item.addAmount(newItem.getAmount()), () -> items.add(newItem));
     }
 
     private String[] parseItem(String item) {

@@ -69,6 +69,17 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public List<BalanceStatus> getCurrentReceiptBalanceStatuses(Receipt receipt) {
+        Stream<BalanceStatus> payments = getPaymentsFromReceiptAsBalanceStatuses(receipt).stream();
+
+        Stream<BalanceStatus> spendings = getSpendingsFromReceiptAsBalanceStatuses(receipt).stream();
+
+        List<BalanceStatus> allBalances = Stream.concat(payments, spendings).collect(toList());
+
+        return calcService.getTotalBalance(allBalances);
+    }
+
+    @Override
     public List<DebtReturnTransaction> getReturnStrategy(Chat chat) {
         List<BalanceStatus> totalBalanceStatuses = getTotalBalanceStatuses(chat);
         return calcService.getReturnStrategy(totalBalanceStatuses);

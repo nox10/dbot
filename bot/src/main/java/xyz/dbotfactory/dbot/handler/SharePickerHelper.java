@@ -31,7 +31,7 @@ public class SharePickerHelper {
             long chatId = Long.parseLong(pmUserId);
             BigDecimal totalPrice = getTotalPriceForUser(receipt, chatId);
             String text = "Your total price is " + totalPrice + " \n" + GO_TO_GROUP_TEXT;
-            botMessageHelper.sendSimpleMessageToChat(text, chatId, bot);
+            botMessageHelper.sendSimpleMessage(text, chatId, bot);
         }
 
         groupChat.getChatMetaInfo().setPmUserIds("");

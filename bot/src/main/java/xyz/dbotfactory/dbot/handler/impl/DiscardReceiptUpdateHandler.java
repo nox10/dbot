@@ -49,6 +49,6 @@ public class DiscardReceiptUpdateHandler implements UpdateHandler {
         chatService.removeActiveReceipt(chat);
         chat.setChatState(NO_ACTIVE_RECEIPT);
         chatService.save(chat);
-        messageHelper.sendSimpleMessageToChat(MESSAGE, chat.getTelegramChatId(), bot);
+        messageHelper.sendSimpleMessage(MESSAGE, chat.getTelegramChatId(), bot);
     }
 }
