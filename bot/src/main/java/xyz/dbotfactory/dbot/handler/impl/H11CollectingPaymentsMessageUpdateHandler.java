@@ -84,7 +84,7 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
 
         InlineKeyboardMarkup howToPayOffMarkup = null;
 
-        if (totalBalance.equals(totalReceiptPrice)) {
+        if (totalBalance.compareTo(totalReceiptPrice) == 0) {
             response = "<i>All good, receipt input completed.\n\nCurrent balances: \n" +
                     getPrettyChatBalanceStatuses(chat) + "</i>";
             chat.setChatState(NO_ACTIVE_RECEIPT);
