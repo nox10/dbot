@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.BigDecimalUtils;
+import xyz.dbotfactory.dbot.handler.PayOffHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -38,20 +39,26 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
     private final ChatService chatService;
 
 
+    private final PayOffHelper payOffHelper;
+
     private final ReceiptService receiptService;
 
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public H11CollectingPaymentsMessageUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot) {
+    public H11CollectingPaymentsMessageUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot, PayOffHelper payOffHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
+        this.payOffHelper = payOffHelper;
     }
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return chat.getChatState() == COLLECTING_PAYMENTS_INFO;
+
+        return update.hasMessage() &&
+                !update.getMessage().isCommand() &&
+                chat.getChatState() == COLLECTING_PAYMENTS_INFO;
     }
 
     @Override
@@ -90,12 +97,11 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
 
-            if (needPayoffButton(chat)) {
-                InlineKeyboardButton howToPayOffButton = new InlineKeyboardButton()
-                        .setText(SUGGEST_DEBT_RETURN_STATEGY_MESSAGE)
-                        .setCallbackData(SUGGEST_DEBT_RETURN_STATEGY + DELIMITER + chat.getTelegramChatId());
+            if (payOffHelper.canSuggestPayOffStrategy(chat)) {
+                InlineKeyboardButton payOffButton = payOffHelper.getPayOffButton(chat.getTelegramChatId());
+                InlineKeyboardButton discardBalancesButton = payOffHelper.getDiscardBalancesButton(chat.getTelegramChatId(), receipt.getId());
                 howToPayOffMarkup = new InlineKeyboardMarkup()
-                        .setKeyboard(singletonList(singletonList(howToPayOffButton)));
+                        .setKeyboard(singletonList(List.of(payOffButton, discardBalancesButton)));
             }
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
             response = "<i>Ok. Anyone else?\n\n" +
@@ -125,11 +131,5 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
             sb.append("@").append(userName).append(" : ").append(balanceStatus.getAmount()).append("\n");
         }
         return sb.toString();
-    }
-
-    private boolean needPayoffButton(Chat chat) {
-        List<BalanceStatus> totalBalanceStatuses = chatService.getTotalBalanceStatuses(chat);
-        return totalBalanceStatuses.stream()
-                .anyMatch(balance -> !balance.getAmount().equals(BigDecimalUtils.create(0)));
     }
 }

@@ -9,6 +9,7 @@ import xyz.dbotfactory.dbot.model.Chat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -35,7 +36,8 @@ public class UpdateHandlerAggregator implements BeanPostProcessor {
             throw new DBotUserException("No handler for update found");
 
         if (collect.size() > 1)
-            throw new DBotUserException("More than 1 handler for update found");
+            throw new DBotUserException("More than 1 handler for update found: "
+                    + collect.stream().map(x -> x.getClass().getSimpleName()).collect(Collectors.joining(", ")));
 
         return collect.get(0);
     }
