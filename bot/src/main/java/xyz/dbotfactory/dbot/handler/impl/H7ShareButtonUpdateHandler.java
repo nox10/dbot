@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import xyz.dbotfactory.dbot.handler.SharePickerHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.ShareButtonCallbackInfo;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -35,12 +36,15 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
 
+    private final SharePickerHelper sharePickerHelper;
+
     @Autowired
     public H7ShareButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                      TelegramLongPollingBot bot) {
+                                      TelegramLongPollingBot bot, SharePickerHelper sharePickerHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
+        this.sharePickerHelper = sharePickerHelper;
     }
 
     @Override
@@ -131,15 +135,7 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
                     .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
             bot.execute(sendMessage);
 
-            String[] pmUserIds = groupChat.getChatMetaInfo().getPmUserIds().split(DELIMITER);
-            for (String pmUserId : pmUserIds) {
-                SendMessage sendMessage2 = new SendMessage()
-                        .setChatId(pmUserId)
-                        .setParseMode(ParseMode.HTML)
-                        .setText(GO_TO_GROUP_TEXT);
-                bot.execute(sendMessage2);
-                groupChat.getChatMetaInfo().setPmUserIds("");
-            }
+            sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
         }
 
         chatService.save(groupChat);
