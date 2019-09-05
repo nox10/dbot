@@ -3,7 +3,7 @@ package xyz.dbotfactory.dbot.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.dbotfactory.dbot.BigDecimalUtils;
-import xyz.dbotfactory.dbot.helper.PrettyPrintHelper;
+import xyz.dbotfactory.dbot.helper.PrettyPrintUtils;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.repo.ReceiptRepository;
 
@@ -97,8 +97,8 @@ public class ReceiptServiceImpl implements ReceiptService {
         int maxNameLength = items.stream().mapToInt(x -> x.getName().length()).max().orElse(0);
         int maxPriceLength = items.stream().mapToInt(x -> String.valueOf(x.getPrice()).length()).max().orElse(0);
         for (ReceiptItem item : items) {
-            String itemName = PrettyPrintHelper.padRight(item.getName(), maxNameLength);
-            String price = PrettyPrintHelper.padRight(String.valueOf(item.getPrice()), maxPriceLength);
+            String itemName = PrettyPrintUtils.padRight(item.getName(), maxNameLength);
+            String price = PrettyPrintUtils.padRight(String.valueOf(item.getPrice()), maxPriceLength);
             stringBuilder
                     .append(itemName).append(" : ")
                     .append(price).append(" x ")

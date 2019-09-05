@@ -13,10 +13,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.handler.impl.callback.ShareEqualCallbackInfo;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.service.ChatService;
+
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.telegram.telegrambots.meta.api.methods.ParseMode.HTML;
@@ -63,9 +66,11 @@ public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandl
                         .setText(CONTINUE_BUTTON_TEXT);
 
 
+        ShareEqualCallbackInfo shareEqualCallbackInfo = new ShareEqualCallbackInfo(chat.getTelegramChatId());
+        InlineKeyboardButton shareEqualButton = shareEqualCallbackInfo.getButton();
 
         InlineKeyboardMarkup itemButtonsMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(singletonList(singletonList(continueButton)));
+                .setKeyboard(singletonList(List.of(continueButton, shareEqualButton)));
 
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())

@@ -6,16 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
-import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.BigDecimalUtils;
 import xyz.dbotfactory.dbot.handler.PayOffHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.impl.callback.DiscardReceiptBalanceCallbackInfo;
 import xyz.dbotfactory.dbot.handler.impl.callback.PayOffCallbackInfo;
+import xyz.dbotfactory.dbot.helper.PrettyPrintUtils;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.Receipt;
@@ -30,7 +28,7 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.isSmaller;
-import static xyz.dbotfactory.dbot.handler.CommonConsts.*;
+import static xyz.dbotfactory.dbot.helper.PrettyPrintUtils.getPrettyBalanceStatuses;
 import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 
@@ -134,20 +132,12 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
         StringBuilder sb = new StringBuilder();
         sb.append("RECEIPT BALANCES: \n\n");
         List<BalanceStatus> receiptBalanceStatuses = chatService.getCurrentReceiptBalanceStatuses(chatService.getActiveReceipt(chat));
-        sb.append(getPrettyBalanceStatuses(receiptBalanceStatuses));
+        sb.append(getPrettyBalanceStatuses(receiptBalanceStatuses, bot));
         sb.append("\n\n TOTAL BALANCES: \n\n");
         List<BalanceStatus> totalBalanceStatuses = chatService.getTotalBalanceStatuses(chat);
-        sb.append(getPrettyBalanceStatuses(totalBalanceStatuses));
+        sb.append(getPrettyBalanceStatuses(totalBalanceStatuses, bot));
         return sb.toString();
     }
 
-    private String getPrettyBalanceStatuses(List<BalanceStatus> totalBalanceStatuses) throws org.telegram.telegrambots.meta.exceptions.TelegramApiException {
-        StringBuilder sb = new StringBuilder();
-        for (BalanceStatus balanceStatus : totalBalanceStatuses) {
-            GetChat getChat = new GetChat(balanceStatus.getId());
-            String userName = bot.execute(getChat).getUserName();
-            sb.append("@").append(userName).append(" : ").append(balanceStatus.getAmount()).append("\n");
-        }
-        return sb.toString();
-    }
+
 }
