@@ -17,9 +17,12 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     private final ReceiptRepository receiptRepository;
 
+    private final RecognService recognService;
+
     @Autowired
-    public ReceiptServiceImpl(ReceiptRepository receiptRepository) {
+    public ReceiptServiceImpl(ReceiptRepository receiptRepository, RecognService recognService) {
         this.receiptRepository = receiptRepository;
+        this.recognService = recognService;
     }
 
     @Override
@@ -79,5 +82,10 @@ public class ReceiptServiceImpl implements ReceiptService {
                         .reduce(BigDecimal::add)
                         .orElse(create(0)).equals(item.getAmount()))
                 .reduce(Boolean::logicalAnd).orElseThrow(() -> new IllegalStateException("Empty receipt"));
+    }
+
+    @Override
+    public OCRResult parseReceipt(String imageUrl) {
+        return this.recognService.parseReceipt(imageUrl);
     }
 }
