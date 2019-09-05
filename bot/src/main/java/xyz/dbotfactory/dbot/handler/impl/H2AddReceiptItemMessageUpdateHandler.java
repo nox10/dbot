@@ -35,6 +35,7 @@ import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
 
 
+    private static final String ITEM_REGEX = "\\d+(\\.\\d+)?\\ \\d+(\\.\\d+)?\\ \\w+";
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
@@ -64,15 +65,16 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
     @SneakyThrows
     public void handle(Update update, Chat chat) {
         String text = update.getMessage().getText();
+        if(!text.matches(ITEM_REGEX))
+            return;
         String[] itemInfo = parseItem(text);
-
         String amountStr = itemInfo[0];
         String priceForUnit = itemInfo[1];
         String name = itemInfo[2];
 
         Receipt receipt = chatService.getActiveReceipt(chat);
-        BigDecimal price = create(Double.parseDouble(priceForUnit));
 
+        BigDecimal price = create(priceForUnit);
         BigDecimal amount = create(amountStr);
 
         if(amount.signum() <= 0 || price.signum() < 0)

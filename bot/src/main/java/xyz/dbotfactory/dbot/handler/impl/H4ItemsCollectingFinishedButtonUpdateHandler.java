@@ -62,6 +62,8 @@ public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandl
                                 chat.getTelegramChatId() + CONTINUE_DELIMITER + receipt.getId())
                         .setText(CONTINUE_BUTTON_TEXT);
 
+
+
         InlineKeyboardMarkup itemButtonsMarkup = new InlineKeyboardMarkup()
                 .setKeyboard(singletonList(singletonList(continueButton)));
 
