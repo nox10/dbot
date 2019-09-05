@@ -30,11 +30,6 @@ import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
 @Log
 public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private static final String YOUR_RECEIPT_TEXT = "<b>Your receipt:\n\n</b>";
-    private static final String DONE_TEXT = "<i>Feel free to add more items now</i>";
-    private static final String SQUARED_DONE_EMOJI = "☑️";
-    private static final String COLLECTING_FINISHED_BUTTON_TEXT =
-            SQUARED_DONE_EMOJI + " No more items " + SQUARED_DONE_EMOJI;
 
     private final ChatService chatService;
     private final ReceiptService receiptService;
@@ -51,7 +46,7 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
     @Override
     public boolean canHandle(Update update, Chat chat) {
         return update.hasMessage() &&
-                !update.getMessage().isCommand() &&
+                !update.getMessage().isCommand() && update.getMessage().hasText() &&
                 chat.getChatState() == ChatState.COLLECTING_ITEMS;
     }
 

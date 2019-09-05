@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class OCRResult {
-    boolean parsed;
+    boolean handled;
     public Receipt receipt;
 }

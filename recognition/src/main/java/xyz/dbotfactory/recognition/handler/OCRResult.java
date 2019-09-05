@@ -8,7 +8,7 @@ import xyz.dbotfactory.recognition.model.Receipt;
 
 @Builder
 @Data
-public class OCRHandleInfo {
+public class OCRResult {
     boolean handled;
-    public Receipt handleInfo;
+    public Receipt receipt;
 }

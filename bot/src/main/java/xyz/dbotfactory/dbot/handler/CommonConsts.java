@@ -19,4 +19,9 @@ public interface CommonConsts {
             "Total sum is: </i>";
     String GO_TO_GROUP_TEXT = "<i>Go back to group chat</i>";
     String ITEMS_MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
+    String YOUR_RECEIPT_TEXT = "<b>Your receipt:\n\n</b>";
+    String DONE_TEXT = "<i>Feel free to add more items now</i>";
+    String SQUARED_DONE_EMOJI = "☑️";
+    String COLLECTING_FINISHED_BUTTON_TEXT =
+            SQUARED_DONE_EMOJI + " No more items " + SQUARED_DONE_EMOJI;
 }

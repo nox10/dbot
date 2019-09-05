@@ -5,7 +5,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,13 +21,13 @@ public class OCRHandlerAggregator implements BeanPostProcessor {
         return bean;
     }
 
-    public OCRHandleInfo tryOCRHandlers(String image){
+    public OCRResult tryOCRHandlers(String image){
         OCRHandlers.sort(Comparator.comparing(OCRHandler::getPriority));
         for (OCRHandler ocrHadnler : OCRHandlers) {
-            OCRHandleInfo ocrHandleInfo = ocrHadnler.parseImage(image);
+            OCRResult ocrHandleInfo = ocrHadnler.parseImage(image);
             if (ocrHandleInfo.isHandled())
                 return ocrHandleInfo;
         }
-        return OCRHandleInfo.builder().handled(false).build();
+        return OCRResult.builder().handled(false).build();
     }
 }

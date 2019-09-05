@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import xyz.dbotfactory.recognition.handler.OCRHandleInfo;
+import xyz.dbotfactory.recognition.handler.OCRResult;
 import xyz.dbotfactory.recognition.service.RecognitionService;
 
 @RestController
@@ -22,7 +22,7 @@ public class RecognitionController {
     }
 
     @PostMapping("get_result")
-    public OCRHandleInfo getParsedReceipt(@RequestBody String imageUrl){
+    public OCRResult getParsedReceipt(@RequestBody String imageUrl){
         log.info("new parse request:" + imageUrl);
         return recognitionService.parseReceipt(imageUrl);
     }

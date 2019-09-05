@@ -1,7 +1,7 @@
 package xyz.dbotfactory.recognition.service;
 
-import xyz.dbotfactory.recognition.handler.OCRHandleInfo;
+import xyz.dbotfactory.recognition.handler.OCRResult;
 
 public interface RecognitionService {
-    OCRHandleInfo parseReceipt(String imageUrl);
+    OCRResult parseReceipt(String imageUrl);
 }
