@@ -5,11 +5,8 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.ButtonFactory;
@@ -27,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Collections.singletonList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 
 @Component
@@ -65,7 +61,7 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
     @SneakyThrows
     public void handle(Update update, Chat chat) {
         String text = update.getMessage().getText();
-        
+
         if(!text.matches(ITEM_REGEX))
             return;
         text = text.replace(',', '.');
