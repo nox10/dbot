@@ -14,6 +14,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import xyz.dbotfactory.dbot.BigDecimalUtils;
 import xyz.dbotfactory.dbot.handler.PayOffHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.handler.impl.callback.DiscardReceiptBalanceCallbackInfo;
+import xyz.dbotfactory.dbot.handler.impl.callback.PayOffCallbackInfo;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.Receipt;
@@ -97,11 +99,17 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
 
-            if (payOffHelper.canSuggestPayOffStrategy(chat)) {
-                InlineKeyboardButton payOffButton = payOffHelper.getPayOffButton(chat.getTelegramChatId());
-                InlineKeyboardButton discardBalancesButton = payOffHelper.getDiscardBalancesButton(chat.getTelegramChatId(), receipt.getId());
+            if (true){//payOffHelper.canSuggestPayOffStrategy(chat)) {
+                PayOffCallbackInfo payOffCallbackInfo =
+                        new PayOffCallbackInfo(chat.getTelegramChatId());
+
+                DiscardReceiptBalanceCallbackInfo discardReceiptBalanceCallbackInfo =
+
+                        new DiscardReceiptBalanceCallbackInfo(chat.getTelegramChatId(), receipt.getId());
+
                 howToPayOffMarkup = new InlineKeyboardMarkup()
-                        .setKeyboard(singletonList(List.of(payOffButton, discardBalancesButton)));
+                        .setKeyboard(singletonList(List.of(payOffCallbackInfo.getButton(),
+                                discardReceiptBalanceCallbackInfo.getButton())));
             }
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
             response = "<i>Ok. Anyone else?\n\n" +
