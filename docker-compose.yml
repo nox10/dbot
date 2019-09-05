@@ -1,0 +1,42 @@
+version: '3'
+services:
+
+  bot:
+    image: "incarcerous8/receiptbotimage:prod"
+    container_name: "receiptbot_container"
+    env_file:
+      - dbot.env
+    restart: always
+    networks:
+      - botnetwork
+    ports:
+      - "8080:8080"
+    depends_on:
+      - calculator
+      - recognition
+
+  calculator:
+    image: "incarcerous8/receiptcalcimage:prod"
+    container_name: "receiptcalc_container"
+    env_file:
+      - dbot.env
+    restart: always
+    networks:
+      - botnetwork
+    ports:
+      - "8081:8081"
+
+  recognition:
+    image: "incarcerous8/receiptrecognimage:prod"
+    container_name: "receiptrecogn_container"
+    env_file:
+      - dbot.env
+    restart: always
+    networks:
+      - botnetwork
+    ports:
+      - "8082:8082"
+
+networks:
+  localhost:
+    driver: bridge

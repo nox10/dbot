@@ -62,16 +62,6 @@
         </dependency>
     </dependencies>
 
-    <resources>
-        <resource>
-            <filtering>true</filtering>
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>application.yml</include>
-            </includes>
-        </resource>
-    </resources>
-
     <build>
         <plugins>
             <plugin>
