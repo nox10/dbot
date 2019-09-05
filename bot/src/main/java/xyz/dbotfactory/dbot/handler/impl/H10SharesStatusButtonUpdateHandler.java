@@ -75,7 +75,7 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler {
                         .map(Share::getShare)
                         .reduce(BigDecimal::add)
                         .orElse(create(0));
-                if (!item.getAmount().equals(pickedShare)) {
+                if (item.getAmount().compareTo(pickedShare) != 0) {
 
                     BigDecimal unpickedShare = item.getAmount().subtract(pickedShare);
                     sb.append("<pre>").append(item.getName()).append(" x ").append(df2.format(unpickedShare))
