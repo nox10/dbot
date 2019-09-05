@@ -23,7 +23,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 @Log
 public class H1NewReceiptCommandUpdateHandler implements UpdateHandler {
 
-    private static final String COMMAND_NAME = "/new_receipt";
+    public static final String COMMAND_NAME = "/new_receipt";
     private static final String RECEIPT_EMOJI = "🧾";
     private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <i>Now send receipt information.</i>\n\n" +
             "<i>Receipt info should be in the next format (with spaces):</i>\n\n" +

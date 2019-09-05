@@ -16,4 +16,6 @@ public interface ChatService {
     List<DebtReturnTransaction> getReturnStrategy(Chat chat);
 
     void save(Chat chat);
+
+    void removeActiveReceipt(Chat chat);
 }
