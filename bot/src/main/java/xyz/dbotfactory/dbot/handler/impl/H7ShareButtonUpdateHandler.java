@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
-import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 
 @Component
 @Log

@@ -3,7 +3,7 @@ package xyz.dbotfactory.dbot;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class BigDecimalHelper {
+public class BigDecimalUtils {
 
     private static final int SCALE = 4;
 

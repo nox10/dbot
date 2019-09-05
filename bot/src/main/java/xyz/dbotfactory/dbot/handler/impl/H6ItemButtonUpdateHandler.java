@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static xyz.dbotfactory.dbot.BigDecimalHelper.isGreater;
-import static xyz.dbotfactory.dbot.BigDecimalHelper.isGreaterOrEqual;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.isGreater;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.isGreaterOrEqual;
 
 @Component
 @Log

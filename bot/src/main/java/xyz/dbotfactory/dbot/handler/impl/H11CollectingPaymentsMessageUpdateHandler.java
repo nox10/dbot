@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.BigDecimalHelper;
+import xyz.dbotfactory.dbot.BigDecimalUtils;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
-import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
-import static xyz.dbotfactory.dbot.BigDecimalHelper.isSmaller;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.isSmaller;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.*;
 import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
@@ -130,6 +130,6 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
     private boolean needPayoffButton(Chat chat) {
         List<BalanceStatus> totalBalanceStatuses = chatService.getTotalBalanceStatuses(chat);
         return totalBalanceStatuses.stream()
-                .anyMatch(balance -> !balance.getAmount().equals(BigDecimalHelper.create(0)));
+                .anyMatch(balance -> !balance.getAmount().equals(BigDecimalUtils.create(0)));
     }
 }

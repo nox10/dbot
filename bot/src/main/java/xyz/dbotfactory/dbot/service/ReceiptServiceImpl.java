@@ -2,7 +2,7 @@ package xyz.dbotfactory.dbot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import xyz.dbotfactory.dbot.BigDecimalHelper;
+import xyz.dbotfactory.dbot.BigDecimalUtils;
 import xyz.dbotfactory.dbot.helper.PrettyPrintHelper;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.repo.ReceiptRepository;
@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 
 @Service
 @Transactional
@@ -65,7 +65,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         BigDecimal shareAmount = item.getShares().stream()
                 .filter(share -> share.getTelegramUserId() == telegramUserId)
                 .findFirst().orElse(Share.builder().share(create(0)).build()).getShare();
-        if (BigDecimalHelper.equals(shareAmount, 0.0)) {
+        if (BigDecimalUtils.equals(shareAmount, 0.0)) {
             return "";
         } else {
             return " — " + shareAmount;

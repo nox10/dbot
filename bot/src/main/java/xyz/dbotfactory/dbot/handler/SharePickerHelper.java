@@ -9,7 +9,7 @@ import xyz.dbotfactory.dbot.model.Receipt;
 
 import java.math.BigDecimal;
 
-import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.GO_TO_GROUP_TEXT;
 

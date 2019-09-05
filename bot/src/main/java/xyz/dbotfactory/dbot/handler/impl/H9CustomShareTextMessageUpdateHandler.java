@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.BigDecimalHelper;
+import xyz.dbotfactory.dbot.BigDecimalUtils;
 import xyz.dbotfactory.dbot.handler.SharePickerHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -87,8 +87,8 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                 receipt.getItems().stream().filter(anItem -> anItem.getId() == itemId).findFirst().get();
 
         boolean shareIsValid =
-                BigDecimalHelper.isSmallerOrEqual(customShareAmount, receiptService.shareLeft(item, userId))
-                        && BigDecimalHelper.isGreaterOrEqual(customShareAmount, BigDecimal.ZERO);
+                BigDecimalUtils.isSmallerOrEqual(customShareAmount, receiptService.shareLeft(item, userId))
+                        && BigDecimalUtils.isGreaterOrEqual(customShareAmount, BigDecimal.ZERO);
 
         if (shareIsValid) {
             Share share;
@@ -154,15 +154,15 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
         if (text.contains("/")) {
             String[] fraction = text.split("/");
             if (isNotProperDecimal(fraction[0]) || isNotProperDecimal(fraction[1])) {
-                return BigDecimalHelper.create(-1);
+                return BigDecimalUtils.create(-1);
             } else {
-                return BigDecimalHelper.create(parseDouble(fraction[0]) / parseDouble(fraction[1]));
+                return BigDecimalUtils.create(parseDouble(fraction[0]) / parseDouble(fraction[1]));
             }
         } else {
             if (isNotProperDecimal(text)) {
-                return BigDecimalHelper.create(-1);
+                return BigDecimalUtils.create(-1);
             } else {
-                return BigDecimalHelper.create(text);
+                return BigDecimalUtils.create(text);
             }
         }
     }

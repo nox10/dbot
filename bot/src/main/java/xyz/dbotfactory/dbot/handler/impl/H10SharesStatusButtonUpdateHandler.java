@@ -15,7 +15,7 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import static xyz.dbotfactory.dbot.BigDecimalHelper.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.FINISHED_SETTING_SHARES_CALLBACK_DATA;
 
