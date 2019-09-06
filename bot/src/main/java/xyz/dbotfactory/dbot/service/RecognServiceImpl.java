@@ -8,9 +8,9 @@ import xyz.dbotfactory.dbot.model.OCRResult;
 import java.util.Objects;
 
 @Service
-@CrossOrigin("localhost:8082")
+@CrossOrigin("localhost:8097")
 public class RecognServiceImpl implements RecognService {
-    private static final String GET_RESULT_URI = "http://localhost:8082/parse/get_result";
+    private static final String GET_RESULT_URI = "http://localhost:8097/parse/get_result";
 
     @Override
     public OCRResult parseReceipt(String imageUrl) {

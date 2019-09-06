@@ -10,7 +10,7 @@ services:
     networks:
       - botnetwork
     ports:
-      - "8080:8080"
+      - "8095:8095"
     depends_on:
       - calculator
       - recognition
@@ -24,7 +24,7 @@ services:
     networks:
       - botnetwork
     ports:
-      - "8081:8081"
+      - "8096:8096"
 
   recognition:
     image: "incarcerous8/receiptrecognimage:prod"
@@ -35,7 +35,7 @@ services:
     networks:
       - botnetwork
     ports:
-      - "8082:8082"
+      - "8097:8097"
 
 networks:
   localhost:
