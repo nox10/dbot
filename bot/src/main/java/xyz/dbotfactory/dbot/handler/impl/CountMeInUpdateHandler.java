@@ -68,7 +68,6 @@ public class CountMeInUpdateHandler implements UpdateHandler {
             }
         }
 
-        chatService.save(chat);
         List<BalanceStatus> collect = activeReceipt.getUserBalances()
                 .stream()
                 .map(x -> new BalanceStatus(x.getTelegramUserId(), x.getBalance()))
@@ -81,8 +80,10 @@ public class CountMeInUpdateHandler implements UpdateHandler {
                 chat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());
         messageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
-//        messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
-//                chat.getChatMetaInfo(), sentMessage);
+        messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+
+        chatService.save(chat);
     }
 
     private boolean countInNewUser(Receipt receipt, int id) {
