@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import static xyz.dbotfactory.dbot.handler.CommonConsts.*;
+import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 
 @Data
 @Builder
@@ -14,7 +14,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.*;
 @NoArgsConstructor
 public class PayOffCallbackInfo {
     private static final String CALLBACK_ID = "suggest_debt_return_strategy";
-    private static final  String LABEL = "How to pay off?";
+    private static final String LABEL = "❓ How to pay off ❓";
 
     private long telegramChatId;
 

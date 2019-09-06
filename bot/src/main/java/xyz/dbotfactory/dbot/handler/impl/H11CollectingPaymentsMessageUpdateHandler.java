@@ -119,8 +119,8 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
                         new DiscardReceiptBalanceCallbackInfo(chat.getTelegramChatId(), receipt.getId());
 
                 howToPayOffMarkup = new InlineKeyboardMarkup()
-                        .setKeyboard(singletonList(List.of(payOffCallbackInfo.getButton(),
-                                discardReceiptBalanceCallbackInfo.getButton())));
+                        .setKeyboard(List.of(List.of(payOffCallbackInfo.getButton()),
+                                List.of(discardReceiptBalanceCallbackInfo.getButton())));
             }
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
             whenToExecuteDeleteTask = singletonList(this.getClass().getSimpleName());
