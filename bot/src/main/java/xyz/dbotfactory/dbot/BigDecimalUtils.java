@@ -2,10 +2,13 @@ package xyz.dbotfactory.dbot;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 public class BigDecimalUtils {
 
     private static final int SCALE = 4;
+    private static DecimalFormat df2 = new DecimalFormat("#.##");
+
 
     public static BigDecimal create(double number) {
         return new BigDecimal(number).setScale(SCALE, RoundingMode.HALF_UP);
@@ -71,5 +74,10 @@ public class BigDecimalUtils {
 
     public static boolean equals(BigDecimal shareAmount, double b) {
         return shareAmount.equals(create(b));
+    }
+
+    public static  String toStr(BigDecimal decimal){
+
+        return df2.format(decimal);
     }
 }

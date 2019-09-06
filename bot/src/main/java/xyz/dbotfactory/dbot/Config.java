@@ -6,6 +6,7 @@ import lombok.extern.java.Log;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -19,6 +20,7 @@ import javax.annotation.PostConstruct;
 
 @Configuration
 @EnableConfigurationProperties
+@EnableAspectJAutoProxy
 @Log
 public class Config {
 

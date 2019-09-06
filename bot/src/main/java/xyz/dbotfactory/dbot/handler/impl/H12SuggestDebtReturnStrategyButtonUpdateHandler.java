@@ -18,6 +18,8 @@ import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.List;
 
+import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
+
 
 @Component
 public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHandler {
@@ -89,7 +91,8 @@ public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
             String fromUsername = bot.execute(getFromChat).getUserName();
             String toUsername = bot.execute(getToChat).getUserName();
 
-            String string = "@" + fromUsername + " -> " + "@" + toUsername + " : " + debtReturnTransaction.getAmount() + "\n";
+            String string = "@" + fromUsername + " -> " + "@" + toUsername + " : "
+                    + toStr(debtReturnTransaction.getAmount()) + "\n";
             sb.append(string);
         }
         return sb.toString();

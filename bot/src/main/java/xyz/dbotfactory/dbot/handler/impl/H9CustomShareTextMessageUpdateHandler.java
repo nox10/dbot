@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;
 import static java.util.Collections.singletonList;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
 
 @Component
 @Log
@@ -141,9 +142,9 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
             SendMessage sendMessage = new SendMessage()
                     .setChatId(tgGroupChatId)
                     .setParseMode(ParseMode.HTML)
-                    .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
+                    .setText(DONE_MESSAGE_TEXT + toStr(receiptService.getTotalReceiptPrice(receipt)));
             Message sentMessage = bot.execute(sendMessage);
-            
+
             askCleanupTasks(groupChat, sentMessage);
 
             List<Message> sentMessages = sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.GO_TO_GROUP_TEXT;
 
@@ -34,7 +35,7 @@ public class SharePickerHelper {
         for (String pmUserId : pmUserIds) {
             long chatId = Long.parseLong(pmUserId);
             BigDecimal totalPrice = getTotalPriceForUser(receipt, chatId);
-            String text = "Your total price is " + totalPrice + " \n" + GO_TO_GROUP_TEXT;
+            String text = "Your total price is " + toStr(totalPrice) + " \n" + GO_TO_GROUP_TEXT;
             sentMessages.add(botMessageHelper.sendSimpleMessage(text, chatId, bot));
         }
 

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
 
 @Service
 @Transactional
@@ -91,26 +92,26 @@ public class ReceiptServiceImpl implements ReceiptService {
     public String buildBeautifulReceiptString(Receipt receipt) {
         List<ReceiptItem> items = receipt.getItems();
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<pre>");
-        stringBuilder.append(RECEIPT_LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<pre>");
+        sb.append(RECEIPT_LINE);
         int maxNameLength = items.stream().mapToInt(x -> x.getName().length()).max().orElse(0);
-        int maxPriceLength = items.stream().mapToInt(x -> String.valueOf(x.getPrice()).length()).max().orElse(0);
+        int maxPriceLength = items.stream().mapToInt(x -> x.getPrice().toString().length()).max().orElse(0);
         for (ReceiptItem item : items) {
             String itemName = PrettyPrintUtils.padRight(item.getName(), maxNameLength);
-            String price = PrettyPrintUtils.padRight(String.valueOf(item.getPrice()), maxPriceLength);
-            stringBuilder
+            String price = PrettyPrintUtils.padRight(toStr(item.getPrice()), maxPriceLength);
+            sb
                     .append(itemName).append(" : ")
                     .append(price).append(" x ")
-                    .append(item.getAmount()).append("\n");
+                    .append(toStr(item.getAmount())).append("\n");
         }
-        stringBuilder.append(RECEIPT_LINE);
-        stringBuilder.append("TOTAL: ");
-        stringBuilder.append(getTotalReceiptPrice(receipt));
-        stringBuilder.append("\n");
-        stringBuilder.append(RECEIPT_LINE);
-        stringBuilder.append("</pre>");
-        return stringBuilder.toString();
+        sb.append(RECEIPT_LINE);
+        sb.append("TOTAL: ");
+        sb.append(toStr(getTotalReceiptPrice(receipt)));
+        sb.append("\n");
+        sb.append(RECEIPT_LINE);
+        sb.append("</pre>");
+        return sb.toString();
     }
 
     @Override

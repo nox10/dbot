@@ -7,6 +7,8 @@ import xyz.dbotfactory.dbot.model.BalanceStatus;
 
 import java.util.List;
 
+import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
+
 public class PrettyPrintUtils {
     public static String padRight(String inputString, int length) {
         if (inputString.length() >= length)
@@ -27,7 +29,7 @@ public class PrettyPrintUtils {
         for (BalanceStatus balanceStatus : totalBalanceStatuses) {
             GetChat getChat = new GetChat(balanceStatus.getId());
             String userName = bot.execute(getChat).getUserName();
-            sb.append("@").append(userName).append(" : ").append(balanceStatus.getAmount()).append("\n");
+            sb.append("@").append(userName).append(" : ").append(toStr(balanceStatus.getAmount())).append("\n");
         }
         return sb.toString();
     }

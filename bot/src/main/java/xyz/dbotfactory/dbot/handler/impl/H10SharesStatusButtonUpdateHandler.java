@@ -20,11 +20,11 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
 
 @Component
 public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private static DecimalFormat df2 = new DecimalFormat("#.##");
 
     private final ChatService chatService;
     private final ReceiptService receiptService;
@@ -84,7 +84,7 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
                 if (item.getAmount().compareTo(pickedShare) != 0) {
 
                     BigDecimal unpickedShare = item.getAmount().subtract(pickedShare);
-                    sb.append("<pre>").append(item.getName()).append(" x ").append(df2.format(unpickedShare))
+                    sb.append("<pre>").append(item.getName()).append(" x ").append(toStr(unpickedShare))
                             .append("</pre>");
                 }
             }
