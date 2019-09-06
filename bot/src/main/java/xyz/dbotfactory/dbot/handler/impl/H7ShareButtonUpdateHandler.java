@@ -134,11 +134,8 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
                     .setParseMode(ParseMode.HTML)
                     .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
             Message sentMessage = bot.execute(sendMessage);
-            botMessageHelper.addNewTask(RECEIPT_BALANCES_BUILT, groupChat.getChatMetaInfo(), sentMessage);
-            botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
-                    groupChat.getChatMetaInfo(), sentMessage);
-            botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
-                    groupChat.getChatMetaInfo(), sentMessage);
+            addCleanupTasks(groupChat, sentMessage);
+
             List<Message> sentMessages = sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
             for (Message messagee : sentMessages) {
                 botMessageHelper.addNewTask(H5RedirectToPmButtonUpdateHandler.class.getSimpleName(),
@@ -153,5 +150,13 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), bot, userId);
 
         chatService.save(groupChat);
+    }
+
+    private void addCleanupTasks(Chat groupChat, Message sentMessage) {
+        botMessageHelper.addNewTask(RECEIPT_BALANCES_BUILT, groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
     }
 }

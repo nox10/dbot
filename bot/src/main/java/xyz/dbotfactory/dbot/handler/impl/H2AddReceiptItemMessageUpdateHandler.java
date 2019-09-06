@@ -32,7 +32,7 @@ import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
 
 
-    private static final String ITEM_REGEX = "\\d+([\\. ,]\\d+)?\\ \\d+([\\. ,]\\d+)?\\ \\w+";
+    private static final String ITEM_REGEX = "\\d+([\\. ,]\\d+)?\\ \\d+([\\. ,]\\d+)?\\ .+$";
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;

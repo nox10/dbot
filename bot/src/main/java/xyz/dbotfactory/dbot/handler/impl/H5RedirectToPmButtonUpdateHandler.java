@@ -111,12 +111,16 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), bot,
                 telegramUserId);
         botMessageHelper.addNewTask(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), sentMessage);
+        addCleanupTasks(groupChat, sentMessage);
+
+        chatService.save(groupChat);
+    }
+
+    private void addCleanupTasks(Chat groupChat, Message sentMessage) {
         botMessageHelper.addNewTask(SHARES_DONE_TASK_NAME, groupChat.getChatMetaInfo(), sentMessage);
         botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
                 groupChat.getChatMetaInfo(), sentMessage);
         botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
                 groupChat.getChatMetaInfo(), sentMessage);
-
-        chatService.save(groupChat);
     }
 }

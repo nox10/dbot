@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
+import xyz.dbotfactory.dbot.handler.OcrHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
@@ -41,16 +42,19 @@ public class H2AddReceiptWithOCRUpdateHandler implements UpdateHandler, CommonCo
     private final ReceiptService receiptService;
     private final BotMessageHelper botMessageHelper;
 
+    private final OcrHelper ocrHelper;
+
     private static final String CANT_PARSE_TEXT = "Sorry, we can't parse your receipt, do it yourself.";
     private static final String UNDO_RECEIPT = "Start again";
 
     @Autowired
     public H2AddReceiptWithOCRUpdateHandler(ChatService chatService, TelegramLongPollingBot bot,
-                                            ReceiptService receiptService, BotMessageHelper botMessageHelper) {
+                                            ReceiptService receiptService, BotMessageHelper botMessageHelper, OcrHelper ocrHelper) {
         this.bot = bot;
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.botMessageHelper = botMessageHelper;
+        this.ocrHelper = ocrHelper;
     }
 
     @Override
@@ -68,8 +72,8 @@ public class H2AddReceiptWithOCRUpdateHandler implements UpdateHandler, CommonCo
         String fileId = photoSizes.get(photoSizes.size() - 1).getFileId();
         String getPathQuery = "https://api.telegram.org/bot" + this.bot.getBotToken() + "/getFile?file_id=" + fileId;
 
-        JSONObject jsonObject = this.sendGet(getPathQuery);
-        if ((Boolean) jsonObject.get("ok") == true) {
+        JSONObject jsonObject = ocrHelper.sendGet(getPathQuery);
+        if ((Boolean) jsonObject.get("ok")) {
             JSONObject result = (JSONObject) jsonObject.get("result");
             String filePath = (String) result.get("file_path");
             String imageUrl = "https://api.telegram.org/file/bot" + this.bot.getBotToken() + "/" + filePath;
@@ -128,26 +132,5 @@ public class H2AddReceiptWithOCRUpdateHandler implements UpdateHandler, CommonCo
                 update.getMessage().getFrom().getId());
 
         chatService.save(chat);
-    }
-
-    @SneakyThrows
-    private JSONObject sendGet(String urlString) {
-        URL obj = new URL(urlString);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("GET");
-        int responseCode = con.getResponseCode();
-        JSONObject o = null;
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String line;
-            StringBuffer response = new StringBuffer();
-            JSONParser j = new JSONParser();
-            while ((line = in.readLine()) != null) {
-                o = (JSONObject) j.parse(line);
-            }
-            in.close();
-        }
-        return o;
     }
 }

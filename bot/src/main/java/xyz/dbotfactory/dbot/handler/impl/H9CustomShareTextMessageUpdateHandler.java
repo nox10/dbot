@@ -143,11 +143,9 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                     .setParseMode(ParseMode.HTML)
                     .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
             Message sentMessage = bot.execute(sendMessage);
-            botMessageHelper.addNewTask(RECEIPT_BALANCES_BUILT, groupChat.getChatMetaInfo(), sentMessage);
-            botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
-                    groupChat.getChatMetaInfo(), sentMessage);
-            botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
-                    groupChat.getChatMetaInfo(), sentMessage);
+            
+            askCleanupTasks(groupChat, sentMessage);
+
             List<Message> sentMessages = sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
             for (Message message : sentMessages) {
                 botMessageHelper.addNewTask(H5RedirectToPmButtonUpdateHandler.class.getSimpleName(),
@@ -167,6 +165,14 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
 
         chatService.save(groupChat);
         chatService.save(chat);
+    }
+
+    private void askCleanupTasks(Chat groupChat, Message sentMessage) {
+        botMessageHelper.addNewTask(RECEIPT_BALANCES_BUILT, groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
     }
 
     private BigDecimal getCustomShareFromString(String text) {

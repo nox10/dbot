@@ -146,14 +146,18 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),
                 chat.getChatMetaInfo(), bot, telegramUserId);
         for (String event : whenToExecuteDeleteTask) {
-            botMessageHelper.addNewTask(event, chat.getChatMetaInfo(), sentMessage);
-            botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
-                    chat.getChatMetaInfo(), sentMessage);
-            botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
-                    chat.getChatMetaInfo(), sentMessage);
+            addCleanupTasks(chat, sentMessage, event);
         }
 
         chatService.save(chat);
+    }
+
+    private void addCleanupTasks(Chat chat, Message sentMessage, String event) {
+        botMessageHelper.addNewTask(event, chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
     }
 
     @SneakyThrows

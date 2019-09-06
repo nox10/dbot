@@ -99,11 +99,7 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
                 .setParseMode(ParseMode.HTML);
         Message sentMessage = bot.execute(message);
 
-        botMessageHelper.addNewTask(SHARES_DONE_TASK_NAME, groupChat.getChatMetaInfo(), sentMessage);
-        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
-                groupChat.getChatMetaInfo(), sentMessage);
-        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
-                groupChat.getChatMetaInfo(), sentMessage);
+        addCleanupTasks(groupChat, sentMessage);
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),
                 groupChat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());
 
@@ -112,5 +108,13 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
         bot.execute(answerCallbackQuery);
 
         chatService.save(groupChat);
+    }
+
+    private void addCleanupTasks(Chat groupChat, Message sentMessage) {
+        botMessageHelper.addNewTask(SHARES_DONE_TASK_NAME, groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
     }
 }

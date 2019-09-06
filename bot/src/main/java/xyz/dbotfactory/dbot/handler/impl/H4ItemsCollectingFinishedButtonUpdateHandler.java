@@ -92,12 +92,16 @@ public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandl
                 update.getCallbackQuery().getMessage().getMessageId());
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), chat.getChatMetaInfo(), bot,
                 update.getCallbackQuery().getFrom().getId());
+        addCleanupTasks(chat, sentMessage);
+
+        chatService.save(chat);
+    }
+
+    private void addCleanupTasks(Chat chat, Message sentMessage) {
         botMessageHelper.addNewTask(SHARES_DONE_TASK_NAME, chat.getChatMetaInfo(), sentMessage);
         botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
         botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
-
-        chatService.save(chat);
     }
 }
