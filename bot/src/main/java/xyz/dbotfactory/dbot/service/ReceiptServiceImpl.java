@@ -69,7 +69,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         if (BigDecimalUtils.equals(shareAmount, 0.0)) {
             return "⚪ " + item.getName();
         } else {
-            return "🔘/ " + item.getName() + " — " + shareAmount;
+            return "🔘 " + item.getName() + " — " + shareAmount;
         }
     }
 
