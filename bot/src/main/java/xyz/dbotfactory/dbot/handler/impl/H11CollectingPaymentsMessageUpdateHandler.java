@@ -16,6 +16,7 @@ import xyz.dbotfactory.dbot.handler.PayOffHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.impl.callback.DiscardReceiptBalanceCallbackInfo;
 import xyz.dbotfactory.dbot.handler.impl.callback.PayOffCallbackInfo;
+import xyz.dbotfactory.dbot.handler.impl.callback.PayOffChatCallbackInfo;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.Receipt;
@@ -118,9 +119,14 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
                 DiscardReceiptBalanceCallbackInfo discardReceiptBalanceCallbackInfo =
                         new DiscardReceiptBalanceCallbackInfo(chat.getTelegramChatId(), receipt.getId());
 
+                PayOffChatCallbackInfo payOffChatCallbackInfo = new PayOffChatCallbackInfo(chat.getTelegramChatId());
+
                 howToPayOffMarkup = new InlineKeyboardMarkup()
                         .setKeyboard(List.of(List.of(payOffCallbackInfo.getButton()),
-                                List.of(discardReceiptBalanceCallbackInfo.getButton())));
+                                List.of(discardReceiptBalanceCallbackInfo.getButton()),
+                                List.of(payOffChatCallbackInfo.getButton())));
+
+
             }
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
             whenToExecuteDeleteTask = singletonList(this.getClass().getSimpleName());
