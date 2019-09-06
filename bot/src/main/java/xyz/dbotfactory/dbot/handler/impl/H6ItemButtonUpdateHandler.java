@@ -33,9 +33,8 @@ import static xyz.dbotfactory.dbot.BigDecimalUtils.isGreaterOrEqual;
 @Log
 public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
-    private static final String CUSTOM_SHARE_BUTTON_TEXT = "Custom";
-    private static final String SHARES_MESSAGE_TEXT = "<i>Set your share</i>";
-
+    private static final String CUSTOM_SHARE_BUTTON_TEXT = "Custom 📊";
+    private static final String SHARES_MESSAGE_TEXT = "Set your share 🍕";
 
     private final ChatService chatService;
     private final ReceiptService receiptService;

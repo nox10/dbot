@@ -23,7 +23,6 @@ import xyz.dbotfactory.dbot.service.ChatService;
 
 import java.util.List;
 
-import static java.util.Collections.singletonList;
 import static org.telegram.telegrambots.meta.api.methods.ParseMode.HTML;
 import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
 
@@ -32,7 +31,7 @@ import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
 public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
     private static final String MESSAGE_TEXT = "<i>Press button below to continue</i>";
-    private static final String CONTINUE_BUTTON_TEXT = "Continue";
+    private static final String CONTINUE_BUTTON_TEXT = "📊️ Share not equally 📊️";
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;
@@ -75,7 +74,7 @@ public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandl
         InlineKeyboardButton shareEqualButton = shareEqualCallbackInfo.getButton();
 
         InlineKeyboardMarkup itemButtonsMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(singletonList(List.of(continueButton, shareEqualButton)));
+                .setKeyboard(List.of(List.of(continueButton), List.of(shareEqualButton)));
 
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
@@ -102,6 +101,8 @@ public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandl
         botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
         botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(ShareEqualButtonUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
     }
 }

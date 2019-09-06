@@ -40,6 +40,6 @@ public class H0StartCommandUpdateHandler implements UpdateHandler {
 
         messageHelper.sendMessageWithSingleInlineMarkup(update.getMessage().getChatId(),
                 new InlineKeyboardMarkup().setKeyboard(singletonList(singletonList(button))), bot,
-                "Hello! This bot works only in groups.");
+                "Hello!\n\nℹ️ This bot works only in groups.");
     }
 }

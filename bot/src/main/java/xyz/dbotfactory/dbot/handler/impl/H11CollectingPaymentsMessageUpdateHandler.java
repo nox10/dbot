@@ -101,8 +101,8 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
         List<String> whenToExecuteDeleteTask;
 
         if (totalBalance.compareTo(totalReceiptPrice) == 0) {
-            response = "<i>All good, receipt input completed.\n" +
-                    getPrettyChatBalanceStatuses(chat) + "</i>";
+            response = "✔️ All good, receipt input is completed.\n" +
+                    getPrettyChatBalanceStatuses(chat);
             whenToExecuteDeleteTask = asList(
                     H12SuggestDebtReturnStrategyButtonUpdateHandler.class.getSimpleName(), // TODO
                     H1NewReceiptCommandUpdateHandler.class.getSimpleName());
@@ -125,11 +125,11 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
             }
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
             whenToExecuteDeleteTask = singletonList(this.getClass().getSimpleName());
-            response = "<i>Ok. Anyone else?\n\n" +
-                    "Need " + totalReceiptPrice.subtract(totalBalance) + " more.</i>";
+            response = "✔️ Ok. Anyone else?\n\n" +
+                    "Need " + totalReceiptPrice.subtract(totalBalance) + " more.";
         } else { // totalBalance > totalReceiptPrice
-            response = "<i>Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
-                    + "). Can you pls check and type again?</i>";
+            response = "❗️ Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
+                    + "). Can you pls check and type again?";
             whenToExecuteDeleteTask = singletonList(RECEIPT_BALANCES_BUILT);
             receipt.setUserBalances(new ArrayList<>());
         }

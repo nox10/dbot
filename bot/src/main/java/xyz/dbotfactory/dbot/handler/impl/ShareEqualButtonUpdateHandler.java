@@ -54,7 +54,7 @@ public class ShareEqualButtonUpdateHandler implements UpdateHandler {
                 callbackInfo.getTelegramChatId(),
                 markup,
                 bot,
-                "Click if you're in!");
+                "Click if you're in! 😎");
 
         messageHelper.executeExistingTasks(this.getClass().getSimpleName(),
                 chat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());

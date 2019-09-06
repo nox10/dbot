@@ -67,9 +67,9 @@ public class ReceiptServiceImpl implements ReceiptService {
                 .filter(share -> share.getTelegramUserId() == telegramUserId)
                 .findFirst().orElse(Share.builder().share(create(0)).build()).getShare();
         if (BigDecimalUtils.equals(shareAmount, 0.0)) {
-            return "";
+            return "⚪ " + item.getName();
         } else {
-            return " — " + shareAmount;
+            return "🔘/ " + item.getName() + " — " + shareAmount;
         }
     }
 

@@ -101,7 +101,7 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
         List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
                 .map(anItem -> singletonList(new InlineKeyboardButton()
-                        .setText(anItem.getName() + receiptService.getShareStringForButton(anItem, userId))
+                        .setText(receiptService.getShareStringForButton(anItem, userId))
                         .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + anItem.getId() + DELIMITER +
                                 callbackInfo.getReceiptId() + DELIMITER + callbackInfo.getTgGroupChatId())
                 )).collect(Collectors.toList());
@@ -133,7 +133,7 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
             SendMessage sendMessage = new SendMessage()
                     .setChatId(callbackInfo.getTgGroupChatId())
                     .setParseMode(ParseMode.HTML)
-                    .setText(DONE_MESSAGE_TEXT + toStr(receiptService.getTotalReceiptPrice(receipt)));
+                    .setText(DONE_MESSAGE_TEXT + "<code>" + toStr(receiptService.getTotalReceiptPrice(receipt)) + "</code>");
             Message sentMessage = bot.execute(sendMessage);
             addCleanupTasks(groupChat, sentMessage);
 

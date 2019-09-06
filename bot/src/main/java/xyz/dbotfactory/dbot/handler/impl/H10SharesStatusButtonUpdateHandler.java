@@ -17,7 +17,6 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
@@ -73,7 +72,7 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
         String response;
         if (receipt.getItems().size() != 0) {
             StringBuilder sb = new StringBuilder();
-            sb.append("<b>These items are still not picked:</b> \n");
+            sb.append("❗️ <i>These items are still not picked:</i> \n");
             for (ReceiptItem item : receipt.getItems()) {
 
                 BigDecimal pickedShare = item.getShares()

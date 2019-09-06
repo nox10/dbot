@@ -11,15 +11,15 @@ public interface CommonConsts {
     String SHARE_LEFT_BUTTON_CALLBACK_DATA = "left";
     String SHARE_BUTTON_CALLBACK_DATA = "shr";
     String CUSTOM_SHARE_CALLBACK_DATA = "customshare";
-    String FINISHED_SETTING_SHARES_BUTTON_TEXT = "Finished";
     String SETING_CUSTOM_SHARE_METADATA = "settingcustshr";
-    String DONE_MESSAGE_TEXT = "<i>Now each of you can send me how much you have already paid, right in this chat.\n\n" +
-            "Total sum is: </i>";
-    String GO_TO_GROUP_TEXT = "<i>Go back to group chat</i>";
-    String ITEMS_MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
-    String YOUR_RECEIPT_TEXT = "<b>Your receipt:\n\n</b>";
-    String DONE_TEXT = "<i>Feel free to send more items</i>";
+    String DONE_MESSAGE_TEXT = "💸 Now please send me how much you have paid already, right in this chat.\n\n" +
+            "ℹ️ Total sum is: ";
+    String GO_TO_GROUP_TEXT = "🔙 Please, return to group chat</i>";
+    String ITEMS_MESSAGE_TEXT = "🧾 Tap to items which are yours";
+    String YOUR_RECEIPT_TEXT = "<b>🧾 Your receipt:\n</b>";
+    String DONE_TEXT = "ℹ️ Feel free to send more items";
     String SQUARED_DONE_EMOJI = "☑️";
+    String FINISHED_SETTING_SHARES_BUTTON_TEXT = SQUARED_DONE_EMOJI + " I'm done " + SQUARED_DONE_EMOJI;
     String COLLECTING_FINISHED_BUTTON_TEXT =
             SQUARED_DONE_EMOJI + " No more items " + SQUARED_DONE_EMOJI;
     String SHARES_DONE_TASK_NAME = "shares_done_task";

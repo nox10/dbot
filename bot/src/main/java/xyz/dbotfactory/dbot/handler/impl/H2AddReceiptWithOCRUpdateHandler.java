@@ -3,7 +3,6 @@ package xyz.dbotfactory.dbot.handler.impl;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -25,10 +24,6 @@ import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,8 +39,8 @@ public class H2AddReceiptWithOCRUpdateHandler implements UpdateHandler, CommonCo
 
     private final OcrHelper ocrHelper;
 
-    private static final String CANT_PARSE_TEXT = "Sorry, we can't parse your receipt, do it yourself.";
-    private static final String UNDO_RECEIPT = "Start again";
+    private static final String CANT_PARSE_TEXT = "Sorry, I can't parse your receipt, you need to enter it by yourself 😩";
+    private static final String UNDO_RECEIPT = "🔄 Start again 🔄";
 
     @Autowired
     public H2AddReceiptWithOCRUpdateHandler(ChatService chatService, TelegramLongPollingBot bot,

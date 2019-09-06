@@ -73,7 +73,7 @@ public class CountMeInUpdateHandler implements UpdateHandler {
                 .stream()
                 .map(x -> new BalanceStatus(x.getTelegramUserId(), x.getBalance()))
                 .collect(toList());
-        String message = "Payments:\n" + getPrettyBalanceStatuses(collect, bot);
+        String message = "<b>Payments:</b>\n\n" + getPrettyBalanceStatuses(collect, bot);
         Message sentMessage = messageHelper.sendSimpleMessage(message, chat.getTelegramChatId(), bot);
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
 

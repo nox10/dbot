@@ -15,7 +15,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 @NoArgsConstructor
 public class CountMeInCallbackInfo {
     private static final String CALLBACK_ID = "count_me_in";
-    private static final String LABEL = "Count me!";
+    private static final String LABEL = "💰 Count me! 💰";
 
     private long telegramChatId;
 

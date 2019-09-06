@@ -16,10 +16,10 @@ import xyz.dbotfactory.dbot.service.ChatService;
 @Component
 public class DiscardReceiptBalanceButton implements UpdateHandler {
 
+    private static final String PERERASCHET = "Current receipt is now closed";
+
     private final ChatService chatService;
-
     private final BotMessageHelper messageHelper;
-
     private final TelegramLongPollingBot bot;
 
     @Autowired
@@ -53,7 +53,7 @@ public class DiscardReceiptBalanceButton implements UpdateHandler {
 
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
                 .setCallbackQueryId(update.getCallbackQuery().getId())
-                .setText("Current receipt was PERERASCHETED")
+                .setText(PERERASCHET)
                 .setShowAlert(true);
         bot.execute(answerCallbackQuery);
 

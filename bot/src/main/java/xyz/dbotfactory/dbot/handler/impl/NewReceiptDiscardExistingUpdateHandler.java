@@ -20,8 +20,8 @@ import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 @Component
 public class NewReceiptDiscardExistingUpdateHandler implements UpdateHandler {
 
-    private static final String BUTTON_LABEL = "Discard";
-    private static final String MESSAGE = "Active receipt found. Discard and create a new one?";
+    private static final String BUTTON_LABEL = "❌ Discard ❌";
+    private static final String MESSAGE = "❗️ Active receipt found. Discard and create a new one?";
 
     private final ButtonFactory buttonFactory;
     private final BotMessageHelper botMessageHelper;

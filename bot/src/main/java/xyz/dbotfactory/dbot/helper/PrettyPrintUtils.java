@@ -29,7 +29,8 @@ public class PrettyPrintUtils {
         for (BalanceStatus balanceStatus : totalBalanceStatuses) {
             GetChat getChat = new GetChat(balanceStatus.getId());
             String userName = bot.execute(getChat).getUserName();
-            sb.append("@").append(userName).append(" : ").append(toStr(balanceStatus.getAmount())).append("\n");
+            sb.append("💵 @").append(userName).append(" : <code>").append(toStr(balanceStatus.getAmount()))
+                    .append("</code>\n");
         }
         return sb.toString();
     }

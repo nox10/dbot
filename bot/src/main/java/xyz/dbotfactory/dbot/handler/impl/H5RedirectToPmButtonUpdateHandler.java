@@ -81,7 +81,7 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
 
         List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
                 .map(item -> singletonList(new InlineKeyboardButton()
-                        .setText(item.getName() + receiptService.getShareStringForButton(item, telegramUserId))
+                        .setText(receiptService.getShareStringForButton(item, telegramUserId))
                         .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + item.getId() + DELIMITER +
                                 receiptId + DELIMITER + telegramGroupChatId)
                 )).collect(Collectors.toList());

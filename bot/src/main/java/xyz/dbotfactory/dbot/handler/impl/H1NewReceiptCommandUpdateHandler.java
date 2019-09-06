@@ -28,10 +28,10 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler, CommonCo
 
     public static final String COMMAND_NAME = "/new_receipt";
     private static final String RECEIPT_EMOJI = "🧾";
-    private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <i>Now send receipt information.</i>\n\n" +
-            "<i>Receipt info should be in the next format (with spaces):</i>\n\n" +
+    private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <b>Please, send receipt information</b>\n\n" +
+            "ℹ️ Receipt info should be in the next format (with spaces):\n\n" +
             "<code>amount price-for-unit name-for-item</code>\n\n" +
-            "<i>For example:</i>\n\n" +
+            "For example:\n\n" +
             "<code>2 465.5 Almond milk</code>";
 
     private final TelegramLongPollingBot bot;

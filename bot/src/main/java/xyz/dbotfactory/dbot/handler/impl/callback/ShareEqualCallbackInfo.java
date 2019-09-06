@@ -15,7 +15,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 @NoArgsConstructor
 public class ShareEqualCallbackInfo {
     private static final String CALLBACK_ID = "share_equal";
-    private static final String LABEL = "Share equally";
+    private static final String LABEL = "🍕 Share equally 🍕";
 
     private long telegramChatId;
 

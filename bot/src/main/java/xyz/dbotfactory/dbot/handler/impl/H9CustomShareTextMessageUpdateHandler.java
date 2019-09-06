@@ -111,7 +111,7 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
 
         List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
                 .map(anItem -> singletonList(new InlineKeyboardButton()
-                        .setText(anItem.getName() + receiptService.getShareStringForButton(anItem, userId))
+                        .setText(receiptService.getShareStringForButton(anItem, userId))
                         .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + anItem.getId() + DELIMITER +
                                 receiptId + DELIMITER + tgGroupChatId)
                 )).collect(Collectors.toList());
@@ -142,7 +142,7 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
             SendMessage sendMessage = new SendMessage()
                     .setChatId(tgGroupChatId)
                     .setParseMode(ParseMode.HTML)
-                    .setText(DONE_MESSAGE_TEXT + toStr(receiptService.getTotalReceiptPrice(receipt)));
+                    .setText(DONE_MESSAGE_TEXT + "<code>" + toStr(receiptService.getTotalReceiptPrice(receipt)) + "</code>");
             Message sentMessage = bot.execute(sendMessage);
 
             askCleanupTasks(groupChat, sentMessage);
