@@ -14,7 +14,7 @@ public interface CommonConsts {
     String SETING_CUSTOM_SHARE_METADATA = "settingcustshr";
     String DONE_MESSAGE_TEXT = "💸 Now please send me how much you have paid already, right in this chat.\n\n" +
             "ℹ️ Total sum is: ";
-    String GO_TO_GROUP_TEXT = "🔙 Please, return to group chat</i>";
+    String GO_TO_GROUP_TEXT = "🔙 Please, return to group chat";
     String ITEMS_MESSAGE_TEXT = "🧾 Tap to items which are yours";
     String YOUR_RECEIPT_TEXT = "<b>🧾 Your receipt:\n</b>";
     String DONE_TEXT = "ℹ️ Feel free to send more items";
