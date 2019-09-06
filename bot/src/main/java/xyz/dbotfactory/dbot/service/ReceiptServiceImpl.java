@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.dbotfactory.dbot.BigDecimalUtils;
+import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.helper.PrettyPrintUtils;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.repo.ReceiptRepository;
@@ -16,9 +17,7 @@ import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
 
 @Service
 @Transactional
-public class ReceiptServiceImpl implements ReceiptService {
-    private static final String RECEIPT_LINE = "=====================\n";
-
+public class ReceiptServiceImpl implements ReceiptService, CommonConsts {
     private final ReceiptRepository receiptRepository;
 
     private final RecognService recognService;
@@ -94,7 +93,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<pre>");
-        sb.append(RECEIPT_LINE);
+        sb.append(RECEIPT_LINE + '\n');
         int maxNameLength = items.stream().mapToInt(x -> x.getName().length()).max().orElse(0);
         int maxPriceLength = items.stream().mapToInt(x -> x.getPrice().toString().length()).max().orElse(0);
         for (ReceiptItem item : items) {
@@ -105,11 +104,11 @@ public class ReceiptServiceImpl implements ReceiptService {
                     .append(price).append(" x ")
                     .append(toStr(item.getAmount())).append("\n");
         }
-        sb.append(RECEIPT_LINE);
+        sb.append(RECEIPT_LINE + '\n');
         sb.append("TOTAL: ");
         sb.append(toStr(getTotalReceiptPrice(receipt)));
         sb.append("\n");
-        sb.append(RECEIPT_LINE);
+        sb.append(RECEIPT_LINE_SMALL + '\n');
         sb.append("</pre>");
         return sb.toString();
     }

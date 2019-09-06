@@ -24,4 +24,6 @@ public interface CommonConsts {
             SQUARED_DONE_EMOJI + " No more items " + SQUARED_DONE_EMOJI;
     String SHARES_DONE_TASK_NAME = "shares_done_task";
     String RECEIPT_BALANCES_BUILT = "rceipt_balances_built";
+    String RECEIPT_LINE = "=====================";
+    String RECEIPT_LINE_SMALL = "---------------------";
 }

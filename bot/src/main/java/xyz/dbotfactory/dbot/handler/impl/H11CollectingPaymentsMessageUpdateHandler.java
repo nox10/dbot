@@ -162,10 +162,14 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
     @SneakyThrows
     private String getPrettyChatBalanceStatuses(Chat chat) {
         StringBuilder sb = new StringBuilder();
-        sb.append("RECEIPT BALANCES: \n\n");
+        sb.append("\n<code>" + RECEIPT_LINE + "</code>");
+        sb.append("\n<b>RECEIPT BALANCES</b>");
+        sb.append("\n<code>" + RECEIPT_LINE_SMALL + "\n</code>");
         List<BalanceStatus> receiptBalanceStatuses = chatService.getCurrentReceiptBalanceStatuses(chatService.getActiveReceipt(chat));
         sb.append(getPrettyBalanceStatuses(receiptBalanceStatuses, bot));
-        sb.append("\n\n TOTAL BALANCES: \n\n");
+        sb.append("\n<code>" + RECEIPT_LINE + "</code>");
+        sb.append("\n<b>TOTAL BALANCES</b>");
+        sb.append("\n<code>" + RECEIPT_LINE + "\n</code>");
         List<BalanceStatus> totalBalanceStatuses = chatService.getTotalBalanceStatuses(chat);
         sb.append(getPrettyBalanceStatuses(totalBalanceStatuses, bot));
         return sb.toString();
