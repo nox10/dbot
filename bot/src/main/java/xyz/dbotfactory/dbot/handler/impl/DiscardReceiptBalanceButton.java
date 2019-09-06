@@ -38,7 +38,8 @@ public class DiscardReceiptBalanceButton implements UpdateHandler {
                     DiscardReceiptBalanceCallbackInfo.fromCallbackData(update.getCallbackQuery().getData());
 
             chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
-            return chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT;
+            return chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT
+                    || chat.getChatState() == ChatState.DETECTING_OWNERS;
         }
         return false;
     }
@@ -58,6 +59,7 @@ public class DiscardReceiptBalanceButton implements UpdateHandler {
         bot.execute(answerCallbackQuery);
 
         chatService.removeReceipt(chat, callbackInfo.getReceiptId());
+        chat.setChatState(ChatState.NO_ACTIVE_RECEIPT);
         chatService.save(chat);
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
     }
