@@ -29,8 +29,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
-import static xyz.dbotfactory.dbot.BigDecimalUtils.isSmaller;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.*;
 import static xyz.dbotfactory.dbot.helper.PrettyPrintUtils.getPrettyBalanceStatuses;
 import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_PAYMENTS_INFO;
 import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
@@ -126,7 +125,7 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
             whenToExecuteDeleteTask = singletonList(this.getClass().getSimpleName());
             response = "✔️ Ok. Anyone else?\n\n" +
-                    "Need " + totalReceiptPrice.subtract(totalBalance) + " more.";
+                    "Need " + toStr(totalReceiptPrice.subtract(totalBalance)) + " more.";
         } else { // totalBalance > totalReceiptPrice
             response = "❗️ Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
                     + "). Can you pls check and type again?";
