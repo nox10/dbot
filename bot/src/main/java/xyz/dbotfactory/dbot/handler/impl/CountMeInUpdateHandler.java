@@ -5,9 +5,12 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.impl.callback.CountMeInCallbackInfo;
+import xyz.dbotfactory.dbot.handler.impl.callback.DiscardReceiptBalanceCallbackInfo;
 import xyz.dbotfactory.dbot.handler.impl.callback.PayOffCallbackInfo;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -17,8 +20,10 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.divide;
@@ -74,7 +79,12 @@ public class CountMeInUpdateHandler implements UpdateHandler {
                 .map(x -> new BalanceStatus(x.getTelegramUserId(), x.getBalance()))
                 .collect(toList());
         String message = "<b>Payments:</b>\n\n" + getPrettyBalanceStatuses(collect, bot);
-        Message sentMessage = messageHelper.sendSimpleMessage(message, chat.getTelegramChatId(), bot);
+        DiscardReceiptBalanceCallbackInfo discardReceiptBalanceCallbackInfo =
+                new DiscardReceiptBalanceCallbackInfo(chat.getTelegramChatId(), activeReceipt.getId());
+        InlineKeyboardButton button = discardReceiptBalanceCallbackInfo.getButton();
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup().setKeyboard(singletonList(singletonList(button)));
+        Message sentMessage = messageHelper.sendMessageWithSingleInlineMarkup(chat.getTelegramChatId(), markup , bot, message);
+
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
 
         messageHelper.executeExistingTasks(this.getClass().getSimpleName(),
