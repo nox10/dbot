@@ -78,6 +78,8 @@ public class CountMeInUpdateHandler implements UpdateHandler {
 
         messageHelper.executeExistingTasks(this.getClass().getSimpleName(),
                 chat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());
+        messageHelper.addNewTask(this.getClass().getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
         messageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
         messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
