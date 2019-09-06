@@ -11,8 +11,8 @@ import java.util.Objects;
 @Service
 public class CalcServiceImpl implements CalcService {
 
-    private static final String TOTAL_BALANCE_URI = "http://localhost:8081/calc/total_balance";
-    private static final String RETURN_STRATEGY_URI = "http://localhost:8081/calc/return_strategy";
+    private static final String TOTAL_BALANCE_URI = "http://localhost:8096/calc/total_balance";
+    private static final String RETURN_STRATEGY_URI = "http://localhost:8096/calc/return_strategy";
 
     @Override
     public List<BalanceStatus> getTotalBalance(List<BalanceStatus> balanceStatuses) {
