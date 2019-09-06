@@ -49,7 +49,7 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
             Message message = update.getMessage();
             if (message.hasText()) {
                 String text = message.getText();
-                if (text.startsWith("/start") && text.substring(1 + 5 + 1).startsWith(CONTINUE_COMMAND_METADATA_PREFIX)) {
+                if (text.startsWith("/start") && (!text.equals("/start")) && text.substring(1 + 5 + 1).startsWith(CONTINUE_COMMAND_METADATA_PREFIX)) {
                     String[] metadata = text.substring(1 + 5 + 1 + CONTINUE_COMMAND_METADATA_PREFIX.length())
                             .split(CONTINUE_DELIMITER);
                     long telegramGroupChatId = Long.parseLong(metadata[0]);

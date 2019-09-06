@@ -21,11 +21,8 @@ public class DiscardReceiptUpdateHandler implements UpdateHandler {
     private static String MESSAGE = "Chat was discarded";
 
     private final ButtonFactory buttonFactory;
-
     private final ChatService chatService;
-
     private final BotMessageHelper messageHelper;
-
     private final TelegramLongPollingBot bot;
 
     @Autowired
