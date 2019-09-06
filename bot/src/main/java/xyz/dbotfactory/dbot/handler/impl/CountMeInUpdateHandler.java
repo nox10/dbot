@@ -21,6 +21,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.divide;
 import static xyz.dbotfactory.dbot.helper.PrettyPrintUtils.getPrettyBalanceStatuses;
 import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
 
@@ -62,7 +63,7 @@ public class CountMeInUpdateHandler implements UpdateHandler {
 
         if (countInNewUser(activeReceipt, id)) {
             activeReceipt.getUserBalances().add(UserBalance.builder().telegramUserId(id).build());
-            BigDecimal share = totalBalance.divide(create(activeReceipt.getUserBalances().size()));
+            BigDecimal share = divide(totalBalance,create(activeReceipt.getUserBalances().size()));
             for (UserBalance userBalance : activeReceipt.getUserBalances()) {
                 userBalance.setBalance(share);
             }

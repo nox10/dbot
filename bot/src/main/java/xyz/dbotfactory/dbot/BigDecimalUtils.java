@@ -80,4 +80,8 @@ public class BigDecimalUtils {
 
         return df2.format(decimal);
     }
+
+    public static BigDecimal divide(BigDecimal a, BigDecimal b){
+        return a.divide(b, SCALE, RoundingMode.HALF_UP);
+    }
 }

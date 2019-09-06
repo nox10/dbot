@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import xyz.dbotfactory.dbot.model.CleanupTaskInfo;
 import xyz.dbotfactory.dbot.model.meta.ChatMetaInfo;
 import xyz.dbotfactory.dbot.model.meta.Task;
 import xyz.dbotfactory.dbot.model.meta.TaskSetForHandler;
@@ -114,6 +115,11 @@ public class BotMessageHelper {
 
             handlerTasks.removeAll(tasksDone);
         }
+    }
+
+    public void addNewTasks(List<CleanupTaskInfo> cleanupTaskInfo){
+        for (CleanupTaskInfo taskInfo : cleanupTaskInfo)
+            addNewTask(taskInfo.getHandlerName(), taskInfo.getChatMetaInfo(), taskInfo.getSentMessage());
     }
 
     public void addNewTask(String handlerName, ChatMetaInfo chatMetaInfo, Message sentMessage) {

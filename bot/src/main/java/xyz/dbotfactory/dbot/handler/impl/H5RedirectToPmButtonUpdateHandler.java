@@ -27,6 +27,7 @@ import static java.util.Collections.singletonList;
 
 @Service
 @Log
+@SuppressWarnings("Duplicates")
 public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
     private final ChatService chatService;
