@@ -18,8 +18,10 @@ public interface CommonConsts {
     String GO_TO_GROUP_TEXT = "<i>Go back to group chat</i>";
     String ITEMS_MESSAGE_TEXT = "<i>Tap to items which are yours</i>";
     String YOUR_RECEIPT_TEXT = "<b>Your receipt:\n\n</b>";
-    String DONE_TEXT = "<i>Feel free to add more items now</i>";
+    String DONE_TEXT = "<i>Feel free to send more items</i>";
     String SQUARED_DONE_EMOJI = "☑️";
     String COLLECTING_FINISHED_BUTTON_TEXT =
             SQUARED_DONE_EMOJI + " No more items " + SQUARED_DONE_EMOJI;
+    String SHARES_DONE_TASK_NAME = "shares_done_task";
+    String RECEIPT_BALANCES_BUILT = "rceipt_balances_built";
 }

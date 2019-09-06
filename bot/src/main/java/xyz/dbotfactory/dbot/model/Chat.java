@@ -1,12 +1,13 @@
 package xyz.dbotfactory.dbot.model;
 
 import lombok.*;
+import xyz.dbotfactory.dbot.model.meta.ChatMetaInfo;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.CascadeType.*;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.ORDINAL;
 
 @Entity
@@ -30,6 +31,6 @@ public class Chat {
     @Enumerated(ORDINAL)
     ChatState chatState;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(cascade = ALL, fetch = FetchType.EAGER)
     private ChatMetaInfo chatMetaInfo;
 }

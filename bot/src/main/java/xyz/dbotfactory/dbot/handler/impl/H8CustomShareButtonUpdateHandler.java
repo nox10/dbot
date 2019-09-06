@@ -11,9 +11,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
-import xyz.dbotfactory.dbot.model.*;
+import xyz.dbotfactory.dbot.model.Chat;
+import xyz.dbotfactory.dbot.model.ChatState;
+import xyz.dbotfactory.dbot.model.Receipt;
+import xyz.dbotfactory.dbot.model.ReceiptItem;
+import xyz.dbotfactory.dbot.model.meta.ChatMetaInfo;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
@@ -26,13 +31,15 @@ public class H8CustomShareButtonUpdateHandler implements UpdateHandler, CommonCo
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
+    private final BotMessageHelper botMessageHelper;
 
     @Autowired
     public H8CustomShareButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                            TelegramLongPollingBot bot) {
+                                            TelegramLongPollingBot bot, BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
+        this.botMessageHelper = botMessageHelper;
     }
 
     @Override
@@ -43,7 +50,7 @@ public class H8CustomShareButtonUpdateHandler implements UpdateHandler, CommonCo
                 String[] ids = data.substring(CUSTOM_SHARE_CALLBACK_DATA.length()).split(DELIMITER);
                 int itemId = Integer.parseInt(ids[0]);
                 int receiptId = Integer.parseInt(ids[1]);
-                long tgGroupChatId = Integer.parseInt(ids[2]);
+                long tgGroupChatId = Long.parseLong(ids[2]);
 
                 Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
@@ -62,9 +69,9 @@ public class H8CustomShareButtonUpdateHandler implements UpdateHandler, CommonCo
                 .substring(CUSTOM_SHARE_CALLBACK_DATA.length()).split(DELIMITER);
         int itemId = Integer.parseInt(ids[0]);
         int receiptId = Integer.parseInt(ids[1]);
-        long tgGroupChatId = Integer.parseInt(ids[2]);
+        long tgGroupChatId = Long.parseLong(ids[2]);
         Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
-        long userId = chat.getTelegramChatId();
+        int userId = update.getCallbackQuery().getFrom().getId();
 
         Receipt receipt = chatService.getActiveReceipt(groupChat);
         ReceiptItem item =
@@ -83,13 +90,17 @@ public class H8CustomShareButtonUpdateHandler implements UpdateHandler, CommonCo
                         receiptService.shareLeft(item, userId) + " or press cancel.\n\n" +
                         "You can also use fractions like </i><code>1/3</code>")
                 .setReplyMarkup(cancelKeyboardMarkup)
-                .setChatId(userId)
+                .setChatId((long) userId)
                 .setMessageId(message.getMessageId())
                 .setParseMode(ParseMode.HTML);
         chat.setChatState(ChatState.SETTING_CUSTOM_SHARE);
         chat.setChatMetaInfo(ChatMetaInfo.builder().metaData(SETING_CUSTOM_SHARE_METADATA + itemId + DELIMITER +
                 receiptId + DELIMITER + tgGroupChatId + DELIMITER + message.getMessageId()).build());
         bot.execute(editMessageText);
+
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),
+                groupChat.getChatMetaInfo(), bot, userId);
+
         chatService.save(chat);
     }
 }

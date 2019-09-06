@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -31,13 +32,15 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
+    private final BotMessageHelper botMessageHelper;
 
     @Autowired
     public H5RedirectToPmButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                             TelegramLongPollingBot bot) {
+                                             TelegramLongPollingBot bot, BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
+        this.botMessageHelper = botMessageHelper;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
-        long telegramUserId = chat.getTelegramChatId();
+        int telegramUserId = update.getMessage().getFrom().getId();
         String[] metadata = update.getMessage().getText()
                 .substring(1 + 5 + 1 + CONTINUE_COMMAND_METADATA_PREFIX.length())
                 .split(CONTINUE_DELIMITER);
@@ -94,7 +97,7 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
         SendMessage message = new SendMessage()
                 .setReplyMarkup(markup)
                 .setText(ITEMS_MESSAGE_TEXT)
-                .setChatId(telegramUserId)
+                .setChatId((long) telegramUserId)
                 .setParseMode(ParseMode.HTML);
 
         String pmUserIds = groupChat.getChatMetaInfo().getPmUserIds();
@@ -102,8 +105,18 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
             groupChat.getChatMetaInfo().setPmUserIds(pmUserIds + telegramUserId + DELIMITER);
         }
 
-        chatService.save(groupChat);
+        Message sentMessage = bot.execute(message);
 
-        bot.execute(message);
+        botMessageHelper.deleteMessage(bot, update.getMessage());
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), bot,
+                telegramUserId);
+        botMessageHelper.addNewTask(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(SHARES_DONE_TASK_NAME, groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                groupChat.getChatMetaInfo(), sentMessage);
+
+        chatService.save(groupChat);
     }
 }

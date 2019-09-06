@@ -13,10 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import xyz.dbotfactory.dbot.handler.SharePickerHelper;
-import xyz.dbotfactory.dbot.handler.CommonConsts;
-import xyz.dbotfactory.dbot.handler.ShareButtonCallbackInfo;
-import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.handler.*;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
@@ -35,16 +32,18 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
-
     private final SharePickerHelper sharePickerHelper;
+    private final BotMessageHelper botMessageHelper;
 
     @Autowired
     public H7ShareButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                      TelegramLongPollingBot bot, SharePickerHelper sharePickerHelper) {
+                                      TelegramLongPollingBot bot, SharePickerHelper sharePickerHelper,
+                                      BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
         this.sharePickerHelper = sharePickerHelper;
+        this.botMessageHelper = botMessageHelper;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         String data = update.getCallbackQuery().getData();
         ShareButtonCallbackInfo callbackInfo = ShareButtonCallbackInfo.parseCallbackString(data);
 
-        long userId = update.getCallbackQuery().getMessage().getChatId();
+        int userId = update.getCallbackQuery().getFrom().getId();
 
         Chat groupChat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTgGroupChatId());
         Receipt receipt = chatService.getActiveReceipt(groupChat);
@@ -118,7 +117,7 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         Message message = update.getCallbackQuery().getMessage();
         EditMessageText editMessageReplyMarkup = new EditMessageText()
                 .setMessageId(message.getMessageId())
-                .setChatId(userId)
+                .setChatId((long) userId)
                 .setReplyMarkup(markup)
                 .setParseMode(ParseMode.HTML)
                 .setText(ITEMS_MESSAGE_TEXT);
@@ -127,16 +126,31 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         bot.execute(answerCallbackQuery);
 
         if (receiptService.allSharesDone(receipt)) {
+            botMessageHelper.executeExistingTasks(SHARES_DONE_TASK_NAME, groupChat.getChatMetaInfo(), bot, userId);
             groupChat.setChatState(ChatState.COLLECTING_PAYMENTS_INFO);
             log.info("Chat " + groupChat.getId() + " is now in " + groupChat.getChatState() + " state");
             SendMessage sendMessage = new SendMessage()
                     .setChatId(callbackInfo.getTgGroupChatId())
                     .setParseMode(ParseMode.HTML)
                     .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
-            bot.execute(sendMessage);
-
-            sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
+            Message sentMessage = bot.execute(sendMessage);
+            botMessageHelper.addNewTask(RECEIPT_BALANCES_BUILT, groupChat.getChatMetaInfo(), sentMessage);
+            botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                    groupChat.getChatMetaInfo(), sentMessage);
+            botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                    groupChat.getChatMetaInfo(), sentMessage);
+            List<Message> sentMessages = sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
+            for (Message messagee : sentMessages) {
+                botMessageHelper.addNewTask(H5RedirectToPmButtonUpdateHandler.class.getSimpleName(),
+                        groupChat.getChatMetaInfo(), messagee);
+                botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                        groupChat.getChatMetaInfo(), messagee);
+                botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                        groupChat.getChatMetaInfo(), messagee);
+            }
         }
+
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), bot, userId);
 
         chatService.save(groupChat);
     }

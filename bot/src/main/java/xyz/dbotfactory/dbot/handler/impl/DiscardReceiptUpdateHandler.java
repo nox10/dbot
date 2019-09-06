@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.handler.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.ButtonFactory;
@@ -37,18 +38,28 @@ public class DiscardReceiptUpdateHandler implements UpdateHandler {
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return  update.hasMessage() &&
+        return update.hasMessage() &&
                 update.getMessage().isCommand() &&
-                update.getMessage().getText().contains(COMMAND_NAME)
-                && chat.getChatState() != NO_ACTIVE_RECEIPT
-                && !update.getMessage().getChat().isUserChat();
+                (update.getMessage().getText().equals(COMMAND_NAME + "@" + bot.getBotUsername()) ||
+                        update.getMessage().getText().equals(COMMAND_NAME)) &&
+                !update.getMessage().getChat().isUserChat();
     }
 
     @Override
     public void handle(Update update, Chat chat) {
-        chatService.removeActiveReceipt(chat);
-        chat.setChatState(NO_ACTIVE_RECEIPT);
+        if (chat.getChatState() != NO_ACTIVE_RECEIPT) {
+            chatService.removeActiveReceipt(chat);
+            chat.setChatState(NO_ACTIVE_RECEIPT);
+        }
+
+        messageHelper.deleteMessage(bot, update.getMessage());
+        Message sentMessage = messageHelper.sendSimpleMessage(MESSAGE, chat.getTelegramChatId(), bot);
+
+        messageHelper.executeExistingTasks(this.getClass().getSimpleName(),
+                chat.getChatMetaInfo(), bot, update.getMessage().getFrom().getId());
+
+        messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
         chatService.save(chat);
-        messageHelper.sendSimpleMessage(MESSAGE, chat.getTelegramChatId(), bot);
     }
 }

@@ -9,5 +9,6 @@ import java.util.List;
 @Service
 public interface CalcService {
     List<BalanceStatus> getTotalBalance(List<BalanceStatus> balanceStatuses);
+
     List<DebtReturnTransaction> getReturnStrategy(List<BalanceStatus> balanceStatuses);
 }

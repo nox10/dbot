@@ -6,5 +6,6 @@ import xyz.dbotfactory.dbot.model.Chat;
 public interface UpdateHandler {
 
     boolean canHandle(Update update, Chat chat);
+
     void handle(Update update, Chat chat);
 }

@@ -7,13 +7,15 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
+import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.PayOffHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.impl.callback.DiscardReceiptBalanceCallbackInfo;
 import xyz.dbotfactory.dbot.handler.impl.callback.PayOffCallbackInfo;
-import xyz.dbotfactory.dbot.helper.PrettyPrintUtils;
 import xyz.dbotfactory.dbot.model.BalanceStatus;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.Receipt;
@@ -25,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.isSmaller;
@@ -34,10 +37,9 @@ import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 
 @Component
 @Log
-public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler {
+public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler, CommonConsts {
 
     private final ChatService chatService;
-
 
     private final PayOffHelper payOffHelper;
 
@@ -45,12 +47,17 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
 
     private final TelegramLongPollingBot bot;
 
+    private final BotMessageHelper botMessageHelper;
+
     @Autowired
-    public H11CollectingPaymentsMessageUpdateHandler(ChatService chatService, ReceiptService receiptService, TelegramLongPollingBot bot, PayOffHelper payOffHelper) {
+    public H11CollectingPaymentsMessageUpdateHandler(ChatService chatService, ReceiptService receiptService,
+                                                     TelegramLongPollingBot bot, PayOffHelper payOffHelper,
+                                                     BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
         this.payOffHelper = payOffHelper;
+        this.botMessageHelper = botMessageHelper;
     }
 
     @Override
@@ -72,7 +79,7 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
             return;
         }
         Receipt receipt = chatService.getActiveReceipt(chat);
-        long telegramUserId = update.getMessage().getFrom().getId();
+        int telegramUserId = update.getMessage().getFrom().getId();
 
         UserBalance userBalance = receipt.getUserBalances().stream()
                 .filter(userBalance1 -> userBalance1.getTelegramUserId() == telegramUserId)
@@ -91,18 +98,25 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
 
         InlineKeyboardMarkup howToPayOffMarkup = null;
 
+        List<String> whenToExecuteDeleteTask;
+
         if (totalBalance.compareTo(totalReceiptPrice) == 0) {
             response = "<i>All good, receipt input completed.\n" +
                     getPrettyChatBalanceStatuses(chat) + "</i>";
+            whenToExecuteDeleteTask = asList(
+                    H12SuggestDebtReturnStrategyButtonUpdateHandler.class.getSimpleName(), // TODO
+                    H1NewReceiptCommandUpdateHandler.class.getSimpleName());
             chat.setChatState(NO_ACTIVE_RECEIPT);
             receipt.setActive(false);
 
-            if (true){//payOffHelper.canSuggestPayOffStrategy(chat)) {
+            botMessageHelper.executeExistingTasks(RECEIPT_BALANCES_BUILT, chat.getChatMetaInfo(), bot,
+                    update.getMessage().getFrom().getId());
+
+            if (true) {//payOffHelper.canSuggestPayOffStrategy(chat)) {
                 PayOffCallbackInfo payOffCallbackInfo =
                         new PayOffCallbackInfo(chat.getTelegramChatId());
 
                 DiscardReceiptBalanceCallbackInfo discardReceiptBalanceCallbackInfo =
-
                         new DiscardReceiptBalanceCallbackInfo(chat.getTelegramChatId(), receipt.getId());
 
                 howToPayOffMarkup = new InlineKeyboardMarkup()
@@ -110,21 +124,36 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
                                 discardReceiptBalanceCallbackInfo.getButton())));
             }
         } else if (isSmaller(totalBalance, totalReceiptPrice)) {
+            whenToExecuteDeleteTask = singletonList(this.getClass().getSimpleName());
             response = "<i>Ok. Anyone else?\n\n" +
                     "Need " + totalReceiptPrice.subtract(totalBalance) + " more.</i>";
         } else { // totalBalance > totalReceiptPrice
             response = "<i>Ups, total sum is greater than receipt total (" + totalBalance + "vs" + totalReceiptPrice
                     + "). Can you pls check and type again?</i>";
+            whenToExecuteDeleteTask = singletonList(RECEIPT_BALANCES_BUILT);
             receipt.setUserBalances(new ArrayList<>());
         }
-        chatService.save(chat);
+
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
                 .setText(response)
                 .setReplyMarkup(howToPayOffMarkup)
                 .setParseMode(ParseMode.HTML);
 
-        bot.execute(message);
+        Message sentMessage = bot.execute(message);
+
+        botMessageHelper.deleteMessage(bot, update.getMessage());
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),
+                chat.getChatMetaInfo(), bot, telegramUserId);
+        for (String event : whenToExecuteDeleteTask) {
+            botMessageHelper.addNewTask(event, chat.getChatMetaInfo(), sentMessage);
+            botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                    chat.getChatMetaInfo(), sentMessage);
+            botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                    chat.getChatMetaInfo(), sentMessage);
+        }
+
+        chatService.save(chat);
     }
 
     @SneakyThrows
@@ -138,6 +167,4 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler 
         sb.append(getPrettyBalanceStatuses(totalBalanceStatuses, bot));
         return sb.toString();
     }
-
-
 }

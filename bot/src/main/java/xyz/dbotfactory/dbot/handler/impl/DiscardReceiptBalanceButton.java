@@ -1,9 +1,10 @@
 package xyz.dbotfactory.dbot.handler.impl;
 
-import org.hibernate.pretty.MessageHelper;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -43,13 +44,19 @@ public class DiscardReceiptBalanceButton implements UpdateHandler {
     }
 
     @Override
+    @SneakyThrows
     public void handle(Update update, Chat chat) {
         DiscardReceiptBalanceCallbackInfo callbackInfo =
                 DiscardReceiptBalanceCallbackInfo.fromCallbackData(update.getCallbackQuery().getData());
 
         chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
 
-        messageHelper.sendSimpleMessage("Current receipt was PERERASCHETED", chat.getTelegramChatId(), bot);
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
+                .setCallbackQueryId(update.getCallbackQuery().getId())
+                .setText("Current receipt was PERERASCHETED")
+                .setShowAlert(true);
+        bot.execute(answerCallbackQuery);
+
         chatService.removeReceipt(chat, callbackInfo.getReceiptId());
         chatService.save(chat);
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);

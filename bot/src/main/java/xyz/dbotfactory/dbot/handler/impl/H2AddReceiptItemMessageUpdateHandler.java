@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import xyz.dbotfactory.dbot.DBotUserException;
@@ -35,14 +36,13 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
-
     private final BotMessageHelper messageHelper;
-
     private final ButtonFactory buttonFactory;
 
     @Autowired
     public H2AddReceiptItemMessageUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                                TelegramLongPollingBot bot, BotMessageHelper messageHelper, ButtonFactory buttonFactory) {
+                                                TelegramLongPollingBot bot, BotMessageHelper messageHelper,
+                                                ButtonFactory buttonFactory) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
@@ -62,7 +62,7 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
     public void handle(Update update, Chat chat) {
         String text = update.getMessage().getText();
 
-        if(!text.matches(ITEM_REGEX))
+        if (!text.matches(ITEM_REGEX))
             return;
         text = text.replace(',', '.');
 
@@ -76,7 +76,7 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
         BigDecimal price = create(priceForUnit);
         BigDecimal amount = create(amountStr);
 
-        if(amount.signum() <= 0 || price.signum() < 0)
+        if (amount.signum() <= 0 || price.signum() < 0)
             return;
 
         ReceiptItem receiptItem = ReceiptItem.builder()
@@ -95,13 +95,26 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
         InlineKeyboardMarkup collectingFinishedButton =
                 buttonFactory.getSingleButton(COLLECTING_FINISHED_BUTTON_TEXT, COLLECTING_FINISHED_CALLBACK_DATA);
 
-        messageHelper.sendMessageWithSingleInlineMarkup(
+        Message sentMessage = messageHelper.sendMessageWithSingleInlineMarkup(
                 chat.getTelegramChatId(),
                 collectingFinishedButton,
                 bot,
                 YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT);
 
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
+
+        messageHelper.deleteMessage(bot, update.getMessage());
+        messageHelper.executeExistingTasks(this.getClass().getSimpleName(), chat.getChatMetaInfo(), bot,
+                update.getMessage().getFrom().getId());
+        messageHelper.addNewTask(this.getClass().getSimpleName(), chat.getChatMetaInfo(), sentMessage);
+        messageHelper.addNewTask(H2AddReceiptWithOCRUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        messageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+
+
         chatService.save(chat);
     }
 

@@ -50,7 +50,8 @@ public class DiscardButtonUpdateHandler implements UpdateHandler {
         chatService.removeActiveReceipt(chat);
         chat.setChatState(NO_ACTIVE_RECEIPT);
 
+        botMessageHelper.deleteMessage(bot, update.getCallbackQuery().getMessage());
         botMessageHelper.notifyCallbackProcessed(callbackQuery.getId(), bot);
-        newReceiptCommandUpdateHandler.handle(chat);
+        newReceiptCommandUpdateHandler.handle(update, chat);
     }
 }

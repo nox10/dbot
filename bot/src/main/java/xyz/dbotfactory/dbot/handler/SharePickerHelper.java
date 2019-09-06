@@ -4,10 +4,13 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.Receipt;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
@@ -24,17 +27,19 @@ public class SharePickerHelper {
     }
 
     @SneakyThrows
-    public void sendTotalPriceForEachUser(Chat groupChat, Receipt receipt, TelegramLongPollingBot bot) {
+    public List<Message> sendTotalPriceForEachUser(Chat groupChat, Receipt receipt, TelegramLongPollingBot bot) {
 
         String[] pmUserIds = groupChat.getChatMetaInfo().getPmUserIds().split(DELIMITER);
+        List<Message> sentMessages = new ArrayList<>();
         for (String pmUserId : pmUserIds) {
             long chatId = Long.parseLong(pmUserId);
             BigDecimal totalPrice = getTotalPriceForUser(receipt, chatId);
             String text = "Your total price is " + totalPrice + " \n" + GO_TO_GROUP_TEXT;
-            botMessageHelper.sendSimpleMessage(text, chatId, bot);
+            sentMessages.add(botMessageHelper.sendSimpleMessage(text, chatId, bot));
         }
 
         groupChat.getChatMetaInfo().setPmUserIds("");
+        return sentMessages;
     }
 
     private BigDecimal getTotalPriceForUser(Receipt receipt, long pmUserId) {

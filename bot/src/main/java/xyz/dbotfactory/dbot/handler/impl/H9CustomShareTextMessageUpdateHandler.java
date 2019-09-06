@@ -7,14 +7,15 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.BigDecimalUtils;
-import xyz.dbotfactory.dbot.handler.SharePickerHelper;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
+import xyz.dbotfactory.dbot.handler.SharePickerHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.*;
 import xyz.dbotfactory.dbot.service.ChatService;
@@ -34,16 +35,19 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
+    private final BotMessageHelper botMessageHelper;
 
     private final SharePickerHelper sharePickerHelper;
 
     @Autowired
     public H9CustomShareTextMessageUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                                 TelegramLongPollingBot bot, SharePickerHelper sharePickerHelper) {
+                                                 TelegramLongPollingBot bot, SharePickerHelper sharePickerHelper,
+                                                 BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
         this.sharePickerHelper = sharePickerHelper;
+        this.botMessageHelper = botMessageHelper;
     }
 
     @Override
@@ -57,7 +61,7 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                     .substring(SETING_CUSTOM_SHARE_METADATA.length()).split(DELIMITER);
             int itemId = Integer.parseInt(ids[0]);
             int receiptId = Integer.parseInt(ids[1]);
-            long tgGroupChatId = Integer.parseInt(ids[2]);
+            long tgGroupChatId = Long.parseLong(ids[2]);
 
             Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
@@ -74,10 +78,10 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                 .substring(SETING_CUSTOM_SHARE_METADATA.length()).split(DELIMITER);
         int itemId = Integer.parseInt(ids[0]);
         int receiptId = Integer.parseInt(ids[1]);
-        long tgGroupChatId = Integer.parseInt(ids[2]);
+        long tgGroupChatId = Long.parseLong(ids[2]);
         int editMessageId = Integer.parseInt(ids[3]);
         Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
-        long userId = chat.getTelegramChatId();
+        int userId = update.getMessage().getFrom().getId();
 
         String text = update.getMessage().getText();
         BigDecimal customShareAmount = getCustomShareFromString(text);
@@ -122,32 +126,47 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
 
         EditMessageText editMessageText = new EditMessageText()
                 .setMessageId(editMessageId)
-                .setChatId(userId)
+                .setChatId((long) userId)
                 .setReplyMarkup(markup)
                 .setParseMode(ParseMode.HTML)
                 .setText(ITEMS_MESSAGE_TEXT);
 
-        DeleteMessage deleteMessage = new DeleteMessage()
-                .setMessageId(update.getMessage().getMessageId())
-                .setChatId(update.getMessage().getChatId());
-
         bot.execute(editMessageText);
-        bot.execute(deleteMessage);
 
         if (receiptService.allSharesDone(receipt)) {
+            botMessageHelper.executeExistingTasks(SHARES_DONE_TASK_NAME, groupChat.getChatMetaInfo(), bot,
+                    update.getMessage().getFrom().getId());
             groupChat.setChatState(ChatState.COLLECTING_PAYMENTS_INFO);
             log.info("Chat " + groupChat.getId() + " is now in " + groupChat.getChatState() + " state");
             SendMessage sendMessage = new SendMessage()
                     .setChatId(tgGroupChatId)
                     .setParseMode(ParseMode.HTML)
                     .setText(DONE_MESSAGE_TEXT + receiptService.getTotalReceiptPrice(receipt));
-            bot.execute(sendMessage);
-
-            sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
+            Message sentMessage = bot.execute(sendMessage);
+            botMessageHelper.addNewTask(RECEIPT_BALANCES_BUILT, groupChat.getChatMetaInfo(), sentMessage);
+            botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                    groupChat.getChatMetaInfo(), sentMessage);
+            botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                    groupChat.getChatMetaInfo(), sentMessage);
+            List<Message> sentMessages = sharePickerHelper.sendTotalPriceForEachUser(groupChat, receipt, bot);
+            for (Message message : sentMessages) {
+                botMessageHelper.addNewTask(H5RedirectToPmButtonUpdateHandler.class.getSimpleName(),
+                        groupChat.getChatMetaInfo(), message);
+                botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                        groupChat.getChatMetaInfo(), message);
+                botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                        groupChat.getChatMetaInfo(), message);
+            }
         }
 
-        chatService.save(groupChat);
         chat.setChatState(ChatState.DETECTING_OWNERS);
+
+        botMessageHelper.deleteMessage(bot, update.getMessage());
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),
+                groupChat.getChatMetaInfo(), bot, userId);
+
+        chatService.save(groupChat);
+        chatService.save(chat);
     }
 
     private BigDecimal getCustomShareFromString(String text) {

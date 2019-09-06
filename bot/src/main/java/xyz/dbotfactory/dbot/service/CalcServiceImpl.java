@@ -16,11 +16,11 @@ public class CalcServiceImpl implements CalcService {
 
     @Override
     public List<BalanceStatus> getTotalBalance(List<BalanceStatus> balanceStatuses) {
-        return  List.of(Objects.requireNonNull(new RestTemplate().postForObject(TOTAL_BALANCE_URI, balanceStatuses, BalanceStatus[].class)));
+        return List.of(Objects.requireNonNull(new RestTemplate().postForObject(TOTAL_BALANCE_URI, balanceStatuses, BalanceStatus[].class)));
     }
 
     @Override
     public List<DebtReturnTransaction> getReturnStrategy(List<BalanceStatus> balanceStatuses) {
-        return  List.of(Objects.requireNonNull(new RestTemplate().postForObject(RETURN_STRATEGY_URI, balanceStatuses, DebtReturnTransaction[].class)));
+        return List.of(Objects.requireNonNull(new RestTemplate().postForObject(RETURN_STRATEGY_URI, balanceStatuses, DebtReturnTransaction[].class)));
     }
 }

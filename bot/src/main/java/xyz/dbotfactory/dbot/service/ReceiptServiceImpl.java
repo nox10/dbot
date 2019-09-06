@@ -83,7 +83,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                 .map(item -> item.getShares().stream()
                         .map(Share::getShare)
                         .reduce(BigDecimal::add)
-                        .orElse(create(0)).equals(item.getAmount()))
+                        .orElse(create(0)).compareTo(item.getAmount()) == 0)
                 .reduce(Boolean::logicalAnd).orElseThrow(() -> new IllegalStateException("Empty receipt"));
     }
 

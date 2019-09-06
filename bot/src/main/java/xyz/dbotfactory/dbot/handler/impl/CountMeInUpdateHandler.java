@@ -3,8 +3,8 @@ package xyz.dbotfactory.dbot.handler.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import xyz.dbotfactory.dbot.BigDecimalUtils;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.impl.callback.CountMeInCallbackInfo;
@@ -18,7 +18,6 @@ import xyz.dbotfactory.dbot.service.ReceiptService;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
@@ -29,11 +28,8 @@ import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
 public class CountMeInUpdateHandler implements UpdateHandler {
 
     private final ChatService chatService;
-
     private final ReceiptService receiptService;
-
     private final BotMessageHelper messageHelper;
-
     private final TelegramLongPollingBot bot;
 
     @Autowired
@@ -46,7 +42,7 @@ public class CountMeInUpdateHandler implements UpdateHandler {
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        if(CountMeInCallbackInfo.canHandle(update)){
+        if (CountMeInCallbackInfo.canHandle(update)) {
             PayOffCallbackInfo callbackInfo = CountMeInCallbackInfo.fromCallbackData(update.getCallbackQuery().getData());
             chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
             return chat.getChatState() == DETECTING_OWNERS;
@@ -64,7 +60,7 @@ public class CountMeInUpdateHandler implements UpdateHandler {
         BigDecimal totalBalance = receiptService.getTotalReceiptPrice(activeReceipt);
         int id = update.getCallbackQuery().getFrom().getId();
 
-        if(countInNewUser(activeReceipt, id)){
+        if (countInNewUser(activeReceipt, id)) {
             activeReceipt.getUserBalances().add(UserBalance.builder().telegramUserId(id).build());
             BigDecimal share = totalBalance.divide(create(activeReceipt.getUserBalances().size()));
             for (UserBalance userBalance : activeReceipt.getUserBalances()) {
@@ -77,9 +73,16 @@ public class CountMeInUpdateHandler implements UpdateHandler {
                 .stream()
                 .map(x -> new BalanceStatus(x.getTelegramUserId(), x.getBalance()))
                 .collect(toList());
-        String message = "Payments:\n" +getPrettyBalanceStatuses(collect, bot);
-        messageHelper.sendSimpleMessage(message, chat.getTelegramChatId(), bot);
+        String message = "Payments:\n" + getPrettyBalanceStatuses(collect, bot);
+        Message sentMessage = messageHelper.sendSimpleMessage(message, chat.getTelegramChatId(), bot);
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
+
+        messageHelper.executeExistingTasks(this.getClass().getSimpleName(),
+                chat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());
+        messageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+//        messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+//                chat.getChatMetaInfo(), sentMessage);
     }
 
     private boolean countInNewUser(Receipt receipt, int id) {

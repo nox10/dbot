@@ -8,9 +8,11 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.impl.callback.ShareEqualCallbackInfo;
@@ -34,11 +36,14 @@ public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandl
 
     private final ChatService chatService;
     private final TelegramLongPollingBot bot;
+    private final BotMessageHelper botMessageHelper;
 
     @Autowired
-    public H4ItemsCollectingFinishedButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot) {
+    public H4ItemsCollectingFinishedButtonUpdateHandler(ChatService chatService, TelegramLongPollingBot bot,
+                                                        BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.bot = bot;
+        this.botMessageHelper = botMessageHelper;
     }
 
     @Override
@@ -78,10 +83,21 @@ public class H4ItemsCollectingFinishedButtonUpdateHandler implements UpdateHandl
                 .setParseMode(HTML)
                 .setText(MESSAGE_TEXT);
 
-        bot.execute(message);
+        Message sentMessage = bot.execute(message);
         bot.execute(answerCallbackQuery);
-        chatService.save(chat);
 
         log.info("Chat " + chat.getId() + " is now in " + chat.getChatState() + " state");
+
+        botMessageHelper.deleteButtons(bot, update.getCallbackQuery().getMessage().getChatId(),
+                update.getCallbackQuery().getMessage().getMessageId());
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), chat.getChatMetaInfo(), bot,
+                update.getCallbackQuery().getFrom().getId());
+        botMessageHelper.addNewTask(SHARES_DONE_TASK_NAME, chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+
+        chatService.save(chat);
     }
 }

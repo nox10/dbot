@@ -15,19 +15,18 @@ public class ShareButtonCallbackInfo {
     private int receiptId;
     private long tgGroupChatId;
 
-    public static ShareButtonCallbackInfo parseCallbackString(String string){
+    public static ShareButtonCallbackInfo parseCallbackString(String string) {
         String[] dataArray = string.substring(SHARE_BUTTON_CALLBACK_DATA.length()).split(DELIMITER);
         String shareAmount = dataArray[0];
         int itemId = Integer.parseInt(dataArray[1]);
         int receiptId = Integer.parseInt(dataArray[2]);
-        long tgGroupChatId = Integer.parseInt(dataArray[3]);
-       return ShareButtonCallbackInfo
-               .builder()
-               .itemId(itemId)
-               .receiptId(receiptId)
-               .tgGroupChatId(tgGroupChatId)
-               .shareAmount(shareAmount)
-               .build();
+        long tgGroupChatId = Long.parseLong(dataArray[3]);
+        return ShareButtonCallbackInfo
+                .builder()
+                .itemId(itemId)
+                .receiptId(receiptId)
+                .tgGroupChatId(tgGroupChatId)
+                .shareAmount(shareAmount)
+                .build();
     }
-
 }

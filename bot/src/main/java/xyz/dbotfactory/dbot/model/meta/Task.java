@@ -1,4 +1,4 @@
-package xyz.dbotfactory.dbot.model;
+package xyz.dbotfactory.dbot.model.meta;
 
 import lombok.*;
 
@@ -12,11 +12,12 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatMetaInfo {
+public class Task {
     @Id
     @GeneratedValue
     private int id;
 
-    private String pmUserIds;
-    private String metaData;
+    private Long chatId;
+    private Integer messageId;
+    private Boolean isPrivate;
 }

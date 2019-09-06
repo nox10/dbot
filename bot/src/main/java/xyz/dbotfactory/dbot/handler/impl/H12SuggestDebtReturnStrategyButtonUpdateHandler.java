@@ -4,7 +4,9 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
@@ -19,10 +21,9 @@ import java.util.List;
 
 @Component
 public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHandler {
+
     private final ChatService chatService;
-
     private final TelegramLongPollingBot bot;
-
     private final BotMessageHelper messageHelper;
 
     @Autowired
@@ -58,10 +59,25 @@ public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
         List<DebtReturnTransaction> returnStrategy = chatService.getReturnStrategy(chat);
 
         String response = prettyPrintReturnStrategy(returnStrategy);
-        if (!response.equals(""))
-            messageHelper.sendSimpleMessage(response, callbackInfo.getTelegramChatId(), bot);
+        if (!response.equals("")) {
+            Message sentMessage = messageHelper.sendSimpleMessage(response, callbackInfo.getTelegramChatId(), bot);
+            messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                    chat.getChatMetaInfo(), sentMessage);
+            messageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                    chat.getChatMetaInfo(), sentMessage);
+        } else {
+            AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
+                    .setCallbackQueryId(update.getCallbackQuery().getId())
+                    .setText("Seems like you don't need any return strategy")
+                    .setShowAlert(true);
+            bot.execute(answerCallbackQuery);
+        }
 
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
+        messageHelper.executeExistingTasks(this.getClass().getSimpleName(),
+                chat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());
+
+        chatService.save(chat);
     }
 
     @SneakyThrows

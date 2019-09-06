@@ -1,5 +1,6 @@
 package xyz.dbotfactory.dbot;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -24,6 +25,11 @@ public class Config {
     @PostConstruct
     public void init() {
         ApiContextInitializer.init();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @Bean

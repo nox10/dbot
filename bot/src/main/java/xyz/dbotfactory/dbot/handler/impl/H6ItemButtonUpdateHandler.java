@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
@@ -39,13 +40,15 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
+    private final BotMessageHelper botMessageHelper;
 
     @Autowired
     public H6ItemButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                     TelegramLongPollingBot bot) {
+                                     TelegramLongPollingBot bot, BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
+        this.botMessageHelper = botMessageHelper;
     }
 
     @Override
@@ -56,7 +59,7 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
                 String[] ids = data.substring(ITEM_BUTTON_CALLBACK_DATA_PREFIX.length()).split(DELIMITER);
                 int itemId = Integer.parseInt(ids[0]);
                 int receiptId = Integer.parseInt(ids[1]);
-                long tgGroupChatId = Integer.parseInt(ids[2]);
+                long tgGroupChatId = Long.parseLong(ids[2]);
 
                 Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
@@ -75,9 +78,9 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
                 .substring(ITEM_BUTTON_CALLBACK_DATA_PREFIX.length()).split(DELIMITER);
         int itemId = Integer.parseInt(ids[0]);
         int receiptId = Integer.parseInt(ids[1]);
-        long tgGroupChatId = Integer.parseInt(ids[2]);
+        long tgGroupChatId = Long.parseLong(ids[2]);
         Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
-        long userId = chat.getTelegramChatId();
+        int userId = update.getCallbackQuery().getFrom().getId();
 
         Receipt receipt = chatService.getActiveReceipt(groupChat);
         ReceiptItem item =
@@ -119,7 +122,7 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
         Message message = update.getCallbackQuery().getMessage();
         EditMessageText editMessageText = new EditMessageText()
                 .setMessageId(message.getMessageId())
-                .setChatId(userId)
+                .setChatId((long) userId)
                 .setReplyMarkup(shareButtonsKeyboardMarkup)
                 .setText(SHARES_MESSAGE_TEXT)
                 .setParseMode(ParseMode.HTML);
@@ -128,8 +131,11 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
         if (chat.getChatState() == ChatState.SETTING_CUSTOM_SHARE) {
             chat.setChatState(ChatState.NO_ACTIVE_RECEIPT);
-            chatService.save(chat);
         }
+
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), bot, userId);
+
+        chatService.save(chat);
     }
 
     private String numberToProperString(BigDecimal number) {

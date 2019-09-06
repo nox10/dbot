@@ -3,6 +3,7 @@ package xyz.dbotfactory.dbot.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.dbotfactory.dbot.model.*;
+import xyz.dbotfactory.dbot.model.meta.ChatMetaInfo;
 import xyz.dbotfactory.dbot.repo.ChatRepository;
 
 import javax.transaction.Transactional;
@@ -35,6 +36,8 @@ public class ChatServiceImpl implements ChatService {
                     .telegramChatId(chatId)
                     .chatState(ChatState.NO_ACTIVE_RECEIPT)
                     .receipts(new ArrayList<>())
+                    .chatMetaInfo(ChatMetaInfo.builder().metaData("").pmUserIds("")
+                            .tasks(new ArrayList<>()).build())
                     .build();
             newChat = chatRepository.save(newChat);
             return newChat;

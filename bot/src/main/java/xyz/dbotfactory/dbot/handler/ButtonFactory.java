@@ -9,7 +9,7 @@ import static java.util.Collections.singletonList;
 @Component
 public class ButtonFactory {
 
-    public InlineKeyboardMarkup getSingleButton(String label, String callbackData){
+    public InlineKeyboardMarkup getSingleButton(String label, String callbackData) {
         InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
                 .setText(label)
                 .setCallbackData(callbackData);
