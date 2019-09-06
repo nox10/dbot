@@ -14,7 +14,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 @NoArgsConstructor
 public class PayOffCallbackInfo {
     private static final String CALLBACK_ID = "suggest_debt_return_strategy";
-    private static final String LABEL = "❓ How to pay off ❓";
+    private static final String LABEL = "❓How to pay off❓";
 
     private long telegramChatId;
 
