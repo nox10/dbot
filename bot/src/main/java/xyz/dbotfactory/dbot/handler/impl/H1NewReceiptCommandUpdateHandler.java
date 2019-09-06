@@ -54,8 +54,9 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler, CommonCo
                         update.getMessage().getText().equals(COMMAND_NAME)) &&
                 chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT &&
                 !update.getMessage().getChat().isUserChat() ||
+                (update.hasMessage() &&
                 update.getMessage().getNewChatMembers().stream()
-                        .anyMatch(user -> user.getUserName().equals(bot.getBotUsername()));
+                        .anyMatch(user -> user.getUserName().equals(bot.getBotUsername())));
     }
 
     @Override
