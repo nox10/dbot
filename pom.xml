@@ -29,7 +29,6 @@
     <!-- sub modules -->
     <modules>
         <module>bot</module>
-        <module>calculator</module>
         <module>recognition</module>
     </modules>
 

@@ -15,4 +15,8 @@ import java.math.BigDecimal;
 public class BalanceStatus {
     private long id;
     private BigDecimal amount;
+
+    public void addToAmount(BigDecimal amount) {
+        this.setAmount(this.getAmount().add(amount));
+    }
 }
