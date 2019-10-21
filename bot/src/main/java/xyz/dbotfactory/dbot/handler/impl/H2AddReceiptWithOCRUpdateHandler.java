@@ -18,7 +18,6 @@ import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.OcrHelper;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.model.Chat;
-import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.OCRResult;
 import xyz.dbotfactory.dbot.model.Receipt;
 import xyz.dbotfactory.dbot.service.ChatService;
@@ -54,9 +53,10 @@ public class H2AddReceiptWithOCRUpdateHandler implements UpdateHandler, CommonCo
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return update.hasMessage() &&
-                !update.getMessage().isCommand() && update.getMessage().hasPhoto() &&
-                chat.getChatState() == ChatState.COLLECTING_ITEMS;
+//        return update.hasMessage() &&
+//                !update.getMessage().isCommand() && update.getMessage().hasPhoto() &&
+//                chat.getChatState() == ChatState.COLLECTING_ITEMS;
+        return false;
     }
 
     @Override
