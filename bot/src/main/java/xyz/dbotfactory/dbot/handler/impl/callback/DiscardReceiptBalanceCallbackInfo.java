@@ -15,7 +15,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 public class DiscardReceiptBalanceCallbackInfo {
 
     private static final String CALLBACK_ID = "discard_receipt_item";
-    private static final String LABEL = "✅ Close receipt ✅";
+    private static final String LABEL = "✔️ Close receipt ✔️";
 
     private long telegramChatId;
     private int receiptId;

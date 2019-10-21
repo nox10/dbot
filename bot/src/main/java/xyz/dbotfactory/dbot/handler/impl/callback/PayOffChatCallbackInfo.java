@@ -14,7 +14,7 @@ import static xyz.dbotfactory.dbot.handler.CommonConsts.DELIMITER;
 @Builder
 public class PayOffChatCallbackInfo {
     private static final String CALLBACK_ID = "pay_off_chat";
-    private static final  String LABEL = "Close all receipts";
+    private static final String LABEL = "✅ Close all receipts ✅";
 
     private long telegramChatId;
 
