@@ -56,7 +56,7 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
                 Chat groupChat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTgGroupChatId());
 
-                return groupChat.getChatState() == ChatState.DETECTING_OWNERS &&
+                return groupChat.getChatState() == ChatState.COLLECTING_ITEMS &&
                         chatService.getActiveReceipt(groupChat).getId() == callbackInfo.getReceiptId();
             }
         }
@@ -107,8 +107,8 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
                 )).collect(Collectors.toList());
 
         InlineKeyboardButton finishedButton = new InlineKeyboardButton()
-                .setText(FINISHED_SETTING_SHARES_BUTTON_TEXT)
-                .setCallbackData(FINISHED_SETTING_SHARES_CALLBACK_DATA + callbackInfo.getTgGroupChatId()
+                .setText(CHECK_STATUS_BUTTON_TEXT)
+                .setCallbackData(CHECK_STATUS_CALLBACK_DATA + callbackInfo.getTgGroupChatId()
                         + DELIMITER + callbackInfo.getReceiptId());
 
         itemButtons.add(singletonList(finishedButton));

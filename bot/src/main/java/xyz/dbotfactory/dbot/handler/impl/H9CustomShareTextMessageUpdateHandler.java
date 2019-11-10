@@ -117,8 +117,8 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                 )).collect(Collectors.toList());
 
         InlineKeyboardButton finishedButton = new InlineKeyboardButton()
-                .setText(FINISHED_SETTING_SHARES_BUTTON_TEXT)
-                .setCallbackData(FINISHED_SETTING_SHARES_CALLBACK_DATA + tgGroupChatId
+                .setText(CHECK_STATUS_BUTTON_TEXT)
+                .setCallbackData(CHECK_STATUS_CALLBACK_DATA + tgGroupChatId
                         + DELIMITER + receiptId);
 
         itemButtons.add(singletonList(finishedButton));
@@ -158,7 +158,7 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
             }
         }
 
-        chat.setChatState(ChatState.DETECTING_OWNERS);
+        chat.setChatState(ChatState.COLLECTING_ITEMS);
 
         botMessageHelper.deleteMessage(bot, update.getMessage());
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),

@@ -58,7 +58,7 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
                     Chat publicGroup = chatService.findOrCreateChatByTelegramId(telegramGroupChatId);
 
                     return chatService.getActiveReceipt(publicGroup).getId() == receiptId &&
-                            publicGroup.getChatState() == ChatState.DETECTING_OWNERS;
+                            publicGroup.getChatState() == ChatState.COLLECTING_ITEMS;
                 }
             }
         }
@@ -87,8 +87,8 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
                 )).collect(Collectors.toList());
 
         InlineKeyboardButton finishedButton = new InlineKeyboardButton()
-                .setText(FINISHED_SETTING_SHARES_BUTTON_TEXT)
-                .setCallbackData(FINISHED_SETTING_SHARES_CALLBACK_DATA + telegramGroupChatId + DELIMITER + receiptId);
+                .setText(CHECK_STATUS_BUTTON_TEXT)
+                .setCallbackData(CHECK_STATUS_CALLBACK_DATA + telegramGroupChatId + DELIMITER + receiptId);
 
         itemButtons.add(singletonList(finishedButton));
 

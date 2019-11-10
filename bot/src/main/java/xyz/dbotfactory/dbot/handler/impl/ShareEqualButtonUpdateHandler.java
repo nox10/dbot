@@ -16,7 +16,7 @@ import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.service.ChatService;
 
 import static java.util.Collections.singletonList;
-import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
+import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 
 @Component
 public class ShareEqualButtonUpdateHandler implements UpdateHandler {
@@ -37,7 +37,7 @@ public class ShareEqualButtonUpdateHandler implements UpdateHandler {
         if (ShareEqualCallbackInfo.canHandle(update)) {
             PayOffCallbackInfo callbackInfo = ShareEqualCallbackInfo.fromCallbackData(update.getCallbackQuery().getData());
             chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
-            return chat.getChatState() == DETECTING_OWNERS;
+            return chat.getChatState() == COLLECTING_ITEMS;
         }
         return false;
     }

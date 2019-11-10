@@ -20,7 +20,6 @@ import xyz.dbotfactory.dbot.service.ChatService;
 import xyz.dbotfactory.dbot.service.ReceiptService;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -28,7 +27,7 @@ import static java.util.stream.Collectors.toList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.divide;
 import static xyz.dbotfactory.dbot.helper.PrettyPrintUtils.getPrettyBalanceStatuses;
-import static xyz.dbotfactory.dbot.model.ChatState.DETECTING_OWNERS;
+import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 
 @Component
 public class CountMeInUpdateHandler implements UpdateHandler {
@@ -51,7 +50,7 @@ public class CountMeInUpdateHandler implements UpdateHandler {
         if (CountMeInCallbackInfo.canHandle(update)) {
             PayOffCallbackInfo callbackInfo = CountMeInCallbackInfo.fromCallbackData(update.getCallbackQuery().getData());
             chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
-            return chat.getChatState() == DETECTING_OWNERS;
+            return chat.getChatState() == COLLECTING_ITEMS;
         }
         return false;
     }

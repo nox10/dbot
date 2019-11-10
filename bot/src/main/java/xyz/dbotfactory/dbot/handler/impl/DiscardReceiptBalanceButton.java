@@ -39,7 +39,7 @@ public class DiscardReceiptBalanceButton implements UpdateHandler {
 
             chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
             return chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT
-                    || chat.getChatState() == ChatState.DETECTING_OWNERS;
+                    || chat.getChatState() == ChatState.COLLECTING_ITEMS;
         }
         return false;
     }

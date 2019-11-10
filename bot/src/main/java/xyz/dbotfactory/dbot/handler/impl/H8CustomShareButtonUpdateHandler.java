@@ -54,7 +54,7 @@ public class H8CustomShareButtonUpdateHandler implements UpdateHandler, CommonCo
 
                 Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
-                return groupChat.getChatState() == ChatState.DETECTING_OWNERS &&
+                return groupChat.getChatState() == ChatState.COLLECTING_ITEMS &&
                         chatService.getActiveReceipt(groupChat).getId() == receiptId;
             }
         }

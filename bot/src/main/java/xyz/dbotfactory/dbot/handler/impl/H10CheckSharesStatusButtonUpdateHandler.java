@@ -22,7 +22,7 @@ import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
 
 @Component
-public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, CommonConsts {
+public class H10CheckSharesStatusButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
 
     private final ChatService chatService;
@@ -32,8 +32,8 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
     private final TelegramLongPollingBot bot;
 
     @Autowired
-    public H10SharesStatusButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                              TelegramLongPollingBot bot, BotMessageHelper botMessageHelper) {
+    public H10CheckSharesStatusButtonUpdateHandler(ChatService chatService, ReceiptService receiptService,
+                                                   TelegramLongPollingBot bot, BotMessageHelper botMessageHelper) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
@@ -44,15 +44,15 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
     public boolean canHandle(Update update, Chat chat) {
         if (update.hasCallbackQuery()) {
             String data = update.getCallbackQuery().getData();
-            if (data.startsWith(FINISHED_SETTING_SHARES_CALLBACK_DATA)) {
-                String[] ids = data.substring(FINISHED_SETTING_SHARES_CALLBACK_DATA.length()).split(DELIMITER);
+            if (data.startsWith(CHECK_STATUS_CALLBACK_DATA)) {
+                String[] ids = data.substring(CHECK_STATUS_CALLBACK_DATA.length()).split(DELIMITER);
                 int receiptId = Integer.parseInt(ids[1]);
                 long tgGroupChatId = Long.parseLong(ids[0]);
 
                 Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
                 return chatService.getActiveReceipt(groupChat).getId() == receiptId &&
-                        groupChat.getChatState() == ChatState.DETECTING_OWNERS;
+                        groupChat.getChatState() == ChatState.COLLECTING_ITEMS;
             }
         }
         return false;
@@ -62,7 +62,7 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
     @SneakyThrows
     public void handle(Update update, Chat chat) {
         String[] ids = update.getCallbackQuery()
-                .getData().substring(FINISHED_SETTING_SHARES_CALLBACK_DATA.length()).split(DELIMITER);
+                .getData().substring(CHECK_STATUS_CALLBACK_DATA.length()).split(DELIMITER);
 
         int receiptId = Integer.parseInt(ids[1]);
         long tgGroupChatId = Long.parseLong(ids[0]);
@@ -73,8 +73,8 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
         if (receipt.getItems().size() != 0) {
             StringBuilder sb = new StringBuilder();
             sb.append("❗️ <i>These items are still not picked:</i> \n");
+            sb.append("<pre>");
             for (ReceiptItem item : receipt.getItems()) {
-
                 BigDecimal pickedShare = item.getShares()
                         .stream()
                         .map(Share::getShare)
@@ -83,10 +83,12 @@ public class H10SharesStatusButtonUpdateHandler implements UpdateHandler, Common
                 if (item.getAmount().compareTo(pickedShare) != 0) {
 
                     BigDecimal unpickedShare = item.getAmount().subtract(pickedShare);
-                    sb.append("<pre>").append(item.getName()).append(" x ").append(toStr(unpickedShare))
-                            .append("</pre>");
+                    sb.append(item.getName()).append(" x ").append(toStr(unpickedShare))
+                            .append("\n");
                 }
             }
+
+            sb.append("</pre>\n");
             response = sb.toString();
         } else {
             response = "<i>All items are picked!</i>";

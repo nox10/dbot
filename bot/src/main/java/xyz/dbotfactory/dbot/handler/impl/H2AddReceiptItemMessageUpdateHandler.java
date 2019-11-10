@@ -5,14 +5,17 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import xyz.dbotfactory.dbot.DBotUserException;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
 import xyz.dbotfactory.dbot.handler.ButtonFactory;
 import xyz.dbotfactory.dbot.handler.CommonConsts;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
+import xyz.dbotfactory.dbot.handler.impl.callback.ShareEqualCallbackInfo;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.model.ChatState;
 import xyz.dbotfactory.dbot.model.Receipt;
@@ -25,28 +28,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.telegram.telegrambots.meta.api.methods.ParseMode.HTML;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 
 @Component
 @Log
 public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
-
+    private static final String CONTINUE_BUTTON_TEXT = "📊️ Share not equally 📊️";
 
     private static final String ITEM_REGEX = "\\d+([\\. ,]\\d+)?\\ \\d+([\\. ,]\\d+)?\\ .+$";
     private final ChatService chatService;
     private final ReceiptService receiptService;
     private final TelegramLongPollingBot bot;
-    private final BotMessageHelper messageHelper;
+    private final BotMessageHelper botMessageHelper;
     private final ButtonFactory buttonFactory;
 
     @Autowired
     public H2AddReceiptItemMessageUpdateHandler(ChatService chatService, ReceiptService receiptService,
-                                                TelegramLongPollingBot bot, BotMessageHelper messageHelper,
+                                                TelegramLongPollingBot bot, BotMessageHelper botMessageHelper,
                                                 ButtonFactory buttonFactory) {
         this.chatService = chatService;
         this.receiptService = receiptService;
         this.bot = bot;
-        this.messageHelper = messageHelper;
+        this.botMessageHelper = botMessageHelper;
         this.buttonFactory = buttonFactory;
     }
 
@@ -54,17 +58,14 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
     public boolean canHandle(Update update, Chat chat) {
         return update.hasMessage() &&
                 !update.getMessage().isCommand() && update.getMessage().hasText() &&
-                chat.getChatState() == ChatState.COLLECTING_ITEMS;
+                chat.getChatState() == ChatState.COLLECTING_ITEMS
+                && update.getMessage().getText().matches(ITEM_REGEX);
     }
 
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
-        String text = update.getMessage().getText();
-
-        if (!text.matches(ITEM_REGEX))
-            return;
-        text = text.replace(',', '.');
+        String text = update.getMessage().getText().replace(',', '.');
 
         String[] itemInfo = parseItem(text);
         String amountStr = itemInfo[0];
@@ -92,34 +93,36 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
 
         String formattedReceipt = receiptService.buildBeautifulReceiptString(receipt);
 
-        InlineKeyboardMarkup collectingFinishedButton =
-                buttonFactory.getSingleButton(COLLECTING_FINISHED_BUTTON_TEXT, COLLECTING_FINISHED_CALLBACK_DATA);
+        InlineKeyboardButton continueButton =
+                new InlineKeyboardButton().setUrl(
+                        "https://telegram.me/" + bot.getBotUsername() + "?start=" + CONTINUE_COMMAND_METADATA_PREFIX +
+                                chat.getTelegramChatId() + CONTINUE_DELIMITER + receipt.getId())
+                        .setText(CONTINUE_BUTTON_TEXT);
 
-        Message sentMessage = messageHelper.sendMessageWithSingleInlineMarkup(
-                chat.getTelegramChatId(),
-                collectingFinishedButton,
-                bot,
-                YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT);
+        ShareEqualCallbackInfo shareEqualCallbackInfo = new ShareEqualCallbackInfo(chat.getTelegramChatId());
+        InlineKeyboardButton shareEqualButton = shareEqualCallbackInfo.getButton();
+        InlineKeyboardMarkup itemButtonsMarkup = new InlineKeyboardMarkup()
+                .setKeyboard(List.of(List.of(continueButton), List.of(shareEqualButton)));
+
+        SendMessage message = new SendMessage()
+                .setChatId(chat.getTelegramChatId())
+                .setReplyMarkup(itemButtonsMarkup)
+                .setParseMode(HTML)
+                .setText(YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT);
+
+        Message sentMessage = bot.execute(message);
 
         log.info("item(s) added to receipt" + receipt.getId() + " . Current items:  " + receipt.getItems());
 
-        messageHelper.deleteMessage(bot, update.getMessage());
-        messageHelper.executeExistingTasks(this.getClass().getSimpleName(), chat.getChatMetaInfo(), bot,
+        botMessageHelper.deleteMessage(bot, update.getMessage());
+        botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), chat.getChatMetaInfo(), bot,
                 update.getMessage().getFrom().getId());
-        messageHelper.addNewTask(this.getClass().getSimpleName(), chat.getChatMetaInfo(), sentMessage);
-        messageHelper.addNewTask(H2AddReceiptWithOCRUpdateHandler.class.getSimpleName(),
-                chat.getChatMetaInfo(), sentMessage);
-        messageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
-                chat.getChatMetaInfo(), sentMessage);
-        messageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
-                chat.getChatMetaInfo(), sentMessage);
-
+        addCleanupTasks(chat, sentMessage);
 
         chatService.save(chat);
     }
 
     private void addOrUpdateExistingItem(List<ReceiptItem> items, ReceiptItem newItem) {
-
         Optional<ReceiptItem> existingItem = items
                 .stream()
                 .filter(item -> item.getName().equals(newItem.getName()) && item.getPrice().compareTo(newItem.getPrice()) == 0)
@@ -136,5 +139,16 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
         String name = item.substring(amount.length() + priceForUnit.length() + 2).toUpperCase();
 
         return new String[]{amount, priceForUnit, name};
+    }
+
+    private void addCleanupTasks(Chat chat, Message sentMessage) {
+        botMessageHelper.addNewTask(this.getClass().getSimpleName(), chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(H1NewReceiptCommandUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(SHARES_DONE_TASK_NAME, chat.getChatMetaInfo(), sentMessage);  // TODO: ?
+        botMessageHelper.addNewTask(ShareEqualButtonUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);  // TODO: ?
     }
 }

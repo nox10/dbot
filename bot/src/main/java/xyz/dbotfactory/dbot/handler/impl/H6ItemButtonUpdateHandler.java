@@ -62,7 +62,7 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
                 Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
 
-                return groupChat.getChatState() == ChatState.DETECTING_OWNERS &&
+                return groupChat.getChatState() == ChatState.COLLECTING_ITEMS &&
                         chatService.getActiveReceipt(groupChat).getId() == receiptId;
             }
         }

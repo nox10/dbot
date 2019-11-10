@@ -92,7 +92,9 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler, CommonCo
 
         botMessageHelper.addNewTask(H2AddReceiptItemMessageUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
-        botMessageHelper.addNewTask(H4ItemsCollectingFinishedButtonUpdateHandler.class.getSimpleName(),
+        botMessageHelper.addNewTask(H5RedirectToPmButtonUpdateHandler.class.getSimpleName(),
+                chat.getChatMetaInfo(), sentMessage);
+        botMessageHelper.addNewTask(ShareEqualButtonUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
         botMessageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
                 chat.getChatMetaInfo(), sentMessage);
