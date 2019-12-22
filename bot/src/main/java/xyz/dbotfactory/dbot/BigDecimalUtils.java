@@ -9,7 +9,6 @@ public class BigDecimalUtils {
     private static final int SCALE = 4;
     private static DecimalFormat df2 = new DecimalFormat("#.##");
 
-
     public static BigDecimal create(double number) {
         return new BigDecimal(number).setScale(SCALE, RoundingMode.HALF_UP);
     }
@@ -50,7 +49,6 @@ public class BigDecimalUtils {
         return isGreaterOrEqual(a, create(b));
     }
 
-
     public static boolean isSmallerOrEqual(BigDecimal a, double b) {
         return isSmallerOrEqual(a, create(b));
     }
@@ -77,8 +75,7 @@ public class BigDecimalUtils {
     }
 
     public static  String toStr(BigDecimal decimal){
-
-        return df2.format(decimal);
+        return df2.format(decimal.stripTrailingZeros());
     }
 
     public static BigDecimal divide(BigDecimal a, BigDecimal b){
