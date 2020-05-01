@@ -1,0 +1,11 @@
+bot:
+  token: ${BOT_TOKEN}
+  username: ${BOT_USERNAME}  # without "@"
+
+spring:
+  banner:
+    location: 'classpath:/static/banner'
+
+#logging:
+#  level:
+#    root: debug

@@ -12,7 +12,6 @@
     <artifactId>bot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>bot</name>
-    <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>11</java.version>
@@ -46,7 +45,7 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
-            <version>4.4.0.1</version>
+            <version>4.8.1</version>
         </dependency>
 
         <dependency>

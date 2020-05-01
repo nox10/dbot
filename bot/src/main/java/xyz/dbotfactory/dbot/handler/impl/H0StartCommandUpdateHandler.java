@@ -27,7 +27,11 @@ public class H0StartCommandUpdateHandler implements UpdateHandler {
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return update.hasMessage() && update.getMessage().hasText() && update.getMessage().getText().equals("/start")
+        return update.hasMessage() && update.getMessage().hasText()
+                && (update.getMessage().getText().equals("/start")
+                || update.getMessage().getText().equals("/new_receipt")
+                || update.getMessage().getText().equals("/discard")
+        )
                 && chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT
                 && update.getMessage().getChat().isUserChat();
     }
@@ -35,7 +39,7 @@ public class H0StartCommandUpdateHandler implements UpdateHandler {
     @Override
     public void handle(Update update, Chat chat) {
         InlineKeyboardButton button = new InlineKeyboardButton()
-                .setUrl("https://telegram.me/" + bot.getBotUsername() + "?startgroup=true")
+                .setUrl("https://telegram.me/" + bot.getBotUsername() + "?startgroup=initial_receipt")
                 .setText("🌀 Add to group 🌀");
 
         messageHelper.sendMessageWithSingleInlineMarkup(update.getMessage().getChatId(),

@@ -12,19 +12,7 @@ services:
     ports:
       - "8095:8095"
     depends_on:
-      - calculator
       - recognition
-
-  calculator:
-    image: "incarcerous8/receiptcalcimage:prod"
-    container_name: "receiptcalc_container"
-    env_file:
-      - dbot.env
-    restart: always
-    networks:
-      - botnetwork
-    ports:
-      - "8096:8096"
 
   recognition:
     image: "incarcerous8/receiptrecognimage:prod"

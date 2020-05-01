@@ -27,6 +27,8 @@ import static xyz.dbotfactory.dbot.model.ChatState.COLLECTING_ITEMS;
 public class H1NewReceiptCommandUpdateHandler implements UpdateHandler, CommonConsts {
 
     public static final String COMMAND_NAME = "/new_receipt";
+    public static final String SECOND_COMMAND_NAME = "/start";
+    public static final String SECOND_COMMAND_EXTRA_TEXT = "initial_receipt";
     private static final String RECEIPT_EMOJI = "🧾";
     private static final String SPEECH_SEND_RECEIPT = RECEIPT_EMOJI + " <b>Please, send receipt information</b>\n\n" +
             "ℹ️ Receipt info should be in the next format (with spaces):\n\n" +
@@ -48,15 +50,15 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler, CommonCo
 
     @Override
     public boolean canHandle(Update update, Chat chat) {
-        return update.hasMessage() &&
-                update.getMessage().isCommand() &&
-                (update.getMessage().getText().equals(COMMAND_NAME + "@" + bot.getBotUsername()) ||
-                        update.getMessage().getText().equals(COMMAND_NAME)) &&
-                chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT &&
-                !update.getMessage().getChat().isUserChat() ||
-                (update.hasMessage() &&
-                update.getMessage().getNewChatMembers().stream()
-                        .anyMatch(user -> user.getUserName().equals(bot.getBotUsername())));
+        return update.hasMessage()
+                && update.getMessage().isCommand()
+                && (update.getMessage().getText().equals(COMMAND_NAME + "@" + bot.getBotUsername())
+                || update.getMessage().getText().equals(COMMAND_NAME)
+                || update.getMessage().getText().equals(SECOND_COMMAND_NAME + "@" + bot.getBotUsername() + ' ' + SECOND_COMMAND_EXTRA_TEXT)
+                || update.getMessage().getText().equals(SECOND_COMMAND_NAME + ' ' + SECOND_COMMAND_EXTRA_TEXT)
+        )
+                && chat.getChatState() == ChatState.NO_ACTIVE_RECEIPT
+                && !update.getMessage().getChat().isUserChat();
     }
 
     @Override
