@@ -2,8 +2,9 @@ version: '3'
 services:
 
   receiptbot:
-    container_name: "receiptbot_container"
-    build: ./bot
+    #    image: "incarcerous8/receiptbot:prod"  # For prod environment
+    container_name: "receiptbot_container"  # For non-prod environment
+    build: ./bot  # For non-prod environment
     environment:
       - MONGO_URL=mongodb://db:27017/
     env_file:
