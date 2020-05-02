@@ -5,6 +5,8 @@ bot:
 spring:
   banner:
     location: 'classpath:/static/banner'
+  main:
+    allow-bean-definition-overriding: true
 
 #logging:
 #  level:

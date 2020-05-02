@@ -3,3 +3,4 @@
 .cache
 *.md
 .gitignore
+src/
