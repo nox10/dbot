@@ -20,7 +20,6 @@ services:
   db:
     image: "postgres:12"
     container_name: "postgres_container"
-    environment:
     volumes:
       - "~/receiptbot/db:/var/lib/postgresql/data"
     env_file:
