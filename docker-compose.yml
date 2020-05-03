@@ -8,7 +8,7 @@ services:
     environment:
       - MONGO_URL=mongodb://db:27017/
     env_file:
-      - dbot.env
+      - bot.env
     restart: always
     networks:
       - db_nw
@@ -23,7 +23,7 @@ services:
     volumes:
       - "~/receiptbot/db:/var/lib/postgresql/data"
     env_file:
-      - dbot.env
+      - bot.env
     restart: always
     networks:
       - db_nw
