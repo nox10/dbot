@@ -18,21 +18,16 @@ services:
       - db
 
   db:
-    image: "mongo:4.0.18"
-    container_name: "mongodb_container"
+    image: "postgres:12"
+    container_name: "postgres_container"
     environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    #      - MONGODB_USER="user"
-    #      - MONGODB_PASS="pass"
     volumes:
-      - "~/receiptsbot/db:/data/db"
-    #    env_file:
-    #      - db.env
+      - "~/receiptbot/db:/var/lib/postgresql/data"
+    env_file:
+      - dbot.env
     restart: always
     networks:
       - db_nw
-    command: mongod --smallfiles --logpath=/dev/null # --quiet
 
 networks:
   db_nw:

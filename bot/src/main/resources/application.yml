@@ -7,6 +7,16 @@ spring:
     location: 'classpath:/static/banner'
   main:
     allow-bean-definition-overriding: true
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 #logging:
 #  level:

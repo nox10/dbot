@@ -1,16 +1,12 @@
 package xyz.dbotfactory.dbot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -25,7 +21,6 @@ import javax.annotation.PostConstruct;
 @Configuration
 @EnableConfigurationProperties
 @EnableAspectJAutoProxy
-@EnableMongoRepositories(basePackages = "xyz.dbotfactory.dbot")
 @Log
 public class Config {
 
@@ -37,16 +32,6 @@ public class Config {
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
-    }
-
-    @Bean
-    public MongoClient mongo() {
-        return MongoClients.create("mongodb://localhost:27017");
-    }
-
-    @Bean
-    public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(mongo(), "dbot");
     }
 
     @Bean
