@@ -2,11 +2,9 @@ version: '3'
 services:
 
   receiptbot:
+    container_name: "receiptbot_bot_container"
     #    image: "incarcerous8/receiptbot:prod"  # For prod environment
-    container_name: "receiptbot_container"  # For non-prod environment
     build: ./bot  # For non-prod environment
-    environment:
-      - MONGO_URL=mongodb://db:27017/
     env_file:
       - bot.env
     restart: always
@@ -19,7 +17,7 @@ services:
 
   db:
     image: "postgres:12"
-    container_name: "postgres_container"
+    container_name: "receiptbot_db_container"
     volumes:
       - "~/receiptbot/db:/var/lib/postgresql/data"
     env_file:
