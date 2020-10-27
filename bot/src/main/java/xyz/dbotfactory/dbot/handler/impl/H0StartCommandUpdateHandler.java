@@ -40,10 +40,10 @@ public class H0StartCommandUpdateHandler implements UpdateHandler {
     public void handle(Update update, Chat chat) {
         InlineKeyboardButton button = new InlineKeyboardButton()
                 .setUrl("https://telegram.me/" + bot.getBotUsername() + "?startgroup=initial_receipt")
-                .setText("🌀 Add to group 🌀");
+                .setText("🌀 Add to a group 🌀");
 
         messageHelper.sendMessageWithSingleInlineMarkup(update.getMessage().getChatId(),
                 new InlineKeyboardMarkup().setKeyboard(singletonList(singletonList(button))), bot,
-                "Hello!\n\nℹ️ This bot works only in groups.");
+                "Hello!\n\nℹ️ This bot works perfectly in groups.");
     }
 }
