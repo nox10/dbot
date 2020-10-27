@@ -8,8 +8,8 @@ services:
     env_file:
       - bot.env
     restart: always
-    networks:
-      - db_nw
+    #    networks:
+    #      - db_nw
     #    ports:
     #      - "8095:8095"
     depends_on:
@@ -20,12 +20,14 @@ services:
     container_name: "receiptbot_db_container"
     volumes:
       - "~/receiptbot/db:/var/lib/postgresql/data"
+    #    ports:
+    #      - "5432:5432"
     env_file:
       - bot.env
     restart: always
-    networks:
-      - db_nw
+#    networks:
+#      - db_nw
 
-networks:
-  db_nw:
-    driver: bridge
+#networks:
+#  db_nw:
+#    driver: bridge
