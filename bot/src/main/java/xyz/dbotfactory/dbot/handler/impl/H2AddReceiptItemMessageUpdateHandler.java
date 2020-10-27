@@ -34,7 +34,8 @@ import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 @Component
 @Log
 public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
-    private static final String CONTINUE_BUTTON_TEXT = "📊️ Share not equally 📊️";
+//    private static final String CONTINUE_BUTTON_TEXT = "📊️ Share not equally 📊️";  // TODO: Get rid of "equally" or fix it
+private static final String CONTINUE_BUTTON_TEXT = "➡️ Continue ➡️";
 
     private static final String ITEM_REGEX = "\\d+([\\. ,]\\d+)?\\ \\d+([\\. ,]\\d+)?\\ .+$";
     private final ChatService chatService;

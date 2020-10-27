@@ -12,8 +12,7 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
-import static xyz.dbotfactory.dbot.BigDecimalUtils.toStr;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.*;
 
 @Service
 @Transactional
@@ -68,7 +67,7 @@ public class ReceiptServiceImpl implements ReceiptService, CommonConsts {
         if (BigDecimalUtils.equals(shareAmount, 0.0)) {
             return "⚪ " + item.getName();
         } else {
-            return "🔘 " + item.getName() + " — " + shareAmount;
+            return "🔘 " + item.getName() + " — " + shareToStr(shareAmount);
         }
     }
 

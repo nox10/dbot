@@ -27,6 +27,7 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.isGreater;
+import static xyz.dbotfactory.dbot.BigDecimalUtils.shareToStr;
 
 @Component
 @Log
@@ -89,7 +90,7 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
         BigDecimal shareLeft = receiptService.shareLeft(item, userId);
         if (isGreater(shareLeft, 0)) {
             InlineKeyboardButton shareLeftButton = new InlineKeyboardButton()
-                    .setText(numberToProperString(shareLeft))
+                    .setText(shareToStr(shareLeft))
                     .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + SHARE_LEFT_BUTTON_CALLBACK_DATA +
                             DELIMITER + itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
             shareButtons.add(singletonList(shareLeftButton));
@@ -134,9 +135,5 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(), groupChat.getChatMetaInfo(), bot, userId);
 
         chatService.save(chat);
-    }
-
-    private static String numberToProperString(BigDecimal number) {
-        return number.stripTrailingZeros().toPlainString();
     }
 }

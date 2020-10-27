@@ -74,11 +74,15 @@ public class BigDecimalUtils {
         return shareAmount.equals(create(b));
     }
 
-    public static  String toStr(BigDecimal decimal){
+    public static String toStr(BigDecimal decimal) {
         return df2.format(decimal.stripTrailingZeros());
     }
 
-    public static BigDecimal divide(BigDecimal a, BigDecimal b){
+    public static BigDecimal divide(BigDecimal a, BigDecimal b) {
         return a.divide(b, SCALE, RoundingMode.HALF_UP);
+    }
+
+    public static String shareToStr(BigDecimal number) {
+        return number.stripTrailingZeros().toPlainString();
     }
 }
