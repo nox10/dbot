@@ -27,7 +27,6 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static xyz.dbotfactory.dbot.BigDecimalUtils.isGreater;
-import static xyz.dbotfactory.dbot.BigDecimalUtils.isGreaterOrEqual;
 
 @Component
 @Log
@@ -96,14 +95,14 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
             shareButtons.add(singletonList(shareLeftButton));
         }
 
-        if (isGreaterOrEqual(shareLeft, 1)) {
+        if (isGreater(shareLeft, 1)) {
             InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText("1")
                     .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + "1" + DELIMITER +
                             itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
             shareButtons.add(singletonList(shareLeftButton));
         }
 
-        if (isGreaterOrEqual(shareLeft, 0.5)) {
+        if (isGreater(shareLeft, 0.5)) {
             InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText("0.5")
                     .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + "0.5" + DELIMITER +
                             itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
@@ -137,12 +136,7 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
         chatService.save(chat);
     }
 
-    private String numberToProperString(BigDecimal number) {
-//        if (number - (int) number == 0) {
-//            return Integer.toString((int) number);
-//        } else {
-//            return Double.toString(number);
-//        }
-        return number.toString();
+    private static String numberToProperString(BigDecimal number) {
+        return number.stripTrailingZeros().toPlainString();
     }
 }
