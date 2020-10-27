@@ -102,7 +102,9 @@ public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, Comm
         ShareEqualCallbackInfo shareEqualCallbackInfo = new ShareEqualCallbackInfo(chat.getTelegramChatId());
         InlineKeyboardButton shareEqualButton = shareEqualCallbackInfo.getButton();
         InlineKeyboardMarkup itemButtonsMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(List.of(List.of(continueButton), List.of(shareEqualButton)));
+                .setKeyboard(List.of(List.of(continueButton)
+//                        , List.of(shareEqualButton)  // TODO: Fix unintended taps or complete getting rid of this code
+                ));
 
         SendMessage message = new SendMessage()
                 .setChatId(chat.getTelegramChatId())
