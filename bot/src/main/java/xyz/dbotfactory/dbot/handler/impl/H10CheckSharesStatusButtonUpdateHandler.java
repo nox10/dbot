@@ -7,6 +7,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import xyz.dbotfactory.dbot.handler.BotMessageHelper;
@@ -73,6 +74,7 @@ public class H10CheckSharesStatusButtonUpdateHandler implements UpdateHandler, C
         if (receipt.getItems().size() != 0) {
             StringBuilder sb = new StringBuilder();
             sb.append("❗️ <i>These items are still not picked:</i> \n");
+            sb.append("\n");
             sb.append("<pre>");
             for (ReceiptItem item : receipt.getItems()) {
                 BigDecimal pickedShare = item.getShares()
@@ -100,7 +102,14 @@ public class H10CheckSharesStatusButtonUpdateHandler implements UpdateHandler, C
                 .setParseMode(ParseMode.HTML);
         Message sentMessage = bot.execute(message);
 
-        addCleanupTasks(groupChat, sentMessage);
+//        addCleanupTasks(groupChat, sentMessage);
+
+        Thread.sleep(2000);
+        DeleteMessage deleteMessage = new DeleteMessage()
+                .setChatId(sentMessage.getChatId())
+                .setMessageId(sentMessage.getMessageId());
+        bot.execute(deleteMessage);
+
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),
                 groupChat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());
 
