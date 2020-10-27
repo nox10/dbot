@@ -10,8 +10,8 @@ services:
     restart: always
     networks:
       - db_nw
-    ports:
-      - "8095:8095"
+    #    ports:
+    #      - "8095:8095"
     depends_on:
       - db
 
