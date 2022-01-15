@@ -52,10 +52,11 @@ public class DiscardReceiptBalanceButton implements UpdateHandler {
 
         chat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTelegramChatId());
 
-        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
-                .setCallbackQueryId(update.getCallbackQuery().getId())
-                .setText(PERERASCHET)
-                .setShowAlert(true);
+        AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+                .callbackQueryId(update.getCallbackQuery().getId())
+                .text(PERERASCHET)
+                .showAlert(true)
+                .build();
         bot.execute(answerCallbackQuery);
 
         chatService.removeReceipt(chat, callbackInfo.getReceiptId());

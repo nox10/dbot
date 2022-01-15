@@ -63,11 +63,11 @@ public class CountMeInUpdateHandler implements UpdateHandler {
         Receipt activeReceipt = chatService.getActiveReceipt(chat);
 
         BigDecimal totalBalance = receiptService.getTotalReceiptPrice(activeReceipt);
-        int id = update.getCallbackQuery().getFrom().getId();
+        long id = update.getCallbackQuery().getFrom().getId();
 
         if (countInNewUser(activeReceipt, id)) {
             activeReceipt.getUserBalances().add(UserBalance.builder().telegramUserId(id).build());
-            BigDecimal share = divide(totalBalance,create(activeReceipt.getUserBalances().size()));
+            BigDecimal share = divide(totalBalance, create(activeReceipt.getUserBalances().size()));
             for (UserBalance userBalance : activeReceipt.getUserBalances()) {
                 userBalance.setBalance(share);
             }
@@ -81,8 +81,8 @@ public class CountMeInUpdateHandler implements UpdateHandler {
         DiscardReceiptBalanceCallbackInfo discardReceiptBalanceCallbackInfo =
                 new DiscardReceiptBalanceCallbackInfo(chat.getTelegramChatId(), activeReceipt.getId());
         InlineKeyboardButton button = discardReceiptBalanceCallbackInfo.getButton();
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup().setKeyboard(singletonList(singletonList(button)));
-        Message sentMessage = messageHelper.sendMessageWithSingleInlineMarkup(chat.getTelegramChatId(), markup , bot, message);
+        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(singletonList(singletonList(button))).build();
+        Message sentMessage = messageHelper.sendMessageWithSingleInlineMarkup(chat.getTelegramChatId(), markup, bot, message);
 
         messageHelper.notifyCallbackProcessed(update.getCallbackQuery().getId(), bot);
 
@@ -98,7 +98,7 @@ public class CountMeInUpdateHandler implements UpdateHandler {
         chatService.save(chat);
     }
 
-    private boolean countInNewUser(Receipt receipt, int id) {
+    private boolean countInNewUser(Receipt receipt, long id) {
         return receipt.getUserBalances().stream().noneMatch(x -> x.getTelegramUserId() == id);
     }
 }

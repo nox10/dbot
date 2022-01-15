@@ -27,7 +27,7 @@ public class PrettyPrintUtils {
     public static String getPrettyBalanceStatuses(List<BalanceStatus> totalBalanceStatuses, TelegramLongPollingBot bot) {
         StringBuilder sb = new StringBuilder();
         for (BalanceStatus balanceStatus : totalBalanceStatuses) {
-            GetChat getChat = new GetChat(balanceStatus.getId());
+            GetChat getChat = new GetChat(Long.toString(balanceStatus.getId()));
             String userName = bot.execute(getChat).getUserName();
             sb.append("💵 @").append(userName).append(" : <code>").append(toStr(balanceStatus.getAmount()))
                     .append("</code>\n");

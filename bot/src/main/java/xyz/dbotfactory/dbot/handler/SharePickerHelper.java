@@ -33,22 +33,21 @@ public class SharePickerHelper {
         String[] pmUserIds = groupChat.getChatMetaInfo().getPmUserIds().split(DELIMITER);
         List<Message> sentMessages = new ArrayList<>();
         for (String pmUserId : pmUserIds) {
-            long chatId = Long.parseLong(pmUserId);
-            BigDecimal totalPrice = getTotalPriceForUser(receipt, chatId);
+            BigDecimal totalPrice = getTotalPriceForUser(receipt, pmUserId);
             String text = "Your total price is " + toStr(totalPrice) + " \n" + GO_TO_GROUP_TEXT;
-            sentMessages.add(botMessageHelper.sendSimpleMessage(text, chatId, bot));
+            sentMessages.add(botMessageHelper.sendSimpleMessage(text, Long.parseLong(pmUserId), bot));
         }
 
         groupChat.getChatMetaInfo().setPmUserIds("");
         return sentMessages;
     }
 
-    private BigDecimal getTotalPriceForUser(Receipt receipt, long pmUserId) {
+    private BigDecimal getTotalPriceForUser(Receipt receipt, String pmUserId) {
         return receipt.getItems()
                 .stream()
                 .flatMap(item -> item.getShares()
                         .stream()
-                        .filter(share -> share.getTelegramUserId() == pmUserId)
+                        .filter(share -> share.getTelegramUserId() == Long.parseLong(pmUserId))
                         .map(share -> share.getShare().multiply(item.getPrice()))
                 )
                 .reduce(BigDecimal::add).orElse(create(0));

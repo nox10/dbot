@@ -48,7 +48,7 @@ public class ShareEqualButtonUpdateHandler implements UpdateHandler {
 
         CountMeInCallbackInfo countMeInCallbackInfo = new CountMeInCallbackInfo(callbackInfo.getTelegramChatId());
         InlineKeyboardButton button = countMeInCallbackInfo.getButton();
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup().setKeyboard(singletonList(singletonList(button)));
+        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(singletonList(singletonList(button))).build();
 
         Message sentMessage = messageHelper.sendMessageWithSingleInlineMarkup(
                 callbackInfo.getTelegramChatId(),

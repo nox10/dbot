@@ -79,7 +79,7 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
         int receiptId = Integer.parseInt(ids[1]);
         long tgGroupChatId = Long.parseLong(ids[2]);
         Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
-        int userId = update.getCallbackQuery().getFrom().getId();
+        long userId = update.getCallbackQuery().getFrom().getId();
 
         Receipt receipt = chatService.getActiveReceipt(groupChat);
         ReceiptItem item =
@@ -89,42 +89,51 @@ public class H6ItemButtonUpdateHandler implements UpdateHandler, CommonConsts {
 
         BigDecimal shareLeft = receiptService.shareLeft(item, userId);
         if (isGreater(shareLeft, 0)) {
-            InlineKeyboardButton shareLeftButton = new InlineKeyboardButton()
-                    .setText(shareToStr(shareLeft))
-                    .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + SHARE_LEFT_BUTTON_CALLBACK_DATA +
-                            DELIMITER + itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
+            InlineKeyboardButton shareLeftButton = InlineKeyboardButton.builder()
+                    .text(shareToStr(shareLeft))
+                    .callbackData(SHARE_BUTTON_CALLBACK_DATA + SHARE_LEFT_BUTTON_CALLBACK_DATA +
+                            DELIMITER + itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId)
+                    .build();
             shareButtons.add(singletonList(shareLeftButton));
         }
 
         if (isGreater(shareLeft, 1)) {
-            InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText("1")
-                    .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + "1" + DELIMITER +
-                            itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
+            InlineKeyboardButton shareLeftButton = InlineKeyboardButton.builder()
+                    .text("1")
+                    .callbackData(SHARE_BUTTON_CALLBACK_DATA + "1" + DELIMITER +
+                            itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId)
+                    .build();
             shareButtons.add(singletonList(shareLeftButton));
         }
 
         if (isGreater(shareLeft, 0.5)) {
-            InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText("0.5")
-                    .setCallbackData(SHARE_BUTTON_CALLBACK_DATA + "0.5" + DELIMITER +
-                            itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId);
+            InlineKeyboardButton shareLeftButton = InlineKeyboardButton.builder()
+                    .text("0.5")
+                    .callbackData(SHARE_BUTTON_CALLBACK_DATA + "0.5" + DELIMITER +
+                            itemId + DELIMITER + receiptId + DELIMITER + tgGroupChatId)
+                    .build();
             shareButtons.add(singletonList(shareLeftButton));
         }
 
-        InlineKeyboardButton shareLeftButton = new InlineKeyboardButton().setText(CUSTOM_SHARE_BUTTON_TEXT)
-                .setCallbackData(CUSTOM_SHARE_CALLBACK_DATA + itemId + DELIMITER +
-                        receiptId + DELIMITER + tgGroupChatId);
+        InlineKeyboardButton shareLeftButton = InlineKeyboardButton.builder()
+                .text(CUSTOM_SHARE_BUTTON_TEXT)
+                .callbackData(CUSTOM_SHARE_CALLBACK_DATA + itemId + DELIMITER +
+                        receiptId + DELIMITER + tgGroupChatId)
+                .build();
         shareButtons.add(singletonList(shareLeftButton));
 
-        InlineKeyboardMarkup shareButtonsKeyboardMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(shareButtons);
+        InlineKeyboardMarkup shareButtonsKeyboardMarkup = InlineKeyboardMarkup.builder()
+                .keyboard(shareButtons)
+                .build();
 
         Message message = update.getCallbackQuery().getMessage();
-        EditMessageText editMessageText = new EditMessageText()
-                .setMessageId(message.getMessageId())
-                .setChatId((long) userId)
-                .setReplyMarkup(shareButtonsKeyboardMarkup)
-                .setText(SHARES_MESSAGE_TEXT)
-                .setParseMode(ParseMode.HTML);
+        EditMessageText editMessageText = EditMessageText.builder()
+                .messageId(message.getMessageId())
+                .chatId(Long.toString(userId))
+                .replyMarkup(shareButtonsKeyboardMarkup)
+                .text(SHARES_MESSAGE_TEXT)
+                .parseMode(ParseMode.HTML)
+                .build();
 
         bot.execute(editMessageText);
 

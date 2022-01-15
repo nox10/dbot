@@ -75,10 +75,11 @@ public class H1NewReceiptCommandUpdateHandler implements UpdateHandler, CommonCo
             chat.setChatMetaInfo(ChatMetaInfo.builder().pmUserIds("").build());
         }
 
-        SendMessage message = new SendMessage()
-                .setChatId(chat.getTelegramChatId())
-                .setText(SPEECH_SEND_RECEIPT)
-                .setParseMode(ParseMode.HTML);
+        SendMessage message = SendMessage.builder()
+                .chatId(Long.toString(chat.getTelegramChatId()))
+                .text(SPEECH_SEND_RECEIPT)
+                .parseMode(ParseMode.HTML)
+                .build();
 
         Message sentMessage = bot.execute(message);
 

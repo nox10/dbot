@@ -82,7 +82,7 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
         long tgGroupChatId = Long.parseLong(ids[2]);
         int editMessageId = Integer.parseInt(ids[3]);
         Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
-        int userId = update.getMessage().getFrom().getId();
+        long userId = update.getMessage().getFrom().getId();
 
         String text = update.getMessage().getText();
         BigDecimal customShareAmount = getCustomShareFromString(text);
@@ -110,27 +110,30 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
         }
 
         List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
-                .map(anItem -> singletonList(new InlineKeyboardButton()
-                        .setText(receiptService.getShareStringForButton(anItem, userId))
-                        .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + anItem.getId() + DELIMITER +
+                .map(anItem -> singletonList(InlineKeyboardButton.builder()
+                        .text(receiptService.getShareStringForButton(anItem, userId))
+                        .callbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + anItem.getId() + DELIMITER +
                                 receiptId + DELIMITER + tgGroupChatId)
+                        .build()
                 )).collect(Collectors.toList());
 
-        InlineKeyboardButton finishedButton = new InlineKeyboardButton()
-                .setText(CHECK_STATUS_BUTTON_TEXT)
-                .setCallbackData(CHECK_STATUS_CALLBACK_DATA + tgGroupChatId
-                        + DELIMITER + receiptId);
+        InlineKeyboardButton finishedButton = InlineKeyboardButton.builder()
+                .text(CHECK_STATUS_BUTTON_TEXT)
+                .callbackData(CHECK_STATUS_CALLBACK_DATA + tgGroupChatId
+                        + DELIMITER + receiptId)
+                .build();
 
         itemButtons.add(singletonList(finishedButton));
 
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup().setKeyboard(itemButtons);
+        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(itemButtons).build();
 
-        EditMessageText editMessageText = new EditMessageText()
-                .setMessageId(editMessageId)
-                .setChatId((long) userId)
-                .setReplyMarkup(markup)
-                .setParseMode(ParseMode.HTML)
-                .setText(ITEMS_MESSAGE_TEXT);
+        EditMessageText editMessageText = EditMessageText.builder()
+                .messageId(editMessageId)
+                .chatId(Long.toString(userId))
+                .replyMarkup(markup)
+                .parseMode(ParseMode.HTML)
+                .text(ITEMS_MESSAGE_TEXT)
+                .build();
 
         bot.execute(editMessageText);
 
@@ -139,10 +142,11 @@ public class H9CustomShareTextMessageUpdateHandler implements UpdateHandler, Com
                     update.getMessage().getFrom().getId());
             groupChat.setChatState(ChatState.COLLECTING_PAYMENTS_INFO);
             log.info("Chat " + groupChat.getId() + " is now in " + groupChat.getChatState() + " state");
-            SendMessage sendMessage = new SendMessage()
-                    .setChatId(tgGroupChatId)
-                    .setParseMode(ParseMode.HTML)
-                    .setText(DONE_MESSAGE_TEXT + "<code>" + toStr(receiptService.getTotalReceiptPrice(receipt)) + "</code>");
+            SendMessage sendMessage = SendMessage.builder()
+                    .chatId(Long.toString(tgGroupChatId))
+                    .parseMode(ParseMode.HTML)
+                    .text(DONE_MESSAGE_TEXT + "<code>" + toStr(receiptService.getTotalReceiptPrice(receipt)) + "</code>")
+                    .build();
             Message sentMessage = bot.execute(sendMessage);
 
             askCleanupTasks(groupChat, sentMessage);

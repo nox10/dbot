@@ -31,7 +31,7 @@ public class BotMessageHelper {
 
     @SneakyThrows
     public Message sendSimpleMessage(String message, Long chatId, TelegramLongPollingBot bot) {
-        SendMessage sendMessage = new SendMessage(chatId, message).setParseMode(ParseMode.HTML);
+        SendMessage sendMessage = SendMessage.builder().chatId(Long.toString(chatId)).text(message).parseMode(ParseMode.HTML).build();
         return bot.execute(sendMessage);
     }
 
@@ -40,20 +40,25 @@ public class BotMessageHelper {
                                                      InlineKeyboardMarkup markup,
                                                      TelegramLongPollingBot bot,
                                                      @Nullable String message) {
+        if (message == null) {
+            message = "🔘🔘🔘";
+        }
 
-        SendMessage sendMessage = new SendMessage()
-                .setChatId(chatId)
-                .setText(message)
-                .setReplyMarkup(markup)
-                .setParseMode(ParseMode.HTML);
+        SendMessage sendMessage = SendMessage.builder()
+                .chatId(Long.toString(chatId))
+                .text(message)
+                .replyMarkup(markup)
+                .parseMode(ParseMode.HTML)
+                .build();
 
         return bot.execute(sendMessage);
     }
 
     @SneakyThrows
     public void notifyCallbackProcessed(String callbackId, TelegramLongPollingBot bot) {
-        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
-                .setCallbackQueryId(callbackId);
+        AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+                .callbackQueryId(callbackId)
+                .build();
         bot.execute(answerCallbackQuery);
     }
 
@@ -74,9 +79,10 @@ public class BotMessageHelper {
     @SneakyThrows
     public void deleteMessage(TelegramLongPollingBot bot, String chatId, Integer messageId) {
         try {
-            bot.execute(new DeleteMessage()
-                    .setMessageId(messageId)
-                    .setChatId(chatId));
+            bot.execute(DeleteMessage.builder()
+                    .messageId(messageId)
+                    .chatId(chatId)
+                    .build());
         } catch (Throwable throwable) {
         }
     }
@@ -88,16 +94,17 @@ public class BotMessageHelper {
     @SneakyThrows
     public void deleteButtons(TelegramLongPollingBot bot, String chatId, Integer messageId) {
         try {
-            bot.execute(new EditMessageReplyMarkup()
-                    .setMessageId(messageId)
-                    .setChatId(chatId)
-                    .setReplyMarkup(null));
+            bot.execute(EditMessageReplyMarkup.builder()
+                    .messageId(messageId)
+                    .chatId(chatId)
+                    .replyMarkup(null)
+                    .build());
         } catch (Throwable throwable) {
         }
     }
 
     public void executeExistingTasks(String handlerName, ChatMetaInfo chatMetaInfo, TelegramLongPollingBot bot,
-                                     Integer userId) {
+                                     Long userId) {
         List<TaskSetForHandler> tasks = chatMetaInfo.getTasks();
 
 
@@ -117,7 +124,7 @@ public class BotMessageHelper {
         }
     }
 
-    public void addNewTasks(List<CleanupTaskInfo> cleanupTaskInfo){
+    public void addNewTasks(List<CleanupTaskInfo> cleanupTaskInfo) {
         for (CleanupTaskInfo taskInfo : cleanupTaskInfo)
             addNewTask(taskInfo.getHandlerName(), taskInfo.getChatMetaInfo(), taskInfo.getSentMessage());
     }

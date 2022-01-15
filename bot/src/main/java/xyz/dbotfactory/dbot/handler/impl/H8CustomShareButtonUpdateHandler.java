@@ -71,28 +71,32 @@ public class H8CustomShareButtonUpdateHandler implements UpdateHandler, CommonCo
         int receiptId = Integer.parseInt(ids[1]);
         long tgGroupChatId = Long.parseLong(ids[2]);
         Chat groupChat = chatService.findOrCreateChatByTelegramId(tgGroupChatId);
-        int userId = update.getCallbackQuery().getFrom().getId();
+        long userId = update.getCallbackQuery().getFrom().getId();
 
         Receipt receipt = chatService.getActiveReceipt(groupChat);
         ReceiptItem item =
                 receipt.getItems().stream().filter(anItem -> anItem.getId() == itemId).findFirst().get();
 
-        InlineKeyboardButton cancelButton = new InlineKeyboardButton().setText("Cancel")
-                .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + itemId + DELIMITER +
-                        receiptId + DELIMITER + tgGroupChatId);
+        InlineKeyboardButton cancelButton = InlineKeyboardButton.builder()
+                .text("Cancel")
+                .callbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + itemId + DELIMITER +
+                        receiptId + DELIMITER + tgGroupChatId)
+                .build();
 
-        InlineKeyboardMarkup cancelKeyboardMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(singletonList(singletonList(cancelButton)));
+        InlineKeyboardMarkup cancelKeyboardMarkup = InlineKeyboardMarkup.builder()
+                .keyboard(singletonList(singletonList(cancelButton)))
+                .build();
 
         Message message = update.getCallbackQuery().getMessage();
-        EditMessageText editMessageText = new EditMessageText()
-                .setText("Enter share amount between 0 and " +
+        EditMessageText editMessageText = EditMessageText.builder()
+                .text("Enter share amount between 0 and " +
                         receiptService.shareLeft(item, userId) + " or press cancel.\n\n" +
                         "ℹ️ You can also use fractions like <code>1/3</code>")
-                .setReplyMarkup(cancelKeyboardMarkup)
-                .setChatId((long) userId)
-                .setMessageId(message.getMessageId())
-                .setParseMode(ParseMode.HTML);
+                .replyMarkup(cancelKeyboardMarkup)
+                .chatId(Long.toString(userId))
+                .messageId(message.getMessageId())
+                .parseMode(ParseMode.HTML)
+                .build();
         chat.setChatState(ChatState.SETTING_CUSTOM_SHARE);
         chat.setChatMetaInfo(ChatMetaInfo.builder().metaData(SETING_CUSTOM_SHARE_METADATA + itemId + DELIMITER +
                 receiptId + DELIMITER + tgGroupChatId + DELIMITER + message.getMessageId()).build());

@@ -34,8 +34,8 @@ import static xyz.dbotfactory.dbot.BigDecimalUtils.create;
 @Component
 @Log
 public class H2AddReceiptItemMessageUpdateHandler implements UpdateHandler, CommonConsts {
-//    private static final String CONTINUE_BUTTON_TEXT = "📊️ Share not equally 📊️";  // TODO: Get rid of "equally" or fix it
-private static final String CONTINUE_BUTTON_TEXT = "➡️ Continue ➡️";
+    //    private static final String CONTINUE_BUTTON_TEXT = "📊️ Share not equally 📊️";  // TODO: Get rid of "equally" or fix it
+    private static final String CONTINUE_BUTTON_TEXT = "➡️ Continue ➡️";
 
     private static final String ITEM_REGEX = "\\d+([\\. ,]\\d+)?\\ \\d+([\\. ,]\\d+)?\\ .+$";
     private final ChatService chatService;
@@ -95,23 +95,25 @@ private static final String CONTINUE_BUTTON_TEXT = "➡️ Continue ➡️";
         String formattedReceipt = receiptService.buildBeautifulReceiptString(receipt);
 
         InlineKeyboardButton continueButton =
-                new InlineKeyboardButton().setUrl(
-                        "https://telegram.me/" + bot.getBotUsername() + "?start=" + CONTINUE_COMMAND_METADATA_PREFIX +
-                                chat.getTelegramChatId() + CONTINUE_DELIMITER + receipt.getId())
-                        .setText(CONTINUE_BUTTON_TEXT);
+                InlineKeyboardButton.builder().url(
+                                "https://telegram.me/" + bot.getBotUsername() + "?start=" + CONTINUE_COMMAND_METADATA_PREFIX +
+                                        chat.getTelegramChatId() + CONTINUE_DELIMITER + receipt.getId())
+                        .text(CONTINUE_BUTTON_TEXT)
+                        .build();
 
         ShareEqualCallbackInfo shareEqualCallbackInfo = new ShareEqualCallbackInfo(chat.getTelegramChatId());
         InlineKeyboardButton shareEqualButton = shareEqualCallbackInfo.getButton();
-        InlineKeyboardMarkup itemButtonsMarkup = new InlineKeyboardMarkup()
-                .setKeyboard(List.of(List.of(continueButton)
+        InlineKeyboardMarkup itemButtonsMarkup = InlineKeyboardMarkup.builder()
+                .keyboard(List.of(List.of(continueButton)
 //                        , List.of(shareEqualButton)  // TODO: Fix unintended taps or complete getting rid of this code
-                ));
+                )).build();
 
-        SendMessage message = new SendMessage()
-                .setChatId(chat.getTelegramChatId())
-                .setReplyMarkup(itemButtonsMarkup)
-                .setParseMode(HTML)
-                .setText(YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT);
+        SendMessage message = SendMessage.builder()
+                .chatId(Long.toString(chat.getTelegramChatId()))
+                .replyMarkup(itemButtonsMarkup)
+                .parseMode(HTML)
+                .text(YOUR_RECEIPT_TEXT + formattedReceipt + "\n" + DONE_TEXT)
+                .build();
 
         Message sentMessage = bot.execute(message);
 

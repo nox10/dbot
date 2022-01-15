@@ -38,12 +38,15 @@ public class H0StartCommandUpdateHandler implements UpdateHandler {
 
     @Override
     public void handle(Update update, Chat chat) {
-        InlineKeyboardButton button = new InlineKeyboardButton()
-                .setUrl("https://telegram.me/" + bot.getBotUsername() + "?startgroup=initial_receipt")
-                .setText("🌀 Add to a group 🌀");
+        InlineKeyboardButton button = InlineKeyboardButton.builder()
+                .url("https://telegram.me/" + bot.getBotUsername() + "?startgroup=initial_receipt")
+                .text("🌀 Add to a group 🌀")
+                .build();
 
-        messageHelper.sendMessageWithSingleInlineMarkup(update.getMessage().getChatId(),
-                new InlineKeyboardMarkup().setKeyboard(singletonList(singletonList(button))), bot,
+        messageHelper.sendMessageWithSingleInlineMarkup(
+                update.getMessage().getChatId(),
+                InlineKeyboardMarkup.builder().keyboard(singletonList(singletonList(button))).build(),
+                bot,
                 "Hello!\n\nℹ️ This bot works perfectly in groups.");
     }
 }

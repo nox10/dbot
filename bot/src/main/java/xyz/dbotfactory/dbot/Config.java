@@ -7,16 +7,15 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import xyz.dbotfactory.dbot.handler.UpdateHandler;
 import xyz.dbotfactory.dbot.handler.UpdateHandlerAggregator;
 import xyz.dbotfactory.dbot.model.Chat;
 import xyz.dbotfactory.dbot.service.ChatService;
-
-import javax.annotation.PostConstruct;
 
 @Configuration
 @EnableConfigurationProperties
@@ -24,19 +23,14 @@ import javax.annotation.PostConstruct;
 @Log
 public class Config {
 
-    @PostConstruct
-    public void init() {
-        ApiContextInitializer.init();
-    }
-
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
 
     @Bean
-    public TelegramBotsApi telegramBotsApi() {
-        return new TelegramBotsApi();
+    public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
+        return new TelegramBotsApi(DefaultBotSession.class);
     }
 
     @Bean

@@ -18,17 +18,18 @@ public class PayOffChatCallbackInfo {
 
     private long telegramChatId;
 
-    public InlineKeyboardButton getButton(){
-        return new InlineKeyboardButton()
-                .setText(LABEL)
-                .setCallbackData(CALLBACK_ID + DELIMITER + telegramChatId);
+    public InlineKeyboardButton getButton() {
+        return InlineKeyboardButton.builder()
+                .text(LABEL)
+                .callbackData(CALLBACK_ID + DELIMITER + telegramChatId)
+                .build();
     }
 
-    public static boolean canHandle(String callbackData){
+    public static boolean canHandle(String callbackData) {
         return callbackData.startsWith(CALLBACK_ID);
     }
 
-    public static PayOffChatCallbackInfo fromCallbackData(String callbackData){
+    public static PayOffChatCallbackInfo fromCallbackData(String callbackData) {
         String[] split = callbackData.split(DELIMITER);
         long telegramChatId = Long.parseLong(split[1]);
         return new PayOffChatCallbackInfo(telegramChatId);

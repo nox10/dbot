@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 public class BigDecimalUtils {
 
     private static final int SCALE = 4;
-    private static DecimalFormat df2 = new DecimalFormat("#.##");
+    private static final DecimalFormat df2 = new DecimalFormat("#.##");
 
     public static BigDecimal create(double number) {
         return new BigDecimal(number).setScale(SCALE, RoundingMode.HALF_UP);

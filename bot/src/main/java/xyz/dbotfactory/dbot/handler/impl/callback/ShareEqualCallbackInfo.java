@@ -27,9 +27,10 @@ public class ShareEqualCallbackInfo {
     }
 
     public InlineKeyboardButton getButton() {
-        return new InlineKeyboardButton()
-                .setText(LABEL)
-                .setCallbackData(CALLBACK_ID + DELIMITER + telegramChatId);
+        return InlineKeyboardButton.builder()
+                .text(LABEL)
+                .callbackData(CALLBACK_ID + DELIMITER + telegramChatId)
+                .build();
     }
 
     public static boolean canHandle(String callbackData) {

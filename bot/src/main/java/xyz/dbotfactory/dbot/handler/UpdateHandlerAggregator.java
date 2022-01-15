@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class UpdateHandlerAggregator implements BeanPostProcessor {
 
-    private List<UpdateHandler> updateHandlers = new ArrayList<>();
+    private final List<UpdateHandler> updateHandlers = new ArrayList<>();
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {

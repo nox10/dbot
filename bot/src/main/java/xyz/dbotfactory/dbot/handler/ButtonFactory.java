@@ -10,10 +10,11 @@ import static java.util.Collections.singletonList;
 public class ButtonFactory {
 
     public InlineKeyboardMarkup getSingleButton(String label, String callbackData) {
-        InlineKeyboardButton collectingStatusButton = new InlineKeyboardButton()
-                .setText(label)
-                .setCallbackData(callbackData);
-        return new InlineKeyboardMarkup()
-                .setKeyboard(singletonList(singletonList(collectingStatusButton)));
+        InlineKeyboardButton collectingStatusButton = InlineKeyboardButton.builder()
+                .text(label)
+                .callbackData(callbackData)
+                .build();
+        return InlineKeyboardMarkup.builder()
+                .keyboard(singletonList(singletonList(collectingStatusButton))).build();
     }
 }

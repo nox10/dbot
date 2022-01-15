@@ -69,7 +69,7 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
-        int telegramUserId = update.getMessage().getFrom().getId();
+        long telegramUserId = update.getMessage().getFrom().getId();
         String[] metadata = update.getMessage().getText()
                 .substring(1 + 5 + 1 + CONTINUE_COMMAND_METADATA_PREFIX.length())
                 .split(CONTINUE_DELIMITER);
@@ -80,26 +80,27 @@ public class H5RedirectToPmButtonUpdateHandler implements UpdateHandler, CommonC
         Receipt receipt = chatService.getActiveReceipt(groupChat);
 
         List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
-                .map(item -> singletonList(new InlineKeyboardButton()
-                        .setText(receiptService.getShareStringForButton(item, telegramUserId))
-                        .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + item.getId() + DELIMITER +
-                                receiptId + DELIMITER + telegramGroupChatId)
+                .map(item -> singletonList(InlineKeyboardButton.builder()
+                        .text(receiptService.getShareStringForButton(item, telegramUserId))
+                        .callbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + item.getId() + DELIMITER +
+                                receiptId + DELIMITER + telegramGroupChatId).build()
                 )).collect(Collectors.toList());
 
-        InlineKeyboardButton finishedButton = new InlineKeyboardButton()
-                .setText(CHECK_STATUS_BUTTON_TEXT)
-                .setCallbackData(CHECK_STATUS_CALLBACK_DATA + telegramGroupChatId + DELIMITER + receiptId);
+        InlineKeyboardButton finishedButton = InlineKeyboardButton.builder()
+                .text(CHECK_STATUS_BUTTON_TEXT)
+                .callbackData(CHECK_STATUS_CALLBACK_DATA + telegramGroupChatId + DELIMITER + receiptId)
+                .build();
 
         itemButtons.add(singletonList(finishedButton));
 
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup()
-                .setKeyboard(itemButtons);
+        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(itemButtons).build();
 
-        SendMessage message = new SendMessage()
-                .setReplyMarkup(markup)
-                .setText(ITEMS_MESSAGE_TEXT)
-                .setChatId((long) telegramUserId)
-                .setParseMode(ParseMode.HTML);
+        SendMessage message = SendMessage.builder()
+                .replyMarkup(markup)
+                .text(ITEMS_MESSAGE_TEXT)
+                .chatId(Long.toString(telegramUserId))
+                .parseMode(ParseMode.HTML)
+                .build();
 
         String pmUserIds = groupChat.getChatMetaInfo().getPmUserIds();
         if (!pmUserIds.contains(Long.toString(telegramUserId))) {

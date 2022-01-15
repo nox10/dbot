@@ -68,10 +68,11 @@ public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
             messageHelper.addNewTask(DiscardReceiptUpdateHandler.class.getSimpleName(),
                     chat.getChatMetaInfo(), sentMessage);
         } else {
-            AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
-                    .setCallbackQueryId(update.getCallbackQuery().getId())
-                    .setText("Seems like you don't need any return strategy")
-                    .setShowAlert(true);
+            AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+                    .callbackQueryId(update.getCallbackQuery().getId())
+                    .text("Seems like you don't need any return strategy")
+                    .showAlert(true)
+                    .build();
             bot.execute(answerCallbackQuery);
         }
 
@@ -86,8 +87,8 @@ public class H12SuggestDebtReturnStrategyButtonUpdateHandler implements UpdateHa
     private String prettyPrintReturnStrategy(List<DebtReturnTransaction> returnStrategy) {
         StringBuilder sb = new StringBuilder();
         for (DebtReturnTransaction debtReturnTransaction : returnStrategy) {
-            GetChat getFromChat = new GetChat(debtReturnTransaction.getFromId());
-            GetChat getToChat = new GetChat(debtReturnTransaction.getToId());
+            GetChat getFromChat = new GetChat(Long.toString(debtReturnTransaction.getFromId()));
+            GetChat getToChat = new GetChat(Long.toString(debtReturnTransaction.getToId()));
             String fromUsername = bot.execute(getFromChat).getUserName();
             String toUsername = bot.execute(getToChat).getUserName();
 

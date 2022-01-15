@@ -67,12 +67,12 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
     @Override
     @SneakyThrows
     public void handle(Update update, Chat chat) {
-        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
-                .setCallbackQueryId(update.getCallbackQuery().getId());
+        AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+                .callbackQueryId(update.getCallbackQuery().getId()).build();
         String data = update.getCallbackQuery().getData();
         ShareButtonCallbackInfo callbackInfo = ShareButtonCallbackInfo.parseCallbackString(data);
 
-        int userId = update.getCallbackQuery().getFrom().getId();
+        long userId = update.getCallbackQuery().getFrom().getId();
 
         Chat groupChat = chatService.findOrCreateChatByTelegramId(callbackInfo.getTgGroupChatId());
         Receipt receipt = chatService.getActiveReceipt(groupChat);
@@ -100,28 +100,31 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
         }
 
         List<List<InlineKeyboardButton>> itemButtons = receipt.getItems().stream()
-                .map(anItem -> singletonList(new InlineKeyboardButton()
-                        .setText(receiptService.getShareStringForButton(anItem, userId))
-                        .setCallbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + anItem.getId() + DELIMITER +
+                .map(anItem -> singletonList(InlineKeyboardButton.builder()
+                        .text(receiptService.getShareStringForButton(anItem, userId))
+                        .callbackData(ITEM_BUTTON_CALLBACK_DATA_PREFIX + anItem.getId() + DELIMITER +
                                 callbackInfo.getReceiptId() + DELIMITER + callbackInfo.getTgGroupChatId())
+                        .build()
                 )).collect(Collectors.toList());
 
-        InlineKeyboardButton finishedButton = new InlineKeyboardButton()
-                .setText(CHECK_STATUS_BUTTON_TEXT)
-                .setCallbackData(CHECK_STATUS_CALLBACK_DATA + callbackInfo.getTgGroupChatId()
-                        + DELIMITER + callbackInfo.getReceiptId());
+        InlineKeyboardButton finishedButton = InlineKeyboardButton.builder()
+                .text(CHECK_STATUS_BUTTON_TEXT)
+                .callbackData(CHECK_STATUS_CALLBACK_DATA + callbackInfo.getTgGroupChatId()
+                        + DELIMITER + callbackInfo.getReceiptId())
+                .build();
 
         itemButtons.add(singletonList(finishedButton));
 
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup().setKeyboard(itemButtons);
+        InlineKeyboardMarkup markup = InlineKeyboardMarkup.builder().keyboard(itemButtons).build();
 
         Message message = update.getCallbackQuery().getMessage();
-        EditMessageText editMessageReplyMarkup = new EditMessageText()
-                .setMessageId(message.getMessageId())
-                .setChatId((long) userId)
-                .setReplyMarkup(markup)
-                .setParseMode(ParseMode.HTML)
-                .setText(ITEMS_MESSAGE_TEXT);
+        EditMessageText editMessageReplyMarkup = EditMessageText.builder()
+                .messageId(message.getMessageId())
+                .chatId(Long.toString(userId))
+                .replyMarkup(markup)
+                .parseMode(ParseMode.HTML)
+                .text(ITEMS_MESSAGE_TEXT)
+                .build();
 
         bot.execute(editMessageReplyMarkup);
         bot.execute(answerCallbackQuery);
@@ -130,10 +133,11 @@ public class H7ShareButtonUpdateHandler implements UpdateHandler, CommonConsts {
             botMessageHelper.executeExistingTasks(SHARES_DONE_TASK_NAME, groupChat.getChatMetaInfo(), bot, userId);
             groupChat.setChatState(ChatState.COLLECTING_PAYMENTS_INFO);
             log.info("Chat " + groupChat.getId() + " is now in " + groupChat.getChatState() + " state");
-            SendMessage sendMessage = new SendMessage()
-                    .setChatId(callbackInfo.getTgGroupChatId())
-                    .setParseMode(ParseMode.HTML)
-                    .setText(DONE_MESSAGE_TEXT + "<code>" + toStr(receiptService.getTotalReceiptPrice(receipt)) + "</code>");
+            SendMessage sendMessage = SendMessage.builder()
+                    .chatId(Long.toString(callbackInfo.getTgGroupChatId()))
+                    .parseMode(ParseMode.HTML)
+                    .text(DONE_MESSAGE_TEXT + "<code>" + toStr(receiptService.getTotalReceiptPrice(receipt)) + "</code>")
+                    .build();
             Message sentMessage = bot.execute(sendMessage);
             addCleanupTasks(groupChat, sentMessage);
 

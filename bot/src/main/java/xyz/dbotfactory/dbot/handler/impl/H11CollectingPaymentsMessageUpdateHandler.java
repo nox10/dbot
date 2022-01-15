@@ -79,7 +79,7 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
             return;
         }
         Receipt receipt = chatService.getActiveReceipt(chat);
-        int telegramUserId = update.getMessage().getFrom().getId();
+        long telegramUserId = update.getMessage().getFrom().getId();
 
         UserBalance userBalance = receipt.getUserBalances().stream()
                 .filter(userBalance1 -> userBalance1.getTelegramUserId() == telegramUserId)
@@ -121,10 +121,11 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
 
                 PayOffChatCallbackInfo payOffChatCallbackInfo = new PayOffChatCallbackInfo(chat.getTelegramChatId());
 
-                howToPayOffMarkup = new InlineKeyboardMarkup()
-                        .setKeyboard(List.of(List.of(payOffCallbackInfo.getButton()),
+                howToPayOffMarkup = InlineKeyboardMarkup.builder()
+                        .keyboard(List.of(List.of(payOffCallbackInfo.getButton()),
                                 List.of(discardReceiptBalanceCallbackInfo.getButton()),
-                                List.of(payOffChatCallbackInfo.getButton())));
+                                List.of(payOffChatCallbackInfo.getButton())))
+                        .build();
 
 
             }
@@ -139,11 +140,12 @@ public class H11CollectingPaymentsMessageUpdateHandler implements UpdateHandler,
             receipt.setUserBalances(new ArrayList<>());
         }
 
-        SendMessage message = new SendMessage()
-                .setChatId(chat.getTelegramChatId())
-                .setText(response)
-                .setReplyMarkup(howToPayOffMarkup)
-                .setParseMode(ParseMode.HTML);
+        SendMessage message = SendMessage.builder()
+                .chatId(Long.toString(chat.getTelegramChatId()))
+                .text(response)
+                .replyMarkup(howToPayOffMarkup)
+                .parseMode(ParseMode.HTML)
+                .build();
 
         Message sentMessage = bot.execute(message);
 

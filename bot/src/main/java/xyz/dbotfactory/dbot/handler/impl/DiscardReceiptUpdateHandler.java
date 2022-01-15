@@ -17,8 +17,8 @@ import static xyz.dbotfactory.dbot.model.ChatState.NO_ACTIVE_RECEIPT;
 @Component
 public class DiscardReceiptUpdateHandler implements UpdateHandler {
 
-    private static String COMMAND_NAME = "/discard";
-    private static String MESSAGE = "<pre>Chat was discarded</pre>";
+    private static final String COMMAND_NAME = "/discard";
+    private static final String MESSAGE = "<pre>Chat was discarded</pre>";
 
     private final ButtonFactory buttonFactory;
     private final ChatService chatService;

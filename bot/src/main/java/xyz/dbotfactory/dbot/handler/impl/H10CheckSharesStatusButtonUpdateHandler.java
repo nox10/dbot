@@ -96,25 +96,27 @@ public class H10CheckSharesStatusButtonUpdateHandler implements UpdateHandler, C
             response = "<i>All items are picked!</i>";
         }
 
-        SendMessage message = new SendMessage()
-                .setChatId(chat.getTelegramChatId())
-                .setText(response)
-                .setParseMode(ParseMode.HTML);
+        SendMessage message = SendMessage.builder()
+                .chatId(Long.toString(chat.getTelegramChatId()))
+                .text(response)
+                .parseMode(ParseMode.HTML)
+                .build();
         Message sentMessage = bot.execute(message);
 
 //        addCleanupTasks(groupChat, sentMessage);
 
         Thread.sleep(2000);
-        DeleteMessage deleteMessage = new DeleteMessage()
-                .setChatId(sentMessage.getChatId())
-                .setMessageId(sentMessage.getMessageId());
+        DeleteMessage deleteMessage = DeleteMessage.builder()
+                .chatId(Long.toString(sentMessage.getChatId()))
+                .messageId(sentMessage.getMessageId())
+                .build();
         bot.execute(deleteMessage);
 
         botMessageHelper.executeExistingTasks(this.getClass().getSimpleName(),
                 groupChat.getChatMetaInfo(), bot, update.getCallbackQuery().getFrom().getId());
 
-        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery()
-                .setCallbackQueryId(update.getCallbackQuery().getId());
+        AnswerCallbackQuery answerCallbackQuery = AnswerCallbackQuery.builder()
+                .callbackQueryId(update.getCallbackQuery().getId()).build();
         bot.execute(answerCallbackQuery);
 
         chatService.save(groupChat);
